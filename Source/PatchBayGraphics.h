@@ -161,27 +161,27 @@ private:
         { false, "Pitch", "pbPitchOut", 0, 1 },
         { false, "Tone", "pbToneOut", 0, 2 },
         { false, "Mod", "pbModOut", 0, 3 },
-        { false, "EG", "pbEGOut", 0, 4 },
+        { false, "Prob", "pbProbOut", 0, 4 },
 
         { true,  "Pitch", "pbPitchIn", 1, 0 },
         { true,  "Tone", "pbToneIn", 2, 0 },
-        { true,  "Mod", "pbModIn", 3, 0 },
-        { true,  "VCA", "pbVCAIn", 4, 0 },
+        { false,  "EG", "pbEGOut", 0, 5 },
+        { false,  "Step", "pbStepOut", 0, 6 },
         
-        { true,  "Tens", "pbTensionIn", 5, 0 },
-        { true,  "Inhr", "pbInharmIn", 6, 0 },
-        { true,  "Pos", "pbPositionIn", 7, 0 },
-        { true,  "Algo", "pbAlgoIn", 8, 0 },
+        { true,  "Tens", "pbTensionIn", 3, 0 },
+        { true,  "Inhr", "pbInharmIn", 4, 0 },
+        { true,  "Pos", "pbPositionIn", 5, 0 },
+        { true,  "Step", "pbStepIn", 6, 0 },
         
-        { true,  "O.Lv", "pbOperLevelIn", 9, 0 },
-        { true,  "N.Lv", "pbNoiseLevelIn", 10, 0 },
-        { true,  "N.Fq", "pbNoiseFreqIn", 11, 0 },
-        { true,  "N.Bw", "pbNoiseBWIn", 12, 0 },
+        { true,  "O.Lv", "pbOperLevelIn", 7, 0 },
+        { true,  "N.Lv", "pbNoiseLevelIn", 8, 0 },
+        { true,  "N.Fq", "pbNoiseFreqIn", 9, 0 },
+        { true,  "N.Bw", "pbNoiseBWIn", 10, 0 },
 
-        { false, "Oper", "pbOperOut", 0, 5 },
-        { false, "Nois", "pbNoiseOut", 0, 6 },
-        { false, "Step", "pbStepOut", 0, 7 },
-        { true,  "Subd", "pbSubdOut", 13, 0 },
+        { true, "Algo", "pbAlgoIn", 11, 0 },
+        { true, "VCA", "pbVCAIn", 12, 0 },
+        { false, "M.Wh", "pbMWheelOut", 0, 7 },
+        { false,  "P.Bd", "pbPBendOut", 0, 8 },
     }};
     
     std::atomic<int> parameterIndexAtomic;
@@ -190,6 +190,8 @@ private:
     std::array<PatchPoint, 20> patchPoint;
     std::array<PatchCable, 20> patchCable;
 
+    juce::Label patchBayLabel;
+    
     MotherlyAudioProcessor& audioProcessor;
 };
 

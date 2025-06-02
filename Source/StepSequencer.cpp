@@ -52,7 +52,7 @@ void StepSequencer::flushNote(juce::MidiBuffer& midiBuffer)
 
 void StepSequencer::reset()
 {
-    currentStepIndex = 0;
+    currentStepIndex = 7;
 }
 
 int StepSequencer::getStepIndex()

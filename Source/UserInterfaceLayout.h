@@ -74,7 +74,8 @@ public:
         setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", inharmGraphics);
         
         setStepParams(algorithmLabel, testSlider, juce::Slider::NoTextBox, "Algorithm", testGraphics);
-
+        
+        setStepParams(algorithmLabel, testSlider2, juce::Slider::NoTextBox, "Algorithm", testGraphics2);
     }
     
     ~DrumMainInterface()
@@ -114,8 +115,8 @@ public:
         positionLabel.setBounds(x + 220, y + height * 0.15f, height * 0.5f, height * 0.1f);
         positionSlider.setBounds(x + 220, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        algorithmLabel.setBounds(x + 500, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        algorithmSlider.setBounds(x + 500, y + height * 0.175, height * 0.7f, height * 0.7f);
+        algorithmLabel.setBounds(x + 500, y + height * 0.1f, height * 0.6f, height * 0.1f);
+        algorithmSlider.setBounds(x + 500, y + height * 0.2, height * 0.7f, height * 0.7f);
         
         op1Label.setBounds(x + 300, y + height * 0.1f, height * 0.3f, height * 0.1f);
         op1Slider.setBounds(x + 300, y + height * 0.2, height * 0.3f, height * 0.3f);
@@ -129,9 +130,11 @@ public:
         noiseLabel.setBounds(x + 350, y + height * 0.55f, height * 0.3f, height * 0.1f);
         noiseSlider.setBounds(x + 350, y + height * 0.65, height * 0.3f, height * 0.3f);
         
-        algorithmSlider.setBounds(x + 500, y + height * 0.175, height * 0.7f, height * 0.7f);
+     //   algorithmSlider.setBounds(x + 500, y + height * 0.175, height * 0.7f, height * 0.7f);
         
-        testSlider.setBounds(x + 600, y + height * 0.175, height * 0.7f, height * 0.7f);
+ //       testSlider.setBounds(x + 720, y + height * 0.175, height * 0.4f, height * 0.8f);
+        testSlider2.setBounds(x + 650, y + height * 0.175, height * 0.7f, height * 0.775f);
+
     }
     
     
@@ -153,9 +156,9 @@ public:
     
     
 private:
-    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 };
+    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 }, testGraphics2 { 10 };
     
-    juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider;
+    juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider, testSlider2;
     
     juce::Label tensionLabel, inharmLabel, positionLabel, algorithmLabel, op1Label, op2Label, op3Label, noiseLabel;
     

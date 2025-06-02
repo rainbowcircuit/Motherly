@@ -41,6 +41,8 @@ public:
     void drawPosition(juce::Graphics& g, float x, float y, float width, float height, float position);
     
     void drawAlgorithm(juce::Graphics& g, float x, float y, float width, float height, float position);
+    
+    void drawRateIcon(juce::Graphics& g, float x, float y, float size, int div);
 
     void drawStepCount(juce::Graphics& g, float x, float y, float width, float height, float position);
 

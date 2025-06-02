@@ -72,7 +72,17 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         
     } else if (graphicIndex == 9){
         drawStepCount(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        
+    } else if (graphicIndex == 10){
+        drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        
+        float iconSize = graphicWidth * 0.2f;
+        drawRateIcon(g, graphicX, graphicY + graphicWidth - iconSize, iconSize, 1);
+        drawRateIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize, iconSize, 4);
     }
+
+    
+    
 }
 
 void UserInterfaceGraphics::drawTone(juce::Graphics& g, float x, float y, float width, float height, float position)
@@ -257,10 +267,14 @@ void UserInterfaceGraphics::drawProbability(juce::Graphics& g, float x, float y,
 
 void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
-    float graphicWidth = width * 0.9f;
-    float margin = width * 0.05;
-    float blockSize = (graphicWidth/4) * 0.8f;
-    float blockMargin = (graphicWidth/4) * 0.1f;
+    float graphicWidth = width * 0.6f;
+    float graphicHeight = height * 0.9f;
+
+    float widthMargin = width * 0.15;
+    float heightMargin = width * 0.05;
+
+    float blockSize = (graphicHeight/4) * 0.7f;
+    float blockMargin = (graphicHeight/4) * 0.15f;
     
     float algorithmIndex = position * 9.0f;
     algorithmIndex = std::floor(algorithmIndex);
@@ -339,8 +353,8 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
     }
     
     for (int i = 0; i < 12; i++){ // column
-        float xIncr = x + margin + (graphicWidth/4) * (i % 3);
-        float yIncr = y + margin + (graphicWidth/4) * (i / 3);
+        float xIncr = x + widthMargin + (graphicWidth/3) * (i % 3);
+        float yIncr = y + heightMargin + (graphicHeight/4) * (i / 3);
         
         juce::Path blockPath;
         blockPath.addRoundedRectangle(xIncr, yIncr, blockSize, blockSize, 2);
@@ -369,8 +383,8 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
     }
     
     for (int i = 0; i < 12; i++){ // column
-        float xIncr = x + margin + (graphicWidth/4) * (i % 3);
-        float yIncr = y + margin + (graphicWidth/4) * (i / 3);
+        float xIncr = x + widthMargin + (graphicWidth/3) * (i % 3);
+        float yIncr = y + heightMargin + (graphicHeight/4) * (i / 3);
 
         juce::Path linePath;
         for (int j = 0; j < 4; j++) {
@@ -378,7 +392,7 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
                 if (block.connectValue[j] == DOWNLEFT){
                     linePath.startNewSubPath(xIncr + blockSize/2, yIncr + blockSize/2);
                     linePath.lineTo(xIncr + blockSize/2, yIncr + (blockSize + blockMargin) * 1.5f);
-                    linePath.lineTo(xIncr - (blockSize + blockMargin) * 1.5f, yIncr + (blockSize + blockMargin) * 1.5f);
+                    linePath.lineTo(xIncr - (blockSize + blockMargin), yIncr + (blockSize + blockMargin) * 1.5f);
                     
                 } else if (block.connectValue[j] == DOWNRIGHT){
                     linePath.startNewSubPath(xIncr + blockSize/2, yIncr + blockSize/2);
@@ -387,7 +401,7 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
                     
                 } else if (block.connectValue[j] == DOWN) {
                     linePath.startNewSubPath(xIncr + blockSize/2, yIncr + blockSize/2);
-                    linePath.lineTo(xIncr + blockSize/2, yIncr + (blockSize + blockMargin) * 1.5f);
+                    linePath.lineTo(xIncr + blockSize/2, yIncr + (blockSize + blockMargin) * 1.25f);
                     
                 } else if (block.connectValue[j] == LEFTDOWN) {
                     linePath.startNewSubPath(xIncr + blockSize/2, yIncr + blockSize/2);
@@ -409,10 +423,6 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
         g.strokePath(linePath, juce::PathStrokeType(lineWidth));
     }
 }
-
-
-
-
 
 void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
@@ -517,6 +527,22 @@ void UserInterfaceGraphics::drawPosition(juce::Graphics& g, float x, float y, fl
     g.setColour(Colours::StepColour::iconWhite);
     g.strokePath(graphicLines, juce::PathStrokeType(lineWidth * 1.5f));
 }
+
+void UserInterfaceGraphics::drawRateIcon(juce::Graphics& g, float x, float y, float size, int div)
+{
+    juce::Path graphicPath;
+
+    for (int i = 0; i < div; i++)
+    {
+        float blockWidth = (size * 0.8f)/div;
+        graphicPath.addRoundedRectangle(x + (size/div) * i, y + size * 0.25f,
+                                        blockWidth, size * 0.5f, 2);
+        g.setColour(Colours::StepColour::iconWhite);
+        g.fillPath(graphicPath);
+    }
+}
+
+
 
 void UserInterfaceGraphics::drawStepCount(juce::Graphics& g, float x, float y, float width, float height, float position)
 {

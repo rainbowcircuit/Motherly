@@ -39,7 +39,6 @@ void MotherlyAudioProcessorEditor::paint (juce::Graphics& g)
     for (int step = 0; step < 8; step++)
     {
         stepInterface[step]->setIsStepIndex(stepIndexAtomic);
-       // stepInterface[step]->setAmplitude(amplitudeAtomic);
     }
 }
 
@@ -52,7 +51,7 @@ void MotherlyAudioProcessorEditor::resized()
         stepInterface[step]->setBounds(xIncrement, 50, 75, 300);
     }
     
-    patchBayInterface->setBounds(600, 50, 175, 300);
+    patchBayInterface->setBounds(600, 50, 170, 300);
     patchBayInterface->resized();
     
     presetInterface->setBounds(5, 5, 600, 50);

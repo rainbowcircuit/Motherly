@@ -37,6 +37,18 @@ public:
     }
     void setPatchBayParameters(int index, int inputValue);
     
+    
+    float selector(int index, float in0, float in1, float in2, float in3, float in4, float in5, float in6)
+    {
+        if (index == 1) { return in1; }
+        else if (index == 2) { return in2; }
+        else if (index == 3) { return in3; }
+        else if (index == 4) { return in4; }
+        else if (index == 5) { return in5; }
+        else if (index == 6) { return in6; }
+        else { return in0; }
+    }
+    
 private:
     double sampleRate = 0.0;
     bool isPrepared { false };
@@ -67,35 +79,6 @@ private:
     
     float tension = 0.0f, inharmonicity = 0.0f, position = 0.0f;
     float operatorLevel = 1.0f, noiseLevel = 1.0f, noiseFreq = 1000.0f, noiseBandwidth = 10.0f;
-
-    struct ModulatedParam
-    {
-        juce::String paramName;
-        float baseValue; // set between 0 and 1.
-        float overrideValue; // set between 0 and 1.
-        bool isConnected = false;
-        
-        float getParamValue() const
-        {
-            return isConnected ? overrideValue : baseValue;
-        }
-    };
-    
-    std::array<ModulatedParam, 13> modParam {{
-        { "pitch", 0.0f, 0.0f, false },
-        { "tone", 0.0f, 0.0f, false },
-        { "mod", 0.0f, 0.0f, false },
-        { "EG", 0.0f, 0.0f, false },
-        { "tension", 0.0f, 0.0f, false },
-        { "inharm", 0.0f, 0.0f, false },
-        { "position", 0.0f, 0.0f, false },
-        { "operLevel", 0.0f, 0.0f, false },
-        { "algorithm", 0.0f, 0.0f, false },
-        { "noiseLevel", 0.0f, 0.0f, false },
-        { "noiseFreq", 0.0f, 0.0f, false },
-        { "noiseBW", 0.0f, 0.0f, false },
-        { "feedback", 0.0f, 0.0f, false },
-    }};
 };
 
 class SynthSound : public juce::SynthesiserSound

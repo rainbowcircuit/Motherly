@@ -70,33 +70,15 @@ void SynthVoice::renderOscillator(juce::AudioBuffer<float> buffer)
         
         for(int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            //********* normalized patch bay inputs *********//
-            modParam[0].baseValue = Utility::scale(pitch[stepIndex], 30.0f, 1200.0f, 0.0f, 1.0f);
-            modParam[1].baseValue = Utility::scale(tone[stepIndex], 0.0f, 8.0f, 0.0f, 1.0f);
-            modParam[2].baseValue = Utility::scale(mod[stepIndex], -12.0f, 12.0f, 0.0, 1.0f);
-            modParam[3].baseValue = 1.0f;
-            
-            modParam[4].baseValue = Utility::scale(tension, 0.0f, 100.0f, 0.0, 1.0f);
-            modParam[5].baseValue = Utility::scale(inharmonicity, 0.0f, 100.0f, 0.0, 1.0f);
-            modParam[6].baseValue = Utility::scale(position, 0.0f, 100.0f, 0.0, 1.0f);
-            modParam[7].baseValue = Utility::scale(algorithm, 0.0f, 7.0f, 0.0, 1.0f);
-            
-            modParam[8].baseValue = Utility::scale(operatorLevel, 0.0f, 100.0f, 0.0, 1.0f);
-            modParam[9].baseValue = Utility::scale(noiseLevel, 0.0f, 100.0f, 0.0, 1.0f);
-            modParam[10].baseValue = Utility::scale(noiseFreq, 100.0f, 8000.0f, 0.0f, 1.0f);
-            modParam[11].baseValue = Utility::scale(noiseBandwidth, 0.0f, 10.0f, 0.0f, 1.0f);
-            
-            modParam[12].baseValue = Utility::scale(0.0f, 0.0f, 10.0f, 0.0f, 1.0f);// feedback, not used yet.
-            
-            
-            
-            
-            float pitchScaled = Utility::scale(modParam[0].getParamValue(), 0.0f, 1.0f, 30.0f, 1200.0f);
-            float toneScaled = Utility::scale(modParam[1].getParamValue(), 0.0f, 1.0f, 0.0f, 8.0f);
-            float modScaled = Utility::scale(modParam[2].getParamValue(), 0.0f, 1.0f, -12.0f, 12.0f);
-            float inharmScaled = Utility::scale(modParam[5].getParamValue(), 0.0f, 1.0f, 0.5f, 2.0f);
-            float operLevelScaled = modParam[8].getParamValue();
-            float noiseLevelScaled = modParam[9].getParamValue();
+
+            float pitchScaled = pitch[stepIndex];
+            float toneScaled = tone[stepIndex];
+            float modScaled = mod[stepIndex];
+            float inharmScaled = inharmonicity;
+            float positionScaled = position;
+
+            float operLevelScaled = operatorLevel;
+            float noiseLevelScaled = noiseLevel;
             float operator3 = 0.0f;
             
             float envelope = ampEnvelope.generateEnvelope();
@@ -247,10 +229,8 @@ void SynthVoice::setAlgorithm(int algorithmValue)
 void SynthVoice::setPatchBayParameters(int outputValue, int inputValue)
 {
     if(inputValue > 0){
-        modParam[inputValue].overrideValue = modParam[outputValue].getParamValue();
-        modParam[inputValue].isConnected = true;
         
     } else {
-        modParam[inputValue].isConnected = false;
+
     }
 }

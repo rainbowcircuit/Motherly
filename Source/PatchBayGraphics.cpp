@@ -1,16 +1,13 @@
-/*
-  ==============================================================================
-
-    Graphics.cpp
-    Created: 1 Mar 2025 11:46:37am
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #include "PatchBayGraphics.h"
+
 PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
 {
+    addAndMakeVisible(patchBayLabel);
+    patchBayLabel.setText("In/Out", juce::dontSendNotification);
+    patchBayLabel.setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
+    patchBayLabel.setJustificationType(juce::Justification::centred);
+    patchBayLabel.setFont(12.0f);
+    
     for(int point = 0; point < 20; point++)
     {
         patchPoint[point].setIsInput(patchPointLayout[point].isInput);
@@ -63,17 +60,19 @@ void PatchBay::paint(juce::Graphics& g)
 
 void PatchBay::resized()
 {
+    auto bounds = getLocalBounds().toFloat();
+
+    patchBayLabel.setBounds(bounds.getCentreX(), bounds.getCentreY(), bounds.getWidth(), bounds.getHeight() * 0.1f);
+    
+    float xIncr = (bounds.getWidth() * 0.9f)/4;
+    float yIncr = (bounds.getHeight() * 0.8f)/5;
     for(int point = 0; point < 20; point++)
     {
-        auto bounds = getLocalBounds().toFloat();
-        
-        float xIncr = (bounds.getWidth() * 0.8f)/4;
-        float yIncr = (bounds.getHeight() * 0.8f)/5;
         int xIndex = point % 4;
         int yIndex = point / 4;
-        
-        juce::Point pointCoords = { (bounds.getWidth() * 0.1f) + (xIndex * xIncr),
-            (bounds.getHeight() * 0.1f) + (yIndex * yIncr) };
+
+        juce::Point pointCoords = { (bounds.getWidth() * 0.0775f) + (xIndex * xIncr),
+            (bounds.getHeight() * 0.175f) + (yIndex * yIncr) };
         
         patchPoint[point].setBounds(pointCoords.x, pointCoords.y, 30, 40);
         
@@ -285,7 +284,6 @@ void PatchBay::setParameterValues(int output, int input)
     juce::String outputParam = patchPointLayout[output].paramID;
     int inputIndex = patchPointLayout[input].localInputIndex;
     
-    
     auto* param = audioProcessor.apvts.getParameter(outputParam);
     const juce::NormalisableRange<float> range = param->getNormalisableRange();
     float normalised = range.convertTo0to1(inputIndex);
@@ -474,7 +472,7 @@ PatchCable::PatchCable() {}
 void PatchCable::paint(juce::Graphics& g)
 {
     juce::Path cablePath, cableEndPath;
-    juce::Colour fillColour = cableConnected ? Colours::StepColour::stepMainColour[0] : Colours::StepColour::stepMainColour[0]; // temporary
+    juce::Colour fillColour = Colours::StepColour::stepMainColour[cableOutput];
     g.setColour(fillColour);
 
     if (cableInUse){

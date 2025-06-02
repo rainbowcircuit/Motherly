@@ -181,7 +181,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     
     // patch bay parameters
-    std::array<juce::String, 7> pbParamID = { "Pitch", "Tone", "Mod", "EG", "Oper", "Noise", "Step" };
+    std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
 
     for (int i = 0; i < synth.getNumVoices(); ++i)
     {
@@ -202,7 +202,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             }
             
             // patch bay params
-            for (int output = 0; output < 7; ++output)
+            for (int output = 0; output < 8; ++output)
             {
                 juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
                 float input = apvts.getRawParameterValue(patchBayParamID)->load();
@@ -385,16 +385,16 @@ MotherlyAudioProcessor::createParameterLayout()
     
     //********************* Patch Bay Parameters *********************//
     
-    std::array<juce::String, 7> pbParamID = { "Pitch", "Tone", "Mod", "EG", "Oper", "Noise", "Step" };
+    std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
 
-    for (int output = 0; output < 7; ++output)
+    for (int output = 0; output < 8; ++output)
     {
         juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
         juce::String patchBayParamName = pbParamID[output] + " Out";
         
         layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { patchBayParamID, 1},
                                                                 patchBayParamName,
-                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Mod In", "VCA", "Tension in", "Inharm In", "Position In", "Algo In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Subdivision In" }, 0));
+                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Tension in", "Inharm In", "Position In", "Step In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Algo In", "VCA In" }, 0));
     }
     
     return layout;
