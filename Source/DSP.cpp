@@ -1,0 +1,203 @@
+#include "DSP.h"
+
+void CombFilter::prepareToPlay(double sampleRate, uint32_t maximumBlockSize, uint32_t numChannels)
+{
+    this->sampleRate = sampleRate;
+
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = maximumBlockSize;
+    spec.numChannels = numChannels;
+
+    combDelay.prepare(spec);
+    combDelay.setMaximumDelayInSamples((int)std::ceil(sampleRate));
+    combDelay.setDelay(30.0f);
+}
+
+void CombFilter::setDelayTime(float delayTime)
+{
+    float delayTimeInSamples = delayTime/1000.0f * sampleRate;
+    combDelay.setDelay(delayTimeInSamples);
+}
+
+float CombFilter::processComb(float input)
+{
+    combDelay.pushSample(0, input);
+
+    float delayedSample = combDelay.popSample(0);
+    return input + delayedSample;
+}
+
+void ImpulseMetro::setSampleRate(double sampleRate)
+{
+    this->sampleRate = sampleRate;
+}
+
+void ImpulseMetro::reset()
+{
+    // this ensures that upon first playback the impulse bool returns true.
+    counterAccum = 0.0;
+    previousCounterAccum = 0.9;
+}
+
+void ImpulseMetro::setRate(int rate)
+{
+    this->rate = rate;
+}
+
+bool ImpulseMetro::getImpulse()
+{
+    // this must be called every sample.
+    double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
+    
+    bool impulse;
+    if (isPlaying){ // temporary switch, previously isPlaying
+        counterAccum += bpmToHz/sampleRate;
+        if (counterAccum >= 1.0) counterAccum -= 1.0;
+    impulse = (counterAccum < previousCounterAccum);
+    } else {
+        reset();
+        impulse = false;
+    }
+    previousCounterAccum = counterAccum;
+
+    return impulse;
+}
+
+void ImpulseMetro::getTransport(juce::AudioPlayHead* playhead)
+{
+    // call this method every processBlock to keep track of timing changes.
+    // get tempo
+    if (playhead == nullptr){ return; }
+    
+    const auto opt = playhead->getPosition();
+    const auto& pos = *opt;
+
+    if (!opt.hasValue()) { return; }
+
+    if (pos.getBpm().hasValue()) {
+        bpm = *pos.getBpm();
+    }
+    
+    // get transport state
+    isPlaying = pos.getIsPlaying();
+    if (!isPlaying)
+    {
+        reset();
+    }
+}
+
+bool ImpulseMetro::getIsPlaying()
+{
+    return isPlaying;
+}
+
+void LowPassGate::setSampleRate(double sampleRate)
+{
+    this->sampleRate = sampleRate;
+}
+
+void LowPassGate::setEnvelopeSlew(float riseInMilliseconds, float fallInMilliseconds)
+{
+    envelopeRise = (riseInMilliseconds/1000.0f) * sampleRate;
+    envelopeFall = (fallInMilliseconds/1000.0f) * sampleRate;
+}
+
+void LowPassGate::noteOn()
+{
+    gate = 1.0f;
+}
+
+void LowPassGate::noteOff()
+{
+    gate = 0.0f;
+}
+
+float LowPassGate::generateEnvelope()
+{
+    bool gateThreshold = gate >= 0.5f;
+    
+    float segmentSelect = gateThreshold ? envelopeRise : envelopeFall;
+    segmentSelect = std::max(segmentSelect, 1.0f);
+    
+    float segmentTimeT60 = processT60(segmentSelect);
+    envelope = (1.0f - segmentTimeT60) * gate + segmentTimeT60 * unitDelay;
+    
+    unitDelay = envelope;
+            
+    return envelope;
+}
+
+bool LowPassGate::isActive()
+{
+    return envelope > 0.0001f;
+}
+
+float LowPassGate::processT60(float input)
+{
+    
+    float t60 = std::exp(safediv(-6.9077552789821f, input));
+    return t60;
+}
+
+float LowPassGate::safediv(float numerator, float denominator)
+{
+    return denominator != 0.0f ? numerator / denominator : numerator / epsilon;
+}
+
+void SVF::setSampleRate(float sampleRate)
+{
+    this->sampleRate = sampleRate;
+}
+
+void SVF::setCoefficients(float freq, float Q)
+{
+    g = fastTan.tan(M_PI * freq / sampleRate);
+    k = 1.0f / Q;
+    a1 = 1.0f / (1.0f + g * (g + k));
+    a2 = g * a1;
+    a3 = g * a2;
+}
+
+void SVF::reset()
+{
+    // coefficients
+    g = 0.0f;
+    k = 0.0f;
+    a1 = 0.0f;
+    a2 = 0.0f;
+    a3 = 0.0f;
+    
+    // unit delays
+    z1 = 0.0f;
+    z2 = 0.0f;
+}
+
+float SVF::processSample(float input, int filterType) noexcept
+{
+    float v3 = input - z2;
+    float v1 = a1 * z1 + a2 * v3;
+    float v2 = z2 + a2 * z1 + a3 * v3;
+    
+    // update unit delay
+    z1 = 2.0f * v1 - z1;
+    z2 = 2.0f * v2 - z2;
+    
+    float filterOutput;
+    switch(filterType){
+        case 1: // LP
+            filterOutput = v2;
+            break;
+            
+        case 2: // BP
+            filterOutput = v1 * k;
+            break;
+            
+        case 3: // HP
+            filterOutput = input + -k * v1 * -v2;
+            break;
+    }
+    return filterOutput;
+}
+
+

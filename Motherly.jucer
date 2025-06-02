@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="qO25KC" name="Motherly" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rainbow Circuit"
+              pluginCharacteristicsValue="pluginIsSynth" cppLanguageStandard="20">
+  <MAINGROUP id="SkOxHS" name="Motherly">
+    <GROUP id="{7274407A-0FF6-4757-39AE-DF82C911C23E}" name="Source">
+      <GROUP id="{556FD3D4-6D9D-E298-ECB8-BC1AB56A62CC}" name="Utility">
+        <FILE id="W8vrgF" name="PresetManager.cpp" compile="1" resource="0"
+              file="Source/PresetManager.cpp"/>
+        <FILE id="vVMYnG" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
+        <FILE id="ZLgDgT" name="Utility.h" compile="0" resource="0" file="Source/Utility.h"/>
+      </GROUP>
+      <GROUP id="{F58AFBFA-A0B5-1D99-DC6F-2C4C022C86DA}" name="DSP">
+        <FILE id="fPJnSp" name="DSP.cpp" compile="1" resource="0" file="Source/DSP.cpp"/>
+        <FILE id="HUlKir" name="DSP.h" compile="0" resource="0" file="Source/DSP.h"/>
+      </GROUP>
+      <GROUP id="{D729282A-D6D8-00B0-6349-93397341DEE4}" name="Graphics">
+        <FILE id="NIDg8Q" name="DialGraphics.cpp" compile="1" resource="0"
+              file="Source/DialGraphics.cpp"/>
+        <FILE id="OWaAgJ" name="DialGraphics.h" compile="0" resource="0" file="Source/DialGraphics.h"/>
+        <FILE id="bsuilV" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
+        <FILE id="FHEwX5" name="MiscGraphics.cpp" compile="1" resource="0"
+              file="Source/MiscGraphics.cpp"/>
+        <FILE id="e1uiBr" name="MiscGraphics.h" compile="0" resource="0" file="Source/MiscGraphics.h"/>
+        <FILE id="eJwNwr" name="PatchBayGraphics.cpp" compile="1" resource="0"
+              file="Source/PatchBayGraphics.cpp"/>
+        <FILE id="u0qI4B" name="PatchBayGraphics.h" compile="0" resource="0"
+              file="Source/PatchBayGraphics.h"/>
+        <FILE id="sAvNCM" name="UserInterfaceLayout.cpp" compile="1" resource="0"
+              file="Source/UserInterfaceLayout.cpp"/>
+        <FILE id="JsaNTa" name="UserInterfaceLayout.h" compile="0" resource="0"
+              file="Source/UserInterfaceLayout.h"/>
+      </GROUP>
+      <FILE id="Z0xSt4" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="OKwQJJ" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="piwppW" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="RpFmMQ" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="FvjOfB" name="VoiceProcessor.cpp" compile="1" resource="0"
+            file="Source/VoiceProcessor.cpp"/>
+      <FILE id="OKK6R7" name="VoiceProcessor.h" compile="0" resource="0"
+            file="Source/VoiceProcessor.h"/>
+      <FILE id="c7wSHc" name="FMOperator.cpp" compile="1" resource="0" file="Source/FMOperator.cpp"/>
+      <FILE id="ocBwsp" name="FMOperator.h" compile="0" resource="0" file="Source/FMOperator.h"/>
+      <FILE id="VGBKZf" name="StepSequencer.cpp" compile="1" resource="0"
+            file="Source/StepSequencer.cpp"/>
+      <FILE id="VcyT6R" name="StepSequencer.h" compile="0" resource="0" file="Source/StepSequencer.h"/>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Motherly"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Motherly"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>
