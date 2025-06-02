@@ -9,7 +9,8 @@ public:
     static const juce::String presetNameProperty;
 
     PresetManager(juce::AudioProcessorValueTreeState& apvts);
-
+    ~PresetManager();
+    
     void loadPreset(const juce::String& presetName);
     void savePreset(const juce::String& presetName);
     int loadNextPreset();

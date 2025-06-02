@@ -74,7 +74,7 @@ private:
 };
 
 
-class PatchBay : public juce::Component, juce::AudioProcessorParameter::Listener
+class PatchBay : public juce::Component, juce::AudioProcessorParameter::Listener, juce::AsyncUpdater
 {
 public:
     PatchBay(MotherlyAudioProcessor& p);
@@ -89,9 +89,21 @@ public:
     void mouseUp(const juce::MouseEvent &m) override;
     
 private:
-      
+    
     void parameterValueChanged(int parameterIndex, float newValue) override
     {
+        parameterIndexAtomic.store(parameterIndex);
+        newValueAtomic.store(newValue);
+        
+        triggerAsyncUpdate();
+    }
+    
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
+    
+    void handleAsyncUpdate() override {
+        int parameterIndex = parameterIndexAtomic.load();
+        float newValue = newValueAtomic.load();
+        
         juce::AudioProcessorParameter* parameter = audioProcessor.getParameters()[parameterIndex];
         auto* paramWithID = dynamic_cast<juce::AudioProcessorParameterWithID*>(parameter);
         
@@ -113,14 +125,12 @@ private:
                         setCableFromParameter(output - 1, input);
                         
                         DBG("cable set from" << parameterID << " output: " << output - 1 << " input: " << input);
-                        
                     }
                 }
             }
         }
     }
     
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
     
     void setParameterValues(int output, int input);
     void clearParameterValues(int output);
@@ -174,6 +184,8 @@ private:
         { true,  "Subd", "pbSubdOut", 13, 0 },
     }};
     
+    std::atomic<int> parameterIndexAtomic;
+    std::atomic<float> newValueAtomic;
     std::optional<int> activeCableIndex, prevCableIndex;
     std::array<PatchPoint, 20> patchPoint;
     std::array<PatchCable, 20> patchCable;

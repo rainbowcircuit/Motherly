@@ -14,9 +14,6 @@ private:
     double sampleRate = 0.0;
 };
 
-
-
-
 class ImpulseMetro
 {
 public:
@@ -66,6 +63,7 @@ public:
     
     void noteOn();
     void noteOff();
+    
     float generateEnvelope();
     bool isActive();
     

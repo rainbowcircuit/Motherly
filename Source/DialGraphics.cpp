@@ -71,7 +71,7 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawPosition(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
         
     } else if (graphicIndex == 9){
-       // drawSubdivision(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        drawStepCount(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
     }
 }
 
@@ -517,6 +517,38 @@ void UserInterfaceGraphics::drawPosition(juce::Graphics& g, float x, float y, fl
     g.setColour(Colours::StepColour::iconWhite);
     g.strokePath(graphicLines, juce::PathStrokeType(lineWidth * 1.5f));
 }
+
+void UserInterfaceGraphics::drawStepCount(juce::Graphics& g, float x, float y, float width, float height, float position)
+{
+    float widthMargin = width * 0.025f;
+    width = width * 0.95f;
+    
+    float index = position * 8.0f;
+    index = std::floor(index);
+    float blockSize = (width/4) * 0.6f;
+    float blockMargin = (width/4) * 0.2f;
+
+    for (int i = 0; i < 8; i++)
+    {
+        juce::Path graphicPath;
+        
+        int j = i % 4;
+        int k = i / 4;
+        graphicPath.addRoundedRectangle(widthMargin + (blockMargin + blockSize) * j,
+                                        blockSize + ((blockMargin + blockSize) * k),
+                                        blockSize, blockSize, 2);
+        
+        g.setColour(Colours::StepColour::iconWhite);
+        
+        if (i > index){
+            g.strokePath(graphicPath, juce::PathStrokeType(lineWidth));
+        } else {
+            g.fillPath(graphicPath);
+        }
+    }
+}
+
+
 
 void UserInterfaceGraphics::fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& textEditor)
 {

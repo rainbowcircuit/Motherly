@@ -2,7 +2,8 @@
 
 <JUCERPROJECT id="qO25KC" name="Motherly" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="Rainbow Circuit"
-              pluginCharacteristicsValue="pluginIsSynth" cppLanguageStandard="20">
+              pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              cppLanguageStandard="20">
   <MAINGROUP id="SkOxHS" name="Motherly">
     <GROUP id="{7274407A-0FF6-4757-39AE-DF82C911C23E}" name="Source">
       <GROUP id="{556FD3D4-6D9D-E298-ECB8-BC1AB56A62CC}" name="Utility">

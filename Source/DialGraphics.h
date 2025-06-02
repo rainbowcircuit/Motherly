@@ -34,13 +34,15 @@ public:
     
     void drawProbability(juce::Graphics& g, float x, float y, float width, float height, float position);
 
-    void drawAlgorithm(juce::Graphics& g, float x, float y, float width, float height, float position);
-
     void drawTensionIcon(juce::Graphics& g, float x, float y, float size, float length);
 
     void drawInharmIcon(juce::Graphics& g, float x, float y, float size, float offset);
 
     void drawPosition(juce::Graphics& g, float x, float y, float width, float height, float position);
+    
+    void drawAlgorithm(juce::Graphics& g, float x, float y, float width, float height, float position);
+
+    void drawStepCount(juce::Graphics& g, float x, float y, float width, float height, float position);
 
     void drawTextEditorOutline(juce::Graphics& g, int width, int height, juce::TextEditor& texteditor) override {}
     

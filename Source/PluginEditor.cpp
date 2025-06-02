@@ -15,7 +15,6 @@ MotherlyAudioProcessorEditor::MotherlyAudioProcessorEditor (MotherlyAudioProcess
     addAndMakeVisible(*patchBayInterface);
     addAndMakeVisible(*presetInterface);
     
-
     for (int step = 0; step < 8; step++)
     {
         stepInterface[step] = std::make_unique<StepInterface>(audioProcessor, step);
@@ -46,7 +45,7 @@ void MotherlyAudioProcessorEditor::paint (juce::Graphics& g)
 
 void MotherlyAudioProcessorEditor::resized()
 {
-    mainInterface->setBounds(0, 350, 600, 125);
+    mainInterface->setBounds(0, 350, 775, 125);
     for (int step = 0; step < 8; step++)
     {
         int xIncrement = step * 75;

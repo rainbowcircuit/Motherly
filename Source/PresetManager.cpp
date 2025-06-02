@@ -24,6 +24,11 @@ PresetManager::PresetManager(juce::AudioProcessorValueTreeState& apvts) : apvts(
     currentPreset.referTo(apvts.state.getPropertyAsValue(presetNameProperty, nullptr));
 }
 
+PresetManager::~PresetManager()
+{
+    apvts.state.removeListener(this);
+}
+
 void PresetManager::loadPreset(const juce::String& presetName)
 {
     if (presetName.isEmpty())

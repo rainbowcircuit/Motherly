@@ -32,6 +32,10 @@ PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
     for (auto param : params){
         param->addListener(this);
     }
+    
+    parameterIndexAtomic = 0;
+    newValueAtomic = 0.0f;
+
     resized();
 }
  
@@ -252,8 +256,6 @@ void PatchBay::mouseUp(const juce::MouseEvent &m)
             prevCableIndex.reset();
         }
         activeCableIndex.reset();
-        
-    //    clearParameterValues(*activeCableIndex);
     }
 }
 

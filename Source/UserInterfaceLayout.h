@@ -56,7 +56,7 @@ public:
         auto bounds = getLocalBounds().toFloat();
         float width = bounds.getWidth() * 1.2f;
         
-        setStepParams(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", testGraphics);
+        setStepParams(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", tensionGraphics);
         tensionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "tension", tensionSlider);
 
         setStepParams(inharmLabel, inharmSlider, juce::Slider::TextBoxBelow, "Inharmoncity", inharmGraphics);
@@ -72,6 +72,9 @@ public:
         setStepParams(op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", inharmGraphics);
         setStepParams(op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", inharmGraphics);
         setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", inharmGraphics);
+        
+        setStepParams(algorithmLabel, testSlider, juce::Slider::NoTextBox, "Algorithm", testGraphics);
+
     }
     
     ~DrumMainInterface()
@@ -126,6 +129,9 @@ public:
         noiseLabel.setBounds(x + 350, y + height * 0.55f, height * 0.3f, height * 0.1f);
         noiseSlider.setBounds(x + 350, y + height * 0.65, height * 0.3f, height * 0.3f);
         
+        algorithmSlider.setBounds(x + 500, y + height * 0.175, height * 0.7f, height * 0.7f);
+        
+        testSlider.setBounds(x + 600, y + height * 0.175, height * 0.7f, height * 0.7f);
     }
     
     
@@ -147,7 +153,7 @@ public:
     
     
 private:
-    UserInterfaceGraphics inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 6 };
+    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 };
     
     juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider;
     
@@ -191,7 +197,6 @@ public:
         nextButton.removeListener(this);
         prevButton.removeListener(this);
         presetComboBox.removeListener(this);
-
     }
     
     void paint(juce::Graphics& g) override
