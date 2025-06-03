@@ -1,10 +1,4 @@
-/*
-  ==============================================================================
 
-    This file contains the basic framework code for a JUCE plugin processor.
-
-  ==============================================================================
-*/
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -230,6 +224,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 
     stepIndexAtomic.store(stepIndex);
     amplitudeAtomic.store(rms);
+    
 }
 
 //==============================================================================
@@ -394,7 +389,7 @@ MotherlyAudioProcessor::createParameterLayout()
         
         layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { patchBayParamID, 1},
                                                                 patchBayParamName,
-                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Tension in", "Inharm In", "Position In", "Step In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Algo In", "VCA In" }, 0));
+                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Mod In", "VCA", "Tension in", "Inharm In", "Position In", "Algo In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Subdivision In" }, 0));
     }
     
     return layout;

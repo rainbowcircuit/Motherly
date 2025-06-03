@@ -5,7 +5,6 @@
 void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels)
 {
     this->sampleRate = sampleRate;
-    // impulse
     ampEnvelope.setSampleRate(sampleRate);
 
     for(int i = 0; i < 3; i++)
@@ -14,7 +13,6 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numCh
         op[i].reset();
     }
     noise.prepareToPlay(sampleRate);
-
     isPrepared = true;
 }
 
@@ -50,152 +48,32 @@ void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue)
     
 }
 
-void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples)
+void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples)
 {
-    renderOscillator(outputBuffer);
+    for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
+        float envelope = ampEnvelope.generateEnvelope();
+        float modEnvelope = std::pow(2.0f, envelope * mod[stepIndex]/12.0f);
+
+        // voice DSP
+        noise.setFilter(noiseFreq, noiseBandwidth);
+        
+        op[0].setOperatorInputs(pitch[stepIndex] * modEnvelope, 0.0f, 0.0f);
+        float operator1 = op[0].processOperator() * envelope;
+        float output = operator1;
+        
+
+
+
+        for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
+            buffer.setSample(channel, sample, output);
+            
+        }
+    }
 }
 
 void SynthVoice::setStepIndex(int index)
 {
     stepIndex = index;
-}
-
-void SynthVoice::renderOscillator(juce::AudioBuffer<float> buffer)
-{
-    // Channels
- //   auto channelDataL = buffer.getWritePointer(0);
-    for (int channel = 0; channel < buffer.getNumChannels(); ++channel){
-        auto channelData = buffer.getWritePointer(channel);
-
-        
-        for(int sample = 0; sample < buffer.getNumSamples(); ++sample)
-        {
-
-            float pitchScaled = pitch[stepIndex];
-            float toneScaled = tone[stepIndex];
-            float modScaled = mod[stepIndex];
-            float inharmScaled = inharmonicity;
-            float positionScaled = position;
-
-            float operLevelScaled = operatorLevel;
-            float noiseLevelScaled = noiseLevel;
-            float operator3 = 0.0f;
-            
-            float envelope = ampEnvelope.generateEnvelope();
-            float modEnvelope = std::pow(2.0f, envelope * modScaled/12.0f);
-            
-            // voice DSP
-            noise.setFilter(noiseFreq, noiseBandwidth);
-            float filteredNoise = noise.processNoiseGenerator() * noiseLevelScaled * envelope;
-            
-            op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-            float operator2 = op[1].processOperator() * operLevelScaled * envelope;
-            
-            op[0].setOperatorInputs(pitchScaled * modEnvelope, operator2, toneScaled);
-            float operator1 = op[0].processOperator() * operLevelScaled * envelope;
-            float operatorSum = operator1;
-            float output = operator1 + filteredNoise;
-            
-            
-            
-            if (algorithm == 0){
-                // op2->op1 + noise
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope, operator2, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1;
-                output = operator1 + filteredNoise;
-                
-            } else if (algorithm == 1){
-                // op3->op1 + op2 + noise
-                op[2].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator3 = op[2].processOperator() * operLevelScaled * envelope;
-                
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope, operator3, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1 + operator2;
-                output = operatorSum + filteredNoise;
-                
-            } else if (algorithm == 2){
-                // op3->op1, op3 -> op2 + noise
-                op[2].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator3 = op[2].processOperator() * operLevelScaled * envelope;
-                
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, operator3, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope, operator3, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1 + operator2;
-                output = operatorSum + filteredNoise;
-                
-                
-            } else if (algorithm == 3){
-                // op3->op2->op1 + noise
-                op[2].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator3 = op[2].processOperator() * operLevelScaled * envelope;
-                
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, operator3, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope, operator2, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1;
-                output = operator1 + filteredNoise;
-                
-            } else if (algorithm == 4){
-                // noise->op1
-                op[0].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, filteredNoise, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1;
-                output = operator1;
-                
-            } else if (algorithm == 5){
-                // noise->op2->op1
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, filteredNoise, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, operator2, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1;
-                output = operator1;
-                
-            } else if (algorithm == 6){
-                op[2].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator3 = op[2].processOperator() * operLevelScaled * envelope;
-                
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope, 0.0f, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                operatorSum = operator1 + operator2 + operator3;
-                output = operatorSum + filteredNoise;
-                
-            } else if (algorithm == 7){
-                op[2].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, 0.0f, toneScaled);
-                operator3 = op[2].processOperator() * operLevelScaled * envelope;
-                
-                op[1].setOperatorInputs(pitchScaled * modEnvelope * inharmScaled, operator3, toneScaled);
-                operator2 = op[1].processOperator() * operLevelScaled * envelope;
-                
-                op[0].setOperatorInputs(pitchScaled * modEnvelope, operator3 + operator2, toneScaled);
-                operator1 = op[0].processOperator() * operLevelScaled * envelope;
-                
-                operatorSum = operator1 + operator2 + operator3;
-                output = operatorSum + filteredNoise;
-            }
-            
-            
-            // write to output
-            channelData[sample] = output;
-        }
-    }
 }
 
 void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue, float modValue, float probValue)

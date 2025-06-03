@@ -24,6 +24,7 @@ public:
     void setOperatorInputs(float frequency, double inputPhase, float fmAmount);
     float processOperator();
     
+    
 private:
     CombFilter combFilter;
     double sampleRate, operatorAngle = 0.0, operatorPhase = 0.0, inputPhase = 0.0;

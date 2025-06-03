@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    Graphics.h
-    Created: 1 Mar 2025 11:46:37am
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #pragma once
 #include <JuceHeader.h>
 #include "PluginProcessor.h"

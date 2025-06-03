@@ -21,7 +21,6 @@ public:
     //==============================================================================
     
     void setStepIndex(int index);
-    void renderOscillator(juce::AudioBuffer<float> buffer);
     
     //==============================================================================
     
@@ -30,15 +29,13 @@ public:
     void setVoiceLevels(float operatorLevelValue, float noiseLevelValue, float noiseFreqValue, float noiseBandwidthValue);
     void setAlgorithm(int algorithmValue);
     
-    
     void setEnvelope()
     {
         ampEnvelope.setEnvelopeSlew(1.0f, 1000.0f/pitch[stepIndex] * (tension * 5.0f));
     }
     void setPatchBayParameters(int index, int inputValue);
     
-    
-    float selector(int index, float in0, float in1, float in2, float in3, float in4, float in5, float in6)
+    float selector(int index, float in0, float in1, float in2, float in3, float in4, float in5, float in6, float outputMin, float outputMax)
     {
         if (index == 1) { return in1; }
         else if (index == 2) { return in2; }
@@ -50,6 +47,7 @@ public:
     }
     
 private:
+    // initial preparation
     double sampleRate = 0.0;
     bool isPrepared { false };
     
@@ -79,6 +77,10 @@ private:
     
     float tension = 0.0f, inharmonicity = 0.0f, position = 0.0f;
     float operatorLevel = 1.0f, noiseLevel = 1.0f, noiseFreq = 1000.0f, noiseBandwidth = 10.0f;
+    
+    
+    double phase; // test
+    
 };
 
 class SynthSound : public juce::SynthesiserSound
