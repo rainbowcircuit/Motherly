@@ -195,14 +195,18 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
                 voice->setStepParameters(step, pitch, tone, mod, prob);
             }
             
+            voice->paramsIn0to1();
+            voice->setDefaults();
+
             // patch bay params
             for (int output = 0; output < 8; ++output)
             {
                 juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
                 float input = apvts.getRawParameterValue(patchBayParamID)->load();
-                
-                voice->setPatchBayParameters(output, input);
+                voice->overrideDefaults(output, input);
+                voice->newParamsIn0to1();
             }
+            
             voice->setGlobalParameters(tension, inharmonicity, position);
             voice->setVoiceLevels(opLevel, noiseLevel, noiseFreq, noiseBandWidth);
             voice->setAlgorithm(algorithm);
@@ -389,7 +393,7 @@ MotherlyAudioProcessor::createParameterLayout()
         
         layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { patchBayParamID, 1},
                                                                 patchBayParamName,
-                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Mod In", "VCA", "Tension in", "Inharm In", "Position In", "Algo In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Subdivision In" }, 0));
+                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Tension in", "Inharm In", "Position In", "Step In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Algorithm In", "VCA In" }, 0));
     }
     
     return layout;

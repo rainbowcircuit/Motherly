@@ -2,11 +2,11 @@
 
 PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
 {
-    addAndMakeVisible(patchBayLabel);
-    patchBayLabel.setText("In/Out", juce::dontSendNotification);
-    patchBayLabel.setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
-    patchBayLabel.setJustificationType(juce::Justification::centred);
-    patchBayLabel.setFont(12.0f);
+ //   addAndMakeVisible(patchBayLabel);
+ //   patchBayLabel.setText("In/Out", juce::dontSendNotification);
+ //   patchBayLabel.setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
+  //  patchBayLabel.setJustificationType(juce::Justification::centred);
+  //  patchBayLabel.setFont(12.0f);
     
     for(int point = 0; point < 20; point++)
     {
@@ -54,8 +54,6 @@ void PatchBay::paint(juce::Graphics& g)
     bgFill.addRoundedRectangle(bg.getX(), bg.getY(), bg.getWidth(), bg.getHeight(), 5);
     g.setColour(Colours::InterfaceMain::backgroundFill);
     g.fillPath(bgFill);
-    
-    
 }
 
 void PatchBay::resized()
@@ -379,20 +377,15 @@ PatchPoint::PatchPoint()
 
 void PatchPoint::paint(juce::Graphics &g)
 {
-    juce::Colour bgFillColour = !isInput ? Colours::InterfaceMain::textColor : Colours::InterfaceMain::backgroundHoverFill; // for now
+    juce::Colour bgFillColour = !isInput ? Colours::StepColour::iconWhite : Colours::InterfaceMain::backgroundHoverFill; // for now
     
     juce::Colour patchColour = { 100, 100, 100 };
     
-    if (isInput && available){
+    if (available){
         patchColour = { 100, 100, 100 };
-    } else if (isInput && !available){
+    } else if (!available){
         patchColour = { 150, 150, 150 };
-    } else if (!isInput && available) {
-        patchColour = { 200, 200, 200 };
-    } else if (!isInput && !available){
-        patchColour = { 250, 250, 250 };
     }
-    
     auto bounds = getLocalBounds().toFloat();
     
     juce::Path bgPath, graphicsPath;
@@ -465,7 +458,6 @@ void PatchPoint::setIsInput(bool input)
     juce::Colour labelTextColour = isInput ? Colours::InterfaceMain::textColor : Colours::InterfaceMain::backgroundFillAlt;
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
-
 
 PatchCable::PatchCable() {}
 

@@ -79,7 +79,11 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         float iconSize = graphicWidth * 0.2f;
         drawRateIcon(g, graphicX, graphicY + graphicWidth - iconSize, iconSize, 1);
         drawRateIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize, iconSize, 4);
+    } else if (graphicIndex == 11){
+        drawSmallRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        
     }
+
 
     
     
@@ -473,6 +477,42 @@ void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, f
     g.fillPath(dialDotPath);
     
 }
+
+void UserInterfaceGraphics::drawSmallRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position)
+{
+    float pi = juce::MathConstants<float>::pi;
+    float dialStart = 1.25f * pi;
+    float dialEnd = 2.75f * pi;
+    float sliderPositionScaled = 2.0f + (1.0f - position);
+    float dialPositionInRadians = dialStart + sliderPositionScaled * (dialEnd - dialStart);
+    
+
+    juce::Path dialBodyPath, dialDotPath;
+    float dialBodyRadius = (width * 0.7f)/2;
+    float dialDotRadius = (width * 0.5f)/2;
+
+    // dial body
+    dialBodyPath.addCentredArc(x + width/2, y + width/2,
+                               dialBodyRadius, dialBodyRadius,
+                               0.0f, 0.0f, 6.28f, true);
+    g.setColour(Colours::StepColour::iconWhite);
+    g.strokePath(dialBodyPath, juce::PathStrokeType(lineWidth * 2.5f));
+
+    //==============================================================================
+    // dial dot
+    juce::Point<float> outlineCoords = {x + width/2 + std::sin(dialPositionInRadians) * dialDotRadius,
+        x + width/2 + std::cos(dialPositionInRadians) * dialDotRadius};
+    juce::Point<float> startCoords = {x + width/2 + std::sin(dialStart) * dialDotRadius,
+        x + width/2 + std::cos(dialStart) * dialDotRadius};
+
+    dialDotPath.addCentredArc(outlineCoords.x, outlineCoords.y,
+                              1.5, 1.5, 0.0f, 0.0f, pi * 2, true);
+    
+    g.setColour(Colours::StepColour::iconWhite);
+    g.fillPath(dialDotPath);
+}
+
+
 
 void UserInterfaceGraphics::drawTensionIcon(juce::Graphics& g, float x, float y, float size, float length)
 {

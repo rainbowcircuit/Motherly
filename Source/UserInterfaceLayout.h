@@ -68,14 +68,25 @@ public:
         setStepParams(algorithmLabel, algorithmSlider, juce::Slider::NoTextBox, "Algorithm", algorithmGraphics);
         algorithmAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "algorithm", algorithmSlider);
         
-        setStepParams(op1Label, op1Slider, juce::Slider::NoTextBox, "Op 1", inharmGraphics);
-        setStepParams(op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", inharmGraphics);
-        setStepParams(op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", inharmGraphics);
-        setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", inharmGraphics);
+        setStepParams(op1Label, op1Slider, juce::Slider::NoTextBox, "Op 1", smallDialGraphics);
+        op1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op1Level", op1Slider);
+        
+        setStepParams(op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", smallDialGraphics);
+        op2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op2Level", op2Slider);
+
+        
+        setStepParams(op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", smallDialGraphics);
+        op3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op3Level", op3Slider);
+
+        
+        setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", smallDialGraphics);
+        noiseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseLevel", noiseSlider);
+
         
         setStepParams(algorithmLabel, testSlider, juce::Slider::NoTextBox, "Algorithm", testGraphics);
         
-        setStepParams(algorithmLabel, testSlider2, juce::Slider::NoTextBox, "Algorithm", testGraphics2);
+        setStepParams(algorithmLabel, testSlider2, juce::Slider::TextBoxBelow, "Algorithm", testGraphics2);
+        rateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "seqRate", testSlider2);
     }
     
     ~DrumMainInterface()
@@ -130,11 +141,7 @@ public:
         noiseLabel.setBounds(x + 350, y + height * 0.55f, height * 0.3f, height * 0.1f);
         noiseSlider.setBounds(x + 350, y + height * 0.65, height * 0.3f, height * 0.3f);
         
-     //   algorithmSlider.setBounds(x + 500, y + height * 0.175, height * 0.7f, height * 0.7f);
-        
- //       testSlider.setBounds(x + 720, y + height * 0.175, height * 0.4f, height * 0.8f);
         testSlider2.setBounds(x + 650, y + height * 0.175, height * 0.7f, height * 0.775f);
-
     }
     
     
@@ -156,21 +163,16 @@ public:
     
     
 private:
-    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 }, testGraphics2 { 10 };
+    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 }, testGraphics2 { 10 }, smallDialGraphics { 11 };
     
     juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider, testSlider2;
     
     juce::Label tensionLabel, inharmLabel, positionLabel, algorithmLabel, op1Label, op2Label, op3Label, noiseLabel;
     
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tensionAttachment, inharmAttachment, positionAttachment, algorithmAttachment, testAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tensionAttachment, inharmAttachment, positionAttachment, op1Attachment, op2Attachment, op3Attachment, noiseAttachment, algorithmAttachment, testAttachment, rateAttachment;
 
     MotherlyAudioProcessor& audioProcessor;
 };
-
-
-
-
-
 
 class PresetInterface : public juce::Component, juce::ComboBox::Listener, juce::Button::Listener
 {
@@ -202,10 +204,7 @@ public:
         presetComboBox.removeListener(this);
     }
     
-    void paint(juce::Graphics& g) override
-    {
-        
-    }
+    void paint(juce::Graphics& g) override {}
     
     void resized() override
     {
@@ -214,7 +213,6 @@ public:
         nextButton.setBounds(bounds.getX() + 75, bounds.getY(), 40, 40);
         prevButton.setBounds(bounds.getX() + 125, bounds.getY(), 40, 40);
         presetComboBox.setBounds(bounds.getX() + 175, bounds.getY(), 300, 40);
-
     }
     
     void comboBoxChanged(juce::ComboBox *comboBoxThatHasChanged) override
@@ -229,8 +227,7 @@ public:
             fileChooser = std::make_unique<juce::FileChooser>(
                 "Enter Preset Name",
                 presetManager.defaultDirectory,
-                "*." + presetManager.extension
-            );
+                "*." + presetManager.extension);
             
             fileChooser->launchAsync(juce::FileBrowserComponent::saveMode, [&](const juce::FileChooser& chooser)
             {
@@ -241,13 +238,10 @@ public:
 
         } else if (buttonClicked == &nextButton){
             presetManager.loadNextPreset();
-            
         } else if (buttonClicked == &prevButton){
             presetManager.loadPreviousPreset();
-            
         }
     }
-    
     
     void loadPresetList()
     {
@@ -266,7 +260,6 @@ private:
     
     std::unique_ptr<juce::FileChooser> fileChooser;
 
-    
     PresetManager presetManager;
     MotherlyAudioProcessor& audioProcessor;
 };

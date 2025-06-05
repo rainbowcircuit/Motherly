@@ -26,6 +26,8 @@ public:
     
     void drawRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position);
     
+    void drawSmallRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position);
+
     void drawFrequency(juce::Graphics& g, float x, float y, float width, float height, float position);
     
     void drawTone(juce::Graphics& g, float x, float y, float width, float height, float position);

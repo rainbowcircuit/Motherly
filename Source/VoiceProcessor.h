@@ -6,6 +6,8 @@
 #include "StepSequencer.h"
 #include "Utility.h"
 
+
+
 class SynthVoice : public juce::SynthesiserVoice
 {
 public:
@@ -16,7 +18,8 @@ public:
     void stopNote(float velocity, bool allowTailOff) override;
     void pitchWheelMoved(int newPitchWheelValue) override;
     void controllerMoved(int controllerNumber, int newControllerValue) override;
-    void renderNextBlock(juce::AudioBuffer<float> &outputBuffer, int startSample, int numSamples) override;
+    
+    void renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples) override;
     
     //==============================================================================
     
@@ -31,21 +34,20 @@ public:
     
     void setEnvelope()
     {
-        ampEnvelope.setEnvelopeSlew(1.0f, 1000.0f/pitch[stepIndex] * (tension * 5.0f));
+        float pitchFrom0to1 = pitchIn0to1 * 1170.0f + 30.0f;
+        float tensionFrom0to1 = tensionIn0to1 * 19900.0f + 100.0f;
+        ampEnvelope.setEnvelopeSlew(1.0f, 1000.0f/pitchFrom0to1 * tensionFrom0to1);
     }
-    void setPatchBayParameters(int index, int inputValue);
+ //   void setPatchBayParameters(int index, int inputValue);
+ //   void selector(int outputIndex, int inputIndex, std::array<float, 8>& outputs, std::array<float, 12>& inputs, std::array<float, 12>& defaults);
     
-    float selector(int index, float in0, float in1, float in2, float in3, float in4, float in5, float in6, float outputMin, float outputMax)
-    {
-        if (index == 1) { return in1; }
-        else if (index == 2) { return in2; }
-        else if (index == 3) { return in3; }
-        else if (index == 4) { return in4; }
-        else if (index == 5) { return in5; }
-        else if (index == 6) { return in6; }
-        else { return in0; }
-    }
+    //==============================================================================
     
+    void paramsIn0to1();
+    void setDefaults();
+    void overrideDefaults(int outputIndex, int inputIndex);
+    void newParamsIn0to1();
+
 private:
     // initial preparation
     double sampleRate = 0.0;
@@ -78,18 +80,27 @@ private:
     float tension = 0.0f, inharmonicity = 0.0f, position = 0.0f;
     float operatorLevel = 1.0f, noiseLevel = 1.0f, noiseFreq = 1000.0f, noiseBandwidth = 10.0f;
     
+    // outputs
     
-    double phase; // test
+    
+    std::array<float, 8> outputsIn0to1;
+    std::array<float, 12> inputsIn0to1;
+    std::array<float, 12> defaultsIn0to1;
+        
+    float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionInIn0to1, stepIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, noiseBandIn0to1, algoIn0to1, vcaMixIn0to1;
+    
+    
+    
+
+    
     
 };
+
 
 class SynthSound : public juce::SynthesiserSound
 {
 public:
-    
     bool appliesToNote(int midiNoteNumber) override { return true; }
     bool appliesToChannel(int midiChannel) override { return true; }
-    
-private:
 };
 

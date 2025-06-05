@@ -15,10 +15,10 @@
 class Operator
 {
 public:
-/*
- Operator in the loosest sense -- with a comb filter and diode distortion.
- Since the EG is shared, it is handled externally in synth voice.
- */
+    /*
+    Operator in the loosest sense -- with a comb filter and diode distortion.
+    Since the EG is shared, it is handled externally in synth voice.
+    */
     void prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels);
     void reset();
     void setOperatorInputs(float frequency, double inputPhase, float fmAmount);

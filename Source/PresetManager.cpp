@@ -108,5 +108,3 @@ void PresetManager::valueTreeRedirected(juce::ValueTree &treeWhichHasBeenChanged
 {
     currentPreset.referTo(treeWhichHasBeenChanged.getPropertyAsValue(presetNameProperty, nullptr));
 }
-
-
