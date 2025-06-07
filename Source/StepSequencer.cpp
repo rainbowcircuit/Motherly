@@ -39,7 +39,7 @@ void StepSequencer::suppressMIDIInput(juce::MidiBuffer& midiBuffer)
     midiBuffer.swapWith(filteredBuffer);
 }
 
-
+/*
 void StepSequencer::triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition)
 {
     DBG("sequencer triggernote, with step index:" << currentStepIndex % 7);
@@ -60,12 +60,13 @@ void StepSequencer::triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition
     }
  
 }
+*/
 
 void StepSequencer::flushNote(juce::MidiBuffer& midiBuffer)
 {
     if (pendingNoteOff)
     {
-        DBG("flushnote");
+     //   DBG("flushnote");
         midiBuffer.addEvent(juce::MidiMessage::noteOff(1, 0), 0); // start of next block
         pendingNoteOff = false;
     }
@@ -92,12 +93,10 @@ void StepSequencer::runSequencer(juce::MidiBuffer& midiBuffer, int samplePositio
     if (counter.getIsPlaying()){
         if (counter.getImpulse()){
             currentStepIndex += 1;
-            triggerNote(midiBuffer, samplePosition);
         }
 
     } else {
         reset();
     }
 }
-
 

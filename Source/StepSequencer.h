@@ -19,12 +19,17 @@ public:
     void updateTransport(juce::AudioPlayHead* playhead);
     void suppressMIDIInput(juce::MidiBuffer& midiBuffer);
     
-    void triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition);
+//    void triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition);
     void flushNote(juce::MidiBuffer& midiBuffer);
     void reset();
     int getStepIndex();
     void setRate(int sequencerRate);
     void runSequencer(juce::MidiBuffer& midiBuffer, int samplePosition);
+    
+    float getGate()
+    {
+        return counter.getGate();
+    }
     
 private:
     ImpulseMetro counter;

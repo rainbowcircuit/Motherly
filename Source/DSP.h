@@ -23,6 +23,7 @@ public:
     
     void setRate(int rate);
     bool getImpulse();
+    float getGate();
     
     void getTransport(juce::AudioPlayHead* playhead);
     bool getIsPlaying();
@@ -51,9 +52,8 @@ class LowPassGate
 public:
     void setSampleRate(double sampleRate);
     void setEnvelopeSlew(float riseInMilliseconds, float fallInMilliseconds);
-    
-    void noteOn();
-    void noteOff();
+
+    void triggerEnvelope(float gate);
     
     float generateEnvelope();
     bool isActive();

@@ -21,17 +21,10 @@ bool SynthVoice::canPlaySound (juce::SynthesiserSound* sound)
 }
 
 
-void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *sound, int currentPitchWheelPosition)
-{
-    ampEnvelope.noteOn();
-    DBG("midi ON");
-}
+void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *sound, int currentPitchWheelPosition) { }
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff)
 {
-    DBG("midi OFF");
-    ampEnvelope.noteOff();
-
     if (!allowTailOff || !ampEnvelope.isActive())
     {
         clearCurrentNote();
@@ -112,8 +105,10 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
                 break;
         }
         
+      // DBG(output); // this is working yay!
+
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-            buffer.setSample(channel, sample, output);
+            buffer.addSample(channel, sample, output);
         }
     }
 }
@@ -287,7 +282,7 @@ void SynthVoice::paramsIn0to1()
     float pBendIn0to1 = Utility::scale(pitchWheel, 0.0f, 16383.0f, 0.0f, 1.0f);
 
     // other defaults
-    float tensionIn0to1 = Utility::scale(tension, 5.0f, 100.0f, 0.0f, 1.0f);
+    float tensionIn0to1 = tension/100.0f;
     float inharmIn0to1 = inharmonicity/100.0f;
     float positionIn0to1 = position/100.0f;
     float operLevelIn0to1 = 1.0f;

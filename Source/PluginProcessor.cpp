@@ -4,6 +4,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
+
 MotherlyAudioProcessor::MotherlyAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
@@ -15,6 +16,7 @@ MotherlyAudioProcessor::MotherlyAudioProcessor()
                      #endif
                        )
 #endif
+
 {
 }
 
@@ -30,11 +32,7 @@ const juce::String MotherlyAudioProcessor::getName() const
 
 bool MotherlyAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
     return true;
-   #else
-    return false;
-   #endif
 }
 
 bool MotherlyAudioProcessor::producesMidi() const
@@ -136,6 +134,9 @@ bool MotherlyAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
+    
+    DBG("MIDI size: " << midiMessages.getNumEvents());
+
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -145,15 +146,29 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     
     //************** Sequencer **************//
     stepSequencer.suppressMIDIInput(midiMessages);
-    stepSequencer.flushNote(midiMessages);
     stepSequencer.updateTransport(getPlayHead());
     
     int rate = apvts.getRawParameterValue("seqRate")->load();
     stepSequencer.setRate(rate);
+    
+    auto playhead = getPlayHead();
+    const auto opt = playhead->getPosition();
+    const auto& pos = *opt;
+    
+    if (pos.getIsPlaying())
+    {
+        synth.noteOn(0, 62, 127);
+    } else {
+        synth.noteOff(0, 62, 0.0f, true);
+    }
 
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample){
         // step sequencer has to be accumulated every sample.
         stepSequencer.runSequencer(midiMessages, sample);
+        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(0)))
+        {
+            voice->triggerEnvelope(stepSequencer.getGate());
+        }
     }
     
     int stepIndex = stepSequencer.getStepIndex();
@@ -162,7 +177,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float tension = apvts.getRawParameterValue("tension")->load();
     float inharmonicity = apvts.getRawParameterValue("inharmonicity")->load();
     float position = apvts.getRawParameterValue("position")->load();
-    
+
     int algorithm = apvts.getRawParameterValue("algorithm")->load();
 
     float output = apvts.getRawParameterValue("outputGain")->load();
@@ -174,6 +189,11 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
     float noiseBandWidth = apvts.getRawParameterValue("noiseBandWidth")->load();
 
+    
+    
+    // testing
+    
+    
     // patch bay parameters
     std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
 
@@ -181,6 +201,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     {
         if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
         {
+
             for (int step = 0; step < 8; step++){
                 juce::String freqParamID = "freq" + juce::String(step);
                 juce::String toneParamID = "tone" + juce::String(step);
@@ -211,8 +232,16 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             voice->setAlgorithm(algorithm);
 
             voice->setStepIndex(stepIndex);
+            
+                
+            
+            
+            
+            
         }
     }
+    
+
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     midiMessages.clear();
     
@@ -225,7 +254,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         
     }
     float rms = std::sqrt(sumSquares / static_cast<float>(buffer.getNumSamples()));
-
+   // DBG(rms);
     stepIndexAtomic.store(stepIndex);
     amplitudeAtomic.store(rms);
     

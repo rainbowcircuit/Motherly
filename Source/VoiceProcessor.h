@@ -31,10 +31,15 @@ public:
     void setEnvelope()
     {
         float pitchFrom0to1 = pitchIn0to1 * 1170.0f + 30.0f;
-        float tensionFrom0to1 = tensionIn0to1 * 19900.0f + 100.0f;
+        float tensionFrom0to1 = tensionIn0to1 * 1990.0f + 10.0f;
         ampEnvelope.setEnvelopeSlew(1.0f, 1000.0f/pitchFrom0to1 * tensionFrom0to1);
     }
 
+    void triggerEnvelope(float gate)
+    {
+        ampEnvelope.triggerEnvelope(gate);
+    }
+    
     struct VoiceParams
     {
         float envelope, modEnvelope, pitch, tone, inharm, op0Level, op1Level, op2Level, operLevel, noiseLevel;

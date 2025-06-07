@@ -63,6 +63,23 @@ bool ImpulseMetro::getImpulse()
     return impulse;
 }
 
+float ImpulseMetro::getGate()
+{
+    // this must be called every sample.
+    double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
+    
+    float gate;
+    if (isPlaying){ 
+        counterAccum += bpmToHz/sampleRate;
+        if (counterAccum >= 1.0) counterAccum -= 1.0;
+        gate = counterAccum < 0.075f;
+        
+    } else {
+        reset();
+        gate = 0.0f;
+    }
+    return gate;
+}
 void ImpulseMetro::getTransport(juce::AudioPlayHead* playhead)
 {
     // call this method every processBlock to keep track of timing changes.
@@ -102,17 +119,11 @@ void LowPassGate::setEnvelopeSlew(float riseInMilliseconds, float fallInMillisec
     envelopeFall = (fallInMilliseconds/1000.0f) * sampleRate;
 }
 
-void LowPassGate::noteOn()
+void LowPassGate::triggerEnvelope(float gateValue)
 {
-    gate = 1.0f;
-    DBG("LPG on");
+    gate = gateValue;
 }
 
-void LowPassGate::noteOff()
-{
-    gate = 0.0f;
-    DBG("LPG off");
-}
 
 float LowPassGate::generateEnvelope()
 {
