@@ -18,29 +18,42 @@ public:
     void stopNote(float velocity, bool allowTailOff) override;
     void pitchWheelMoved(int newPitchWheelValue) override;
     void controllerMoved(int controllerNumber, int newControllerValue) override;
-    
     void renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples) override;
     
     //==============================================================================
     
     void setStepIndex(int index);
-    
-    //==============================================================================
-    
     void setStepParameters(int index, float pitchValue, float toneValue, float modValue, float probValue);
     void setGlobalParameters(float tensionValue, float inharmValue, float positionValue);
-    void setVoiceLevels(float operatorLevelValue, float noiseLevelValue, float noiseFreqValue, float noiseBandwidthValue);
-    void setAlgorithm(int algorithmValue);
+    void setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue, float noiseBandwidthValue);
     
+
     void setEnvelope()
     {
         float pitchFrom0to1 = pitchIn0to1 * 1170.0f + 30.0f;
         float tensionFrom0to1 = tensionIn0to1 * 19900.0f + 100.0f;
         ampEnvelope.setEnvelopeSlew(1.0f, 1000.0f/pitchFrom0to1 * tensionFrom0to1);
     }
- //   void setPatchBayParameters(int index, int inputValue);
- //   void selector(int outputIndex, int inputIndex, std::array<float, 8>& outputs, std::array<float, 12>& inputs, std::array<float, 12>& defaults);
+
+    struct VoiceParams
+    {
+        float envelope, modEnvelope, pitch, tone, inharm, op0Level, op1Level, op2Level, operLevel, noiseLevel;
+        
+    };
     
+    void setAlgorithm(int algorithmValue);
+
+    float processAlgorithm0(VoiceParams p);
+    float processAlgorithm1(VoiceParams p);
+    float processAlgorithm2(VoiceParams p);
+    float processAlgorithm3(VoiceParams p);
+    float processAlgorithm4(VoiceParams p);
+    float processAlgorithm5(VoiceParams p);
+    float processAlgorithm6(VoiceParams p);
+    float processAlgorithm7(VoiceParams p);
+    float processAlgorithm8(VoiceParams p);
+    float processAlgorithm9(VoiceParams p);
+
     //==============================================================================
     
     void paramsIn0to1();
@@ -63,7 +76,7 @@ private:
     
     // DSP Initialization
     std::array<Operator, 3> op;
-    NoiseGenerator noise;
+    NoiseGenerator ns;
     
     LowPassGate ampEnvelope;
     CombFilter positionComb;
@@ -78,11 +91,11 @@ private:
     bool probIsTrue;
     
     float tension = 0.0f, inharmonicity = 0.0f, position = 0.0f;
-    float operatorLevel = 1.0f, noiseLevel = 1.0f, noiseFreq = 1000.0f, noiseBandwidth = 10.0f;
+    float pitchWheel = 0.0f, modWheel = 0.0f;
     
-    // outputs
+    float outputGain = 0.0f, operatorLevel = 1.0f, op0Level = 1.0f, op1Level = 1.0f, op2Level = 1.0f, noiseLevel = 1.0f, noiseFreq = 1000.0f, noiseBandwidth = 10.0f;
     
-    
+    // patchbay
     std::array<float, 8> outputsIn0to1;
     std::array<float, 12> inputsIn0to1;
     std::array<float, 12> defaultsIn0to1;

@@ -144,16 +144,13 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         buffer.clear (i, 0, buffer.getNumSamples());
     
     //************** Sequencer **************//
+    stepSequencer.suppressMIDIInput(midiMessages);
     stepSequencer.flushNote(midiMessages);
     stepSequencer.updateTransport(getPlayHead());
     
     int rate = apvts.getRawParameterValue("seqRate")->load();
-    int mode = apvts.getRawParameterValue("seqMode")->load();
-    int offset = apvts.getRawParameterValue("seqOffset")->load();
-    int maximum = apvts.getRawParameterValue("seqMaxCount")->load();
-    
-    stepSequencer.setParameters(rate, offset, maximum, mode); // 6 is quarter note
-    
+    stepSequencer.setRate(rate);
+
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample){
         // step sequencer has to be accumulated every sample.
         stepSequencer.runSequencer(midiMessages, sample);
@@ -168,12 +165,15 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     
     int algorithm = apvts.getRawParameterValue("algorithm")->load();
 
-    float opLevel = apvts.getRawParameterValue("opLevel")->load();
+    float output = apvts.getRawParameterValue("outputGain")->load();
+
+    float op1Level = apvts.getRawParameterValue("op1Level")->load();
+    float op2Level = apvts.getRawParameterValue("op2Level")->load();
+    float op3Level = apvts.getRawParameterValue("op3Level")->load();
     float noiseLevel = apvts.getRawParameterValue("noiseLevel")->load();
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
     float noiseBandWidth = apvts.getRawParameterValue("noiseBandWidth")->load();
 
-    
     // patch bay parameters
     std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
 
@@ -195,10 +195,9 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
                 voice->setStepParameters(step, pitch, tone, mod, prob);
             }
             
+            // patch bay params
             voice->paramsIn0to1();
             voice->setDefaults();
-
-            // patch bay params
             for (int output = 0; output < 8; ++output)
             {
                 juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
@@ -208,13 +207,14 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             }
             
             voice->setGlobalParameters(tension, inharmonicity, position);
-            voice->setVoiceLevels(opLevel, noiseLevel, noiseFreq, noiseBandWidth);
+            voice->setVoiceLevels(output, op1Level, op2Level, op3Level, noiseLevel, noiseFreq, noiseBandWidth);
             voice->setAlgorithm(algorithm);
 
             voice->setStepIndex(stepIndex);
         }
     }
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
+    midiMessages.clear();
     
     // write to atomic
     float sumSquares = 0.0f;
@@ -234,7 +234,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
 //==============================================================================
 bool MotherlyAudioProcessor::hasEditor() const
 {
-    return true; // (change this to false if you choose to not supply an editor)
+    return true; 
 }
 
 juce::AudioProcessorEditor* MotherlyAudioProcessor::createEditor()
@@ -269,7 +269,7 @@ MotherlyAudioProcessor::createParameterLayout()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
-    //********************* DSP Parameters *********************//
+    //********************* Step Parameters *********************//
     
     for (int step = 0; step < 8; ++step)
     {
@@ -304,8 +304,6 @@ MotherlyAudioProcessor::createParameterLayout()
                                                                probParamName,
                                                                 juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 1.0f },
                                                                 100.0f, "%"));
-
-        
     }
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "tension", 1},
@@ -328,23 +326,18 @@ MotherlyAudioProcessor::createParameterLayout()
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "op1Level", 1},
                                                             "Operator 1 Level",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f },
-                                                            50.0f, "%"));
+                                                            100.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "op2Level", 1},
                                                             "Operator 2 Level",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f },
-                                                            50.0f, "%"));
+                                                            100.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "op3Level", 1},
                                                             "Operator 3 Level",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f },
-                                                            50.0f, "%"));
+                                                            100.0f, "%"));
     
-    layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "opLevel", 1},
-                                                            "Operator Level",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f },
-                                                            50.0f, "%"));
-
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseLevel", 1},
                                                             "Noise Level",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f },
@@ -364,23 +357,16 @@ MotherlyAudioProcessor::createParameterLayout()
                                                             "Algorithm",
                                                              0, 9, 0));
 
-    //********************* Sequencer Parameters *********************//
+    layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "outputGain", 1},
+                                                            "Output Gain",
+                                                            juce::NormalisableRange<float> { -72.0f, 6.0f },
+                                                            0.0f));
+
+    //********************* Sequencer Parameter *********************//
 
     layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { "seqRate", 1},
                                                             "Sequencer Rate",
-                                                            juce::StringArray { "4", "3", "8/3", "2", "3/2", "4/3", "1", "3/4", "2/3", "1/2", "3/8", "1/3", "1/4", "3/16", "1/6", "1/8" }, 6));
-    
-    layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { "seqMode", 1},
-                                                            "Sequencer Mode",
-                                                            juce::StringArray { "Forward", "Backward", "Ping-Pong" }, 0));
-
-    layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID { "seqOffset", 1},
-                                                            "Sequencer Offset",
-                                                            0, 8, 0));
-    
-    layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID { "seqMaxCount", 1},
-                                                            "Sequencer Max Count",
-                                                             1, 8 ,8));
+                                                            juce::StringArray { "1/2", "3/8", "1/4", "3/16", "1/8", "3/16", "1/16" }, 4));
     
     //********************* Patch Bay Parameters *********************//
     

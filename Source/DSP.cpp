@@ -60,7 +60,6 @@ bool ImpulseMetro::getImpulse()
         impulse = false;
     }
     previousCounterAccum = counterAccum;
-
     return impulse;
 }
 
@@ -106,11 +105,13 @@ void LowPassGate::setEnvelopeSlew(float riseInMilliseconds, float fallInMillisec
 void LowPassGate::noteOn()
 {
     gate = 1.0f;
+    DBG("LPG on");
 }
 
 void LowPassGate::noteOff()
 {
     gate = 0.0f;
+    DBG("LPG off");
 }
 
 float LowPassGate::generateEnvelope()
@@ -124,7 +125,6 @@ float LowPassGate::generateEnvelope()
     envelope = (1.0f - segmentTimeT60) * gate + segmentTimeT60 * unitDelay;
     
     unitDelay = envelope;
-            
     return envelope;
 }
 

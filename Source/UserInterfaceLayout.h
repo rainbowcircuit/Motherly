@@ -17,6 +17,7 @@
 #include "LookAndFeel.h"
 #include "DialGraphics.h"
 #include "MiscGraphics.h"
+#include "PatchBayGraphics.h"
 
 class StepInterface : public juce::Component, juce::Timer
 {
@@ -194,6 +195,10 @@ public:
         addAndMakeVisible(presetComboBox);
         presetComboBox.addListener(this);
         presetComboBox.setLookAndFeel(&comboBoxLAF);
+        // refresh presets
+        loadPresetList();
+        patchBayInterface = std::make_unique<PatchBay>(audioProcessor);
+        
     }
     
     ~PresetInterface()
@@ -238,9 +243,15 @@ public:
 
         } else if (buttonClicked == &nextButton){
             presetManager.loadNextPreset();
+            loadPresetList();
+            patchBayInterface->refreshFromParameters();
+            
         } else if (buttonClicked == &prevButton){
             presetManager.loadPreviousPreset();
+            loadPresetList();
+            patchBayInterface->refreshFromParameters();
         }
+        
     }
     
     void loadPresetList()
@@ -249,8 +260,10 @@ public:
         const auto allPresets = presetManager.getAllPreset();
         const auto currentPreset = presetManager.getCurrentPreset();
         presetComboBox.addItemList(allPresets, 1);
+        presetComboBox.setTitle(currentPreset);
         presetComboBox.setSelectedItemIndex(allPresets.indexOf(currentPreset), juce::dontSendNotification);
     }
+    
 private:
     ButtonGraphics saveLAF { 0 }, nextLAF { 1 }, prevLAF { 2 };
     ComboBoxGraphics comboBoxLAF;
@@ -259,6 +272,7 @@ private:
     juce::ComboBox presetComboBox;
     
     std::unique_ptr<juce::FileChooser> fileChooser;
+    std::unique_ptr<PatchBay> patchBayInterface;
 
     PresetManager presetManager;
     MotherlyAudioProcessor& audioProcessor;

@@ -44,3 +44,4 @@ private:
     SVF filter;
     float frequency, resonance;
 };
+

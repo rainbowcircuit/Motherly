@@ -11,6 +11,7 @@
 #include "StepSequencer.h"
 void StepSequencer::prepareToPlay(double sampleRate, int samplePerBlock)
 {
+    this->sampleRate = sampleRate;
     this->samplePerBlock = samplePerBlock;
     counter.setSampleRate(sampleRate);
     counter.reset();
@@ -21,16 +22,34 @@ void StepSequencer::updateTransport(juce::AudioPlayHead* playhead)
     counter.getTransport(playhead);
 }
 
-// trying this out just briefly
+void StepSequencer::suppressMIDIInput(juce::MidiBuffer& midiBuffer)
+{
+    juce::MidiBuffer filteredBuffer;
+    for (const juce::MidiMessageMetadata metadata : midiBuffer)
+    {
+        auto message = metadata.getMessage();
+        
+        if(message.isNoteOn() || message.isNoteOff()) {
+            // suppress note on/off
+        } else {
+            // pass on mod wheel or pitch bend message
+            filteredBuffer.addEvent(message, metadata.samplePosition);
+        }
+    }
+    midiBuffer.swapWith(filteredBuffer);
+}
+
+
 void StepSequencer::triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition)
 {
+    DBG("sequencer triggernote, with step index:" << currentStepIndex % 7);
     // run this method every sample.
     juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 0, (juce::uint8)127);
-    int noteOffSamplePosition = samplePosition + 100;
-
-    // Add the noteOn at the current sample position
     midiBuffer.addEvent(noteOn, samplePosition);
+
     // Add the noteOff at the next sample position
+    int noteOffSamplePosition = samplePosition + 128;
+    juce::MidiMessage noteOff = juce::MidiMessage::noteOff(1, 0);
     
     if (noteOffSamplePosition < samplePerBlock){
 
@@ -39,12 +58,14 @@ void StepSequencer::triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition
     } else {
         pendingNoteOff = true;
     }
+ 
 }
 
 void StepSequencer::flushNote(juce::MidiBuffer& midiBuffer)
 {
     if (pendingNoteOff)
     {
+        DBG("flushnote");
         midiBuffer.addEvent(juce::MidiMessage::noteOff(1, 0), 0); // start of next block
         pendingNoteOff = false;
     }
@@ -57,57 +78,26 @@ void StepSequencer::reset()
 
 int StepSequencer::getStepIndex()
 {
-    int stepIndex = (currentStepIndex + stepOffset);
-    if(stepIndex >= maxStepCount)
-    {
-        currentStepIndex = stepOffset;
-    }
-    return stepIndex;
+    return currentStepIndex % 8;
 }
 
-void StepSequencer::setParameters(int sequencerRate, int stepOffset, int maxStepCount, int sequencerMode)
+void StepSequencer::setRate(int sequencerRate)
 {
     this->sequencerRate = sequencerRate;
     counter.setRate(sequencerRate);
-    
-    this->stepOffset = stepOffset;
-    this->maxStepCount = maxStepCount;
-    this->sequencerMode = sequencerMode;
 }
 
 void StepSequencer::runSequencer(juce::MidiBuffer& midiBuffer, int samplePosition)
 {
     if (counter.getIsPlaying()){
         if (counter.getImpulse()){
-            switch(sequencerMode){
-                case 0: // forward
-                    currentStepIndex += 1;
-                    break;
-                case 1: // backward
-                    currentStepIndex--;
-                    if (currentStepIndex < stepOffset)
-                        currentStepIndex = maxStepCount - 1;
-                    break;
-                case 2: // ping pong
-                    if (directionFlag) // forward
-                        currentStepIndex++;
-                    else // backward
-                        currentStepIndex--;
-
-                    if (currentStepIndex >= maxStepCount){
-                        currentStepIndex = maxStepCount - 2;
-                        directionFlag = false;
-                    }
-                    else if (currentStepIndex < stepOffset){
-                        currentStepIndex = stepOffset + 1;
-                        directionFlag = true;
-                    }
-                    break;
-            }
-            
+            currentStepIndex += 1;
             triggerNote(midiBuffer, samplePosition);
         }
+
     } else {
         reset();
     }
 }
+
+

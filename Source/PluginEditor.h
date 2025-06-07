@@ -28,6 +28,10 @@ public:
     //==============================================================================
     void timerCallback() override;
 
+    void updateFromParameter()
+    {
+        DBG("update from parameter called!");
+    }
 private:
     std::atomic<int>& stepIndexAtomic;
     std::atomic<float>& amplitudeAtomic;

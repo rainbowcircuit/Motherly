@@ -53,7 +53,6 @@ void MotherlyAudioProcessorEditor::resized()
     
     patchBayInterface->setBounds(600, 50, 170, 300);
     patchBayInterface->resized();
-    
     presetInterface->setBounds(5, 5, 600, 50);
 }
 

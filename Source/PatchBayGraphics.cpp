@@ -1,13 +1,7 @@
 #include "PatchBayGraphics.h"
 
 PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
-{
- //   addAndMakeVisible(patchBayLabel);
- //   patchBayLabel.setText("In/Out", juce::dontSendNotification);
- //   patchBayLabel.setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
-  //  patchBayLabel.setJustificationType(juce::Justification::centred);
-  //  patchBayLabel.setFont(12.0f);
-    
+{    
     for(int point = 0; point < 20; point++)
     {
         patchPoint[point].setIsInput(patchPointLayout[point].isInput);
@@ -464,7 +458,7 @@ PatchCable::PatchCable() {}
 void PatchCable::paint(juce::Graphics& g)
 {
     juce::Path cablePath, cableEndPath;
-    juce::Colour fillColour = Colours::StepColour::stepMainColour[cableOutput];
+    juce::Colour fillColour = Colours::StepColour::stepMainColour[getConnectionIndex(true)];
     g.setColour(fillColour);
 
     if (cableInUse){

@@ -78,13 +78,25 @@ public:
     void mouseDrag(const juce::MouseEvent &m) override;
     void mouseUp(const juce::MouseEvent &m) override;
     
+    //********************
+
+    void refreshFromParameters()
+    {
+        for (int i = 0; i < audioProcessor.getParameters().size(); ++i)
+        {
+            if (auto* param = dynamic_cast<juce::AudioProcessorParameterWithID*>(audioProcessor.getParameters()[i]))
+            {
+                float value = param->getValue(); // 0.0–1.0
+                parameterValueChanged(i, value); // manually trigger
+            }
+        }
+    }
+
 private:
-    
     void parameterValueChanged(int parameterIndex, float newValue) override
     {
         parameterIndexAtomic.store(parameterIndex);
         newValueAtomic.store(newValue);
-        
         triggerAsyncUpdate();
     }
     
@@ -110,8 +122,6 @@ private:
                     if (patchPointLayout[point].paramID == parameterID) // this means its an output
                     {
                         int output = patchPointLayout[point].localOutputIndex;
-                        //   input = getLocalIndex(input, true);
-                        
                         setCableFromParameter(output - 1, input);
                         
                         DBG("cable set from" << parameterID << " output: " << output - 1 << " input: " << input);

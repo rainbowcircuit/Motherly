@@ -34,23 +34,14 @@ private:
     int rate;
     bool isPlaying = false;
     
-    std::array <double, 16> subdivisionMultiplier =
+    std::array <double, 7> subdivisionMultiplier =
      {
-         0.125,
-         0.5 / 3.0,
-         0.1875,
-         0.25,
-         1.0 / 3.0,
-         0.375,
          0.5,
          2.0 / 3.0,
-         0.75,
          1.0,
          4.0 / 3.0,
-         1.5,
          2.0,
          8.0 / 3.0,
-         3.0,
          4.0
      };
 };
