@@ -16,7 +16,7 @@ StepInterface::StepInterface(MotherlyAudioProcessor& p, int index) : audioProces
     freqLookAndFeel.setStepIndex(stepIndex);
     toneLookAndFeel.setStepIndex(stepIndex);
     modLookAndFeel.setStepIndex(stepIndex);
-    probLookAndFeel.setStepIndex(stepIndex);
+    repeatLookAndFeel.setStepIndex(stepIndex);
 
     // initialize sliders and labels
     setStepParams(freqLabel, freqSlider, juce::Slider::TextBoxBelow, "Freq", freqLookAndFeel);
@@ -31,9 +31,9 @@ StepInterface::StepInterface(MotherlyAudioProcessor& p, int index) : audioProces
     juce::String modID = "mod" + juce::String(stepIndex);
     modAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, modID, modSlider);
 
-    setStepParams(probLabel, probSlider, juce::Slider::TextBoxBelow, "Prob", probLookAndFeel);
-    juce::String probID = "prob" + juce::String(stepIndex);
-    probAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, probID, probSlider);
+    setStepParams(repeatLabel, repeatSlider, juce::Slider::TextBoxBelow, "Repeat", repeatLookAndFeel);
+    juce::String probID = "repeat" + juce::String(stepIndex);
+    repeatAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, probID, repeatSlider);
 
     startTimerHz(30);
 }
@@ -51,15 +51,14 @@ void StepInterface::paint(juce::Graphics& g)
     auto bg = getLocalBounds().toFloat();
     bg.reduce(5, 5);
         
-    juce::Colour mainColour = Colours::InterfaceMain::backgroundFill;
-    juce::Colour hoverColour = Colours::InterfaceMain::backgroundHoverFill;
+    juce::Colour mainColour = Colours::Main::backgroundFill;
+    juce::Colour hoverColour = Colours::Main::backgroundHoverFill;
     juce::Colour bgFillColour = stepHovered ? hoverColour : mainColour;
 
     juce::Path bgFill;
     bgFill.addRoundedRectangle(bg, 5);
 
-    // figure out some logic here for hover/on vs neutral
-    juce::Colour blinkerFillColour { Colours::StepColour::stepMainColour[stepIndex].withAlpha(0.15f) };
+    juce::Colour blinkerFillColour { Colours::Main::backgroundActiveFill };
     juce::Colour fillColour =  isStepIndex ? blinkerFillColour : bgFillColour;
 
     g.setColour(fillColour);
@@ -83,8 +82,8 @@ void StepInterface::resized()
     modLabel.setBounds(x, y + height * 0.575f, width, width/4);
     modSlider.setBounds(x, y + height * 0.575f, width, width * 0.75f);
 
-    probLabel.setBounds(x, y + height * 0.725f, width, width/4);
-    probSlider.setBounds(x, y + height * 0.725f, width, width);
+    repeatLabel.setBounds(x, y + height * 0.725f, width, width/4);
+    repeatSlider.setBounds(x, y + height * 0.725f, width, width);
 }
 
 void StepInterface::setIsStepIndex(int step)
@@ -107,7 +106,7 @@ void StepInterface::setStepParams(juce::Label& label, juce::Slider& slider, juce
     // initialize label
     addAndMakeVisible(label);
     label.setText(labelText, juce::dontSendNotification);
-    label.setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
+    label.setColour(juce::Label::textColourId, Colours::Main::textColor);
     label.setJustificationType(juce::Justification::centred);
     label.setFont(12.0f);
 

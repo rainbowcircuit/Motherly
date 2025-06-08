@@ -14,7 +14,7 @@ private:
     double sampleRate = 0.0;
 };
 
-class ImpulseMetro
+class Metro
 {
 public:
     // tempo synced sample accurate counter that runs on the audio thread.
@@ -22,11 +22,23 @@ public:
     void reset();
     
     void setRate(int rate);
+    
+    void setRepeat(int index, int repeatValue)
+    {
+        repeat[index] = repeatValue;
+    }
+    
+    void setStepIndex(int stepIndex)
+    {
+        this->stepIndex = stepIndex;
+    }
+    
     bool getImpulse();
     float getGate();
     
     void getTransport(juce::AudioPlayHead* playhead);
     bool getIsPlaying();
+    
     
 private:
     double sampleRate;
@@ -45,6 +57,10 @@ private:
          8.0 / 3.0,
          4.0
      };
+    
+    int stepIndex = 7;
+    std::array<int, 8> repeat = { 1, 1, 1, 1, 1, 1, 1, 1 }; // 0 silence
+
 };
 
 class LowPassGate

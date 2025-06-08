@@ -21,10 +21,10 @@ void ButtonGraphics::drawButtonBackground (juce::Graphics& g, juce::Button& butt
     
     juce::Path bgPath;
     bgPath.addRoundedRectangle(bounds, 8.0f);
-    juce::Colour buttonColour = shouldDrawButtonAsDown ? Colours::InterfaceMain::backgroundHoverFill : Colours::InterfaceMain::backgroundFill;
+    juce::Colour buttonColour = shouldDrawButtonAsDown ? Colours::Main::backgroundHoverFill : Colours::Main::backgroundFill;
     g.setColour(buttonColour);
     g.fillPath(bgPath);
-    g.setColour(Colours::InterfaceMain::backgroundFill);
+    g.setColour(Colours::Main::backgroundFill);
     g.strokePath(bgPath, juce::PathStrokeType(2.0f));
     
     float x = bounds.getX();

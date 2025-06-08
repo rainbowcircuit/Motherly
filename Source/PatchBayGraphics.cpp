@@ -46,7 +46,7 @@ void PatchBay::paint(juce::Graphics& g)
     
     juce::Path bgFill;
     bgFill.addRoundedRectangle(bg.getX(), bg.getY(), bg.getWidth(), bg.getHeight(), 5);
-    g.setColour(Colours::InterfaceMain::backgroundFill);
+    g.setColour(Colours::Main::backgroundFill);
     g.fillPath(bgFill);
 }
 
@@ -371,7 +371,7 @@ PatchPoint::PatchPoint()
 
 void PatchPoint::paint(juce::Graphics &g)
 {
-    juce::Colour bgFillColour = !isInput ? Colours::StepColour::iconWhite : Colours::InterfaceMain::backgroundHoverFill; // for now
+    juce::Colour bgFillColour = !isInput ? Colours::StepColour::iconWhite : Colours::Main::backgroundHoverFill; // for now
     
     juce::Colour patchColour = { 100, 100, 100 };
     
@@ -449,7 +449,7 @@ void PatchPoint::setIsAvailable(bool availablity)
 void PatchPoint::setIsInput(bool input)
 {
     isInput = input;
-    juce::Colour labelTextColour = isInput ? Colours::InterfaceMain::textColor : Colours::InterfaceMain::backgroundFillAlt;
+    juce::Colour labelTextColour = isInput ? Colours::Main::textColor : Colours::Main::backgroundFillAlt;
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
 

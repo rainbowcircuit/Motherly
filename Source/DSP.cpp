@@ -28,24 +28,24 @@ float CombFilter::processComb(float input)
     return input + delayedSample;
 }
 
-void ImpulseMetro::setSampleRate(double sampleRate)
+void Metro::setSampleRate(double sampleRate)
 {
     this->sampleRate = sampleRate;
 }
 
-void ImpulseMetro::reset()
+void Metro::reset()
 {
     // this ensures that upon first playback the impulse bool returns true.
     counterAccum = 0.0;
     previousCounterAccum = 0.9;
 }
 
-void ImpulseMetro::setRate(int rate)
+void Metro::setRate(int rate)
 {
     this->rate = rate;
 }
 
-bool ImpulseMetro::getImpulse()
+bool Metro::getImpulse()
 {
     // this must be called every sample.
     double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
@@ -63,24 +63,58 @@ bool ImpulseMetro::getImpulse()
     return impulse;
 }
 
-float ImpulseMetro::getGate()
+float Metro::getGate()
 {
     // this must be called every sample.
     double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
+    
+    float gateSize = 0.05;
+    int repeatIndex = repeat[stepIndex];
     
     float gate;
     if (isPlaying){ 
         counterAccum += bpmToHz/sampleRate;
         if (counterAccum >= 1.0) counterAccum -= 1.0;
-        gate = counterAccum < 0.075f;
         
+        switch(repeatIndex){
+            case 0: { // off
+                gate = 0.0f;
+                break;
+                
+            } case 1: {
+                gate = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
+                break;
+                
+            } case 2: { // repeat 2
+                bool gateBool1 = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
+                bool gateBool2 = counterAccum >= 0.5 && counterAccum < 0.5 + gateSize;
+                gate = gateBool1 || gateBool2;
+                break;
+                
+            } case 3: { // repeat 3
+                bool gateBool1 = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
+                bool gateBool2 = counterAccum >= 0.333 && counterAccum < 0.333 + gateSize;
+                bool gateBool3 = counterAccum >= 0.666 && counterAccum < 0.666 + gateSize;
+                gate = gateBool1 || gateBool2 || gateBool3;
+                break;
+                
+            } case 4: { // repeat 4
+                bool gateBool1 = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
+                bool gateBool2 = counterAccum >= 0.25 && counterAccum < 0.25 + gateSize;
+                bool gateBool3 = counterAccum >= 0.5 && counterAccum < 0.5 + gateSize;
+                bool gateBool4 = counterAccum >= 0.75 && counterAccum < 0.75 + gateSize;
+                gate = gateBool1 || gateBool2 || gateBool3 || gateBool4;
+                break;
+            }
+        }
     } else {
         reset();
         gate = 0.0f;
     }
     return gate;
 }
-void ImpulseMetro::getTransport(juce::AudioPlayHead* playhead)
+
+void Metro::getTransport(juce::AudioPlayHead* playhead)
 {
     // call this method every processBlock to keep track of timing changes.
     // get tempo
@@ -103,7 +137,7 @@ void ImpulseMetro::getTransport(juce::AudioPlayHead* playhead)
     }
 }
 
-bool ImpulseMetro::getIsPlaying()
+bool Metro::getIsPlaying()
 {
     return isPlaying;
 }

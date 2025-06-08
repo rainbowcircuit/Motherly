@@ -28,13 +28,21 @@ public:
     
     float getGate()
     {
+        counter.setStepIndex(getStepIndex());
         return counter.getGate();
     }
     
+    void setRepeat(int index, int repeatValue)
+    { 
+        counter.setRepeat(index, repeatValue);
+    }
+    
 private:
-    ImpulseMetro counter;
+    Metro counter;
     double sampleRate;
     int samplePerBlock = 0;
     bool pendingNoteOff = false, rateUpdatePending = false;
-    int currentStepIndex = 0, sequencerRate = 0, pendingRate = 0;
+    int currentStepIndex = 0, sequencerRate = 0;
+
+    
 };

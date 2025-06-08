@@ -21,14 +21,14 @@ public:
     */
     void prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels);
     void reset();
-    void setOperatorInputs(float frequency, double inputPhase, float fmAmount);
+    void setOperatorInputs(float frequency, double inputPhase, float fmAmount, float position);
     float processOperator();
     
     
 private:
     CombFilter combFilter;
     double sampleRate, operatorAngle = 0.0, operatorPhase = 0.0, inputPhase = 0.0;
-    float fmAmount, softClipGain;
+    float fmAmount, softClipGain, combPosition;
          
 };
 

@@ -16,7 +16,7 @@ UserInterfaceGraphics::UserInterfaceGraphics(int graphicIndex)
 {
     this->graphicIndex = graphicIndex;
     setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    setColour(juce::Slider::textBoxTextColourId, Colours::InterfaceMain::textColor);
+    setColour(juce::Slider::textBoxTextColourId, Colours::Main::textColor);
 }
 
 void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
@@ -29,12 +29,24 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
     float graphicHeight = bounds.getHeight();
     lineWidth = bounds.getWidth() * 0.015f;
     
+    //==============================================================================
+    // Hover Color
+    bool hover = slider.isMouseOver();
+    
+    iconGradientColor = hover ? juce::Colour(Colours::Gradient::gradientHover[stepIndex]) : juce::Colour(Colours::Gradient::gradient[stepIndex]);
+
+    iconWhiteColor = hover ? juce::Colour(Colours::Main::iconWhiteHover) : juce::Colour(Colours::Main::iconWhite);
+
+    // Path stroke
+
+    
+    // use enums
     if (graphicIndex == 0){
         drawTone(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     } else if (graphicIndex == 1) {
-       // drawPosition(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-        
+        drawNoiseFreq(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+
     } else if (graphicIndex == 2){
         drawPitchMod(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
@@ -48,6 +60,8 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawAlgorithm(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     } else if (graphicIndex == 6){
+        // tension
+        
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
         float iconSize = graphicWidth * 0.2f;
@@ -58,6 +72,8 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
                         iconSize, 0.0f);
 
     } else if (graphicIndex == 7){
+        // inharmoncity
+        
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
         float iconSize = graphicWidth * 0.2f;
@@ -71,22 +87,19 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawPosition(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
         
     } else if (graphicIndex == 9){
-        drawStepCount(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+      //  drawStepCount(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     } else if (graphicIndex == 10){
+        // amp
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
         float iconSize = graphicWidth * 0.2f;
-        drawRateIcon(g, graphicX, graphicY + graphicWidth - iconSize, iconSize, 1);
-        drawRateIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize, iconSize, 4);
+        drawAmpIcon(g, graphicX, graphicY + graphicWidth - iconSize, iconSize, 0.5f);
+        drawAmpIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize, iconSize, 1.0f);
     } else if (graphicIndex == 11){
         drawSmallRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     }
-
-
-    
-    
 }
 
 void UserInterfaceGraphics::drawTone(juce::Graphics& g, float x, float y, float width, float height, float position)
@@ -102,36 +115,36 @@ void UserInterfaceGraphics::drawTone(juce::Graphics& g, float x, float y, float 
     float innerRadius = width * 0.205f;
 
     juce::Path outerBottomLines, outerTopLines, innerLines;
-    // outer arc back layer
+
+    //==============================================================================
+    // outer arc
     outerBottomLines.addCentredArc(outerBotCoords.x, outerBotCoords.y, OuterRadius, OuterRadius/3, 0.0f, 0.0f, 6.28f, true);
     outerBottomLines.startNewSubPath(outerTopCoords.x - OuterRadius, outerTopCoords.y);
     outerBottomLines.lineTo(outerBotCoords.x - OuterRadius, outerBotCoords.y);
     outerBottomLines.startNewSubPath(outerTopCoords.x + OuterRadius, outerTopCoords.y);
     outerBottomLines.lineTo(outerBotCoords.x + OuterRadius, outerBotCoords.y);
-    g.setColour(Colours::StepColour::iconShadow);
+    g.setColour(iconLightGreyColour);
     g.strokePath(outerBottomLines, juce::PathStrokeType(lineWidth));
 
+    //==============================================================================
     // inner arc
     innerLines.addCentredArc(innerTopCoords.x, innerTopCoords.y, innerRadius, innerRadius/3, 0.0f, -1.57f, 1.57f, true);
     innerLines.lineTo(innerBotCoords.x + innerRadius, innerBotCoords.y);
     innerLines.addCentredArc(innerBotCoords.x, innerBotCoords.y, innerRadius, innerRadius/3, 0.0f, 1.57, 4.71f, false);
     innerLines.lineTo(innerTopCoords.x - innerRadius, innerTopCoords.y);
 
-
     innerLines.closeSubPath();
-    g.setColour(Colours::StepColour::stepMainColour[stepIndex]);
+    g.setColour(iconGradientColor);
     g.fillPath(innerLines);
     
     // outer arc top layer
     outerTopLines.addCentredArc(outerTopCoords.x, outerTopCoords.y, OuterRadius, OuterRadius/3, 0.0f, 0.0f, 6.28f, true);
-    g.setColour(Colours::StepColour::iconShadow);
+    g.setColour(iconLightGreyColour);
     g.strokePath(outerTopLines, juce::PathStrokeType(lineWidth));
-
 }
 
 void UserInterfaceGraphics::drawFrequency(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
-    
     float panelWidth = width * 0.5f;
     float panelHeight = height * 0.125f;
 
@@ -167,8 +180,9 @@ void UserInterfaceGraphics::drawFrequency(juce::Graphics& g, float x, float y, f
     graphicLines.lineTo(leftCoords.x + isoMargin, leftCoords.y - panelHeight);
 
     graphicLines.closeSubPath();
-    g.setColour(Colours::StepColour::stepMainColour[stepIndex]);
+    g.setColour(iconGradientColor);
     g.fillPath(graphicLines);
+    g.strokePath(graphicLines, juce::PathStrokeType(lineWidth));
 
     // right hand
     graphicLines.startNewSubPath(topCoords.x, topCoords.y + panelHeight);
@@ -183,8 +197,9 @@ void UserInterfaceGraphics::drawFrequency(juce::Graphics& g, float x, float y, f
                          topCoords.x + isoMargin, topCoords.y - panelHeight);
 
     graphicLines.closeSubPath();
-    g.setColour(Colours::StepColour::stepMainColourAlt[stepIndex]);
+    g.setColour(iconGradientColor);
     g.fillPath(graphicLines);
+    g.strokePath(graphicLines, juce::PathStrokeType(lineWidth));
     
 }
 
@@ -212,7 +227,7 @@ void UserInterfaceGraphics::drawPitchMod(juce::Graphics& g, float x, float y, fl
     graphicLines.addCentredArc(rightCoords.x, rightCoords.y, radius, radius, 0.0f, 0.0f, 6.28f, true);
     graphicLines.addCentredArc(centerCoords.x, centerCoords.y, radius, radius, 0.0f, 0.0f, 6.28f, true);
     
-    g.setColour(Colours::StepColour::stepMainColour[stepIndex]);
+    g.setColour(iconGradientColor);
     g.fillPath(graphicLines);
 
     // left lines
@@ -246,6 +261,8 @@ void UserInterfaceGraphics::drawProbability(juce::Graphics& g, float x, float y,
     float gap = 0.05f;
     float centerGap = 0.5f;
     int positionScaled = std::floor(position * 6.0f);
+    
+    //==============================================================================
     for (int i = 0; i < 6; i++)
     {
         float startAngle = segmentSize * i + gap;
@@ -261,9 +278,9 @@ void UserInterfaceGraphics::drawProbability(juce::Graphics& g, float x, float y,
         graphicPath = graphicPath.createPathWithRoundedCorners(2);
         
         if (i < positionScaled){
-            g.setColour(Colours::StepColour::stepMainColour2[stepIndex]);
+            g.setColour(iconGradientColor);
         } else {
-            g.setColour(Colours::StepColour::iconShadow);
+            g.setColour(iconDarkGreyColour);
         }
         g.fillPath(graphicPath);
     }
@@ -273,17 +290,16 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
 {
     float graphicWidth = width * 0.6f;
     float graphicHeight = height * 0.9f;
-
     float widthMargin = width * 0.15;
     float heightMargin = width * 0.05;
-
     float blockSize = (graphicHeight/4) * 0.7f;
     float blockMargin = (graphicHeight/4) * 0.15f;
     
     float algorithmIndex = position * 9.0f;
     algorithmIndex = std::floor(algorithmIndex);
 
-
+    //==============================================================================
+    // simple struct
     enum blockFill { FILL, OPER, NOISE};
     enum blockConnect { NONE, DOWN, DOWNLEFT, DOWNRIGHT, LEFTDOWN, RIGHTDOWN };
     struct blockValues
@@ -362,25 +378,23 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
         
         juce::Path blockPath;
         blockPath.addRoundedRectangle(xIncr, yIncr, blockSize, blockSize, 2);
-        juce::Colour fillColour = Colours::StepColour::stepMainColour[i % 4];
         
         for (int j = 0; j < 4; j++) {
             if (i != block.blockToUse[j]) {
-                g.setColour(Colours::StepColour::stepMainColour[i % 4]);
+                g.setColour(juce::Colour(iconDarkGreyColour));
                 g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
 
             } else {
                 if (block.fillValue[j] == OPER) {
                     
-                    g.setColour(Colours::StepColour::iconWhite);
+                    g.setColour(iconWhiteColor);
                     g.fillPath(blockPath);
                     g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
 
                 } else if (block.fillValue[j] == NOISE) {
-                    g.setColour(Colours::StepColour::iconWhite);
+                    g.setColour(iconWhiteColor);
                     g.fillPath(blockPath);
                     g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
-
                 }
             }
         }
@@ -422,9 +436,12 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
                 }
             }
         }
+        
         linePath = linePath.createPathWithRoundedCorners(3);
-        g.setColour(Colours::StepColour::iconWhite);
-        g.strokePath(linePath, juce::PathStrokeType(lineWidth));
+        g.setColour(iconWhiteColor);
+        
+        juce::PathStrokeType strokeType(lineWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
+        g.strokePath(linePath, juce::PathStrokeType(strokeType));
     }
 }
 
@@ -450,14 +467,16 @@ void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, f
                                   0.0f, dialStart, dialEnd, true);
     g.setColour(Colours::StepColour::iconWhite); //
 
-    g.strokePath(dialOutlinePath, juce::PathStrokeType(lineWidth));
+    juce::PathStrokeType strokeType(lineWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
+    g.strokePath(dialOutlinePath, juce::PathStrokeType(strokeType));
 
     //==============================================================================
     // dial body
+    
     dialBodyPath.addCentredArc(x + width/2, y + width/2,
                                dialBodyRadius, dialBodyRadius,
                                0.0f, 0.0f, 6.28f, true);
-    g.setColour(Colours::StepColour::iconWhite); //
+    g.setColour(iconWhiteColor); //
     g.fillPath(dialBodyPath);
     
     //==============================================================================
@@ -473,7 +492,7 @@ void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, f
     dialDotPath.addCentredArc(outlineCoords.x, outlineCoords.y,
                               1.5, 1.5, 0.0f, 0.0f, pi * 2, true);
     
-    g.setColour(Colours::StepColour::iconShadow);
+    g.setColour(iconBlackColor);
     g.fillPath(dialDotPath);
     
 }
@@ -487,16 +506,24 @@ void UserInterfaceGraphics::drawSmallRoundDial(juce::Graphics& g, float x, float
     float dialPositionInRadians = dialStart + sliderPositionScaled * (dialEnd - dialStart);
     
 
-    juce::Path dialBodyPath, dialDotPath;
+    juce::Path dialBodyPath, dialDotPath, dialOutlinePath;
+    float dialOutlineRadius = (width * 0.9f)/2;
     float dialBodyRadius = (width * 0.7f)/2;
-    float dialDotRadius = (width * 0.5f)/2;
+    float dialDotRadius = (width * 0.45f)/2;
 
+    dialOutlinePath.addCentredArc(x + width/2, y + width/2,
+                                  dialOutlineRadius, dialOutlineRadius,
+                               0.0f, 0.0f, 6.28f, true);
+    g.setColour(juce::Colour(iconDarkGreyColour));
+    g.strokePath(dialOutlinePath, juce::PathStrokeType(lineWidth * 1.5f));
+    
+    //==============================================================================
     // dial body
     dialBodyPath.addCentredArc(x + width/2, y + width/2,
                                dialBodyRadius, dialBodyRadius,
                                0.0f, 0.0f, 6.28f, true);
-    g.setColour(Colours::StepColour::iconWhite);
-    g.strokePath(dialBodyPath, juce::PathStrokeType(lineWidth * 2.5f));
+    g.setColour(iconWhiteColor);
+    g.fillPath(dialBodyPath);
 
     //==============================================================================
     // dial dot
@@ -508,11 +535,9 @@ void UserInterfaceGraphics::drawSmallRoundDial(juce::Graphics& g, float x, float
     dialDotPath.addCentredArc(outlineCoords.x, outlineCoords.y,
                               1.5, 1.5, 0.0f, 0.0f, pi * 2, true);
     
-    g.setColour(Colours::StepColour::iconWhite);
+    g.setColour(iconBlackColor);
     g.fillPath(dialDotPath);
 }
-
-
 
 void UserInterfaceGraphics::drawTensionIcon(juce::Graphics& g, float x, float y, float size, float length)
 {
@@ -522,7 +547,7 @@ void UserInterfaceGraphics::drawTensionIcon(juce::Graphics& g, float x, float y,
                             x + size, y + size * 0.75f,
                             x + size * length, y + size * 0.75f);
     graphicPath = graphicPath.createPathWithRoundedCorners(1);
-    g.setColour(Colours::StepColour::iconWhite);
+    g.setColour(iconWhiteColor);
     g.fillPath(graphicPath);
 }
 
@@ -533,7 +558,7 @@ void UserInterfaceGraphics::drawInharmIcon(juce::Graphics& g, float x, float y, 
     graphicPath.addEllipse(x, y + size * 0.25f, size * 0.5f, size * 0.5f);
     graphicPath.addEllipse(x + size * offset, y + size * 0.25f,
                            size * 0.5f, size * 0.5f);
-    g.setColour(Colours::StepColour::iconWhite);
+    g.setColour(iconWhiteColor);
     g.strokePath(graphicPath, juce::PathStrokeType(lineWidth));
 }
 
@@ -552,7 +577,7 @@ void UserInterfaceGraphics::drawPosition(juce::Graphics& g, float x, float y, fl
     juce::Point<float>botMidCoords = { x + width * 0.35f, juce::jlimit(y + height * 0.1f, y + height * 0.9f, midCoords.y + height * 0.1f)};
 
 
-    juce::Path graphicLines, arrowLines;
+    juce::Path graphicLines;
     graphicLines.startNewSubPath(topRightCoords);
     
     graphicLines.lineTo(topMidCoords);
@@ -564,55 +589,60 @@ void UserInterfaceGraphics::drawPosition(juce::Graphics& g, float x, float y, fl
     
     graphicLines.startNewSubPath(topLeftCoords);
     graphicLines.lineTo(botLeftCoords);
-    g.setColour(Colours::StepColour::iconWhite);
-    g.strokePath(graphicLines, juce::PathStrokeType(lineWidth * 1.5f));
+    
+    g.setColour(iconWhiteColor);
+    juce::PathStrokeType thickStroke(lineWidth * 1.5f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
+    g.strokePath(graphicLines, juce::PathStrokeType(thickStroke));
 }
 
-void UserInterfaceGraphics::drawRateIcon(juce::Graphics& g, float x, float y, float size, int div)
+void UserInterfaceGraphics::drawNoiseFreq(juce::Graphics& g, float x, float y, float width, float height, float position)
+{
+    juce::Path linePath, arcPath, posArcPath;
+    juce::Point<float>topCoords = { x + width/2, y + width * 0.15f };
+    juce::Point<float>botCoords = { x + width/2, y + width * 0.85f };
+
+    linePath.startNewSubPath(topCoords);
+    linePath.lineTo(botCoords);
+    g.setColour(iconLightGreyColour);
+    g.strokePath(linePath, juce::PathStrokeType(lineWidth * 2.0f));
+    
+    float radius = width * 0.05f;
+    arcPath.addCentredArc(topCoords.x, topCoords.y, radius, radius, 0.0f, 0.0f, 6.28f, true);
+    arcPath.addCentredArc(botCoords.x, botCoords.y, radius, radius, 0.0f, 0.0f, 6.28f, true);
+    g.fillPath(arcPath);
+    
+    float posRadius = width * 0.075f;
+    float pos = width * 0.7f * (1.0f - position);
+    posArcPath.addCentredArc(x + width/2, (width * 0.15f) + pos , posRadius, posRadius, 0.0f, 0.0f, 6.28f, true);
+    g.setColour(iconWhiteColor);
+    g.fillPath(posArcPath);
+
+}
+
+
+
+void UserInterfaceGraphics::drawRateIcon(juce::Graphics& g, float x, float y, float size, int radius)
 {
     juce::Path graphicPath;
-
-    for (int i = 0; i < div; i++)
-    {
-        float blockWidth = (size * 0.8f)/div;
-        graphicPath.addRoundedRectangle(x + (size/div) * i, y + size * 0.25f,
-                                        blockWidth, size * 0.5f, 2);
-        g.setColour(Colours::StepColour::iconWhite);
-        g.fillPath(graphicPath);
-    }
+    // start top left, length is 0~1
+    graphicPath.addCentredArc(x + size/2, y + size/2, (size/2) * radius, (size/2) * radius, 0.0f, 0.0f, 6.28f);
+    g.setColour(iconWhiteColor);
+    g.fillPath(graphicPath);
 }
 
-
-
-void UserInterfaceGraphics::drawStepCount(juce::Graphics& g, float x, float y, float width, float height, float position)
+void UserInterfaceGraphics::drawAmpIcon(juce::Graphics& g, float x, float y, float size, float radius)
 {
-    float widthMargin = width * 0.025f;
-    width = width * 0.95f;
+    juce::Path graphicPath, graphicLinePath;
+    // start top left, length is 0~1
+    graphicPath.addCentredArc(x + size/2, y + size/2, (size/4) * radius, (size/4) * radius, 0.0f, 0.0f, 6.28f);
+    g.setColour(iconWhiteColor);
+    g.fillPath(graphicPath);
     
-    float index = position * 8.0f;
-    index = std::floor(index);
-    float blockSize = (width/4) * 0.6f;
-    float blockMargin = (width/4) * 0.2f;
+    graphicLinePath.addCentredArc(x + size/2, y + size/2, (size/4), (size/4), 0.0f, 0.0f, 6.28f, true);
+    g.strokePath(graphicLinePath, juce::PathStrokeType(lineWidth));
 
-    for (int i = 0; i < 8; i++)
-    {
-        juce::Path graphicPath;
-        
-        int j = i % 4;
-        int k = i / 4;
-        graphicPath.addRoundedRectangle(widthMargin + (blockMargin + blockSize) * j,
-                                        blockSize + ((blockMargin + blockSize) * k),
-                                        blockSize, blockSize, 2);
-        
-        g.setColour(Colours::StepColour::iconWhite);
-        
-        if (i > index){
-            g.strokePath(graphicPath, juce::PathStrokeType(lineWidth));
-        } else {
-            g.fillPath(graphicPath);
-        }
-    }
 }
+
 
 
 
@@ -631,7 +661,7 @@ juce::Label* UserInterfaceGraphics::createSliderTextBox(juce::Slider& slider)
     
     label->setFont(juce::Font(12.0f, juce::Font::plain));
     label->setJustificationType(juce::Justification::centred);
-    label->setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
+    label->setColour(juce::Label::textColourId, Colours::Main::textColor);
 
     label->onEditorShow = [label]()
     {

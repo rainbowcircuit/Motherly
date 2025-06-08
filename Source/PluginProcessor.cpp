@@ -134,9 +134,6 @@ bool MotherlyAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    
-    DBG("MIDI size: " << midiMessages.getNumEvents());
-
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -147,21 +144,20 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     //************** Sequencer **************//
     stepSequencer.suppressMIDIInput(midiMessages);
     stepSequencer.updateTransport(getPlayHead());
-    
-    int rate = apvts.getRawParameterValue("seqRate")->load();
-    stepSequencer.setRate(rate);
-    
+        
     auto playhead = getPlayHead();
     const auto opt = playhead->getPosition();
     const auto& pos = *opt;
     
-    if (pos.getIsPlaying())
-    {
+    if (pos.getIsPlaying()) {
         synth.noteOn(0, 62, 127);
     } else {
         synth.noteOff(0, 62, 0.0f, true);
     }
 
+    int rate = apvts.getRawParameterValue("seqRate")->load();
+    stepSequencer.setRate(rate);
+    
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample){
         // step sequencer has to be accumulated every sample.
         stepSequencer.runSequencer(midiMessages, sample);
@@ -181,7 +177,6 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     int algorithm = apvts.getRawParameterValue("algorithm")->load();
 
     float output = apvts.getRawParameterValue("outputGain")->load();
-
     float op1Level = apvts.getRawParameterValue("op1Level")->load();
     float op2Level = apvts.getRawParameterValue("op2Level")->load();
     float op3Level = apvts.getRawParameterValue("op3Level")->load();
@@ -189,11 +184,6 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
     float noiseBandWidth = apvts.getRawParameterValue("noiseBandWidth")->load();
 
-    
-    
-    // testing
-    
-    
     // patch bay parameters
     std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
 
@@ -206,14 +196,15 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
                 juce::String freqParamID = "freq" + juce::String(step);
                 juce::String toneParamID = "tone" + juce::String(step);
                 juce::String modParamID = "mod" + juce::String(step);
-                juce::String probParamID = "prob" + juce::String(step);
+                juce::String probParamID = "repeat" + juce::String(step);
 
                 float pitch = apvts.getRawParameterValue(freqParamID)->load();
                 float tone = apvts.getRawParameterValue(toneParamID)->load();
                 float mod = apvts.getRawParameterValue(modParamID)->load();
-                float prob = apvts.getRawParameterValue(probParamID)->load();
+                float repeat = apvts.getRawParameterValue(probParamID)->load();
 
-                voice->setStepParameters(step, pitch, tone, mod, prob);
+                voice->setStepParameters(step, pitch, tone, mod, 0.0f);
+                stepSequencer.setRepeat(step, repeat);
             }
             
             // patch bay params
@@ -230,14 +221,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             voice->setGlobalParameters(tension, inharmonicity, position);
             voice->setVoiceLevels(output, op1Level, op2Level, op3Level, noiseLevel, noiseFreq, noiseBandWidth);
             voice->setAlgorithm(algorithm);
-
             voice->setStepIndex(stepIndex);
-            
-                
-            
-            
-            
-            
         }
     }
     
@@ -307,7 +291,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
         layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { freqParamID, 1},
                                                                freqParamName,
-                                                                juce::NormalisableRange<float> { 30.0f, 1200.0f, 0.1f, 0.5f },
+                                                                juce::NormalisableRange<float> { 30.0f, 1200.0f, 0.1f, 0.25f },
                                                                 220.0f));
 
         juce::String toneParamID = "tone" + juce::String(step);
@@ -315,7 +299,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
         layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { toneParamID, 1},
                                                                toneParamName,
-                                                                juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 0.5f },
+                                                                juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 0.25f },
                                                                 10.0f, "%"));
 
         juce::String modParamID = "mod" + juce::String(step);
@@ -326,19 +310,19 @@ MotherlyAudioProcessor::createParameterLayout()
                                                                 juce::NormalisableRange<float> { -12.0f, 12.0f, 0.1f, 1.0f },
                                                                 0.0f, "st"));
         
-        juce::String probParamID = "prob" + juce::String(step);
-        juce::String probParamName = "Probability Amount " + juce::String(step);
+        juce::String repeatParamID = "repeat" + juce::String(step);
+        juce::String repeatParamName = "Repeat " + juce::String(step);
 
-        layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { probParamID, 1},
-                                                               probParamName,
-                                                                juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 1.0f },
-                                                                100.0f, "%"));
+        layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { repeatParamID, 1},
+                                                                repeatParamName,
+                                                                juce::StringArray { "0", "1", "2", "3", "4" }, 1));
+
     }
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "tension", 1},
                                                             "Tension",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 1.0f },
-                                                            20.0f, "%"));
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 0.5f },
+                                                            5.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "inharmonicity", 1},
                                                             "Inharmonicity",
@@ -354,32 +338,32 @@ MotherlyAudioProcessor::createParameterLayout()
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "op1Level", 1},
                                                             "Operator 1 Level",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f },
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f },
                                                             100.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "op2Level", 1},
                                                             "Operator 2 Level",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f },
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f },
                                                             100.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "op3Level", 1},
                                                             "Operator 3 Level",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f },
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f },
                                                             100.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseLevel", 1},
                                                             "Noise Level",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f },
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f },
                                                             50.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseFreq", 1},
                                                             "Noise Frequency",
-                                                            juce::NormalisableRange<float> { 100.0f, 8000.0f },
+                                                            juce::NormalisableRange<float> { 100.0f, 8000.0f, 0.1, 0.25f },
                                                             1000.0f, "Hz"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseBandWidth", 1},
                                                             "Noise Bandwidth",
-                                                            juce::NormalisableRange<float> { 0.0f, 10.0f },
+                                                            juce::NormalisableRange<float> { 0.0f, 10.0f, 0.1f },
                                                             5.0f));
     
     layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID { "algorithm", 1},
@@ -388,7 +372,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "outputGain", 1},
                                                             "Output Gain",
-                                                            juce::NormalisableRange<float> { -72.0f, 6.0f },
+                                                            juce::NormalisableRange<float> { -72.0f, 6.0f, 0.1f },
                                                             0.0f));
 
     //********************* Sequencer Parameter *********************//

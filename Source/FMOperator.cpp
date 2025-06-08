@@ -12,11 +12,12 @@ void Operator::reset()
     operatorPhase = 0.0;
 }
 
-void Operator::setOperatorInputs(float frequency, double inputPhase, float tone)
+void Operator::setOperatorInputs(float frequency, double inputPhase, float tone, float position)
 {
     operatorPhase = frequency/sampleRate;
     this->inputPhase = inputPhase;
     fmAmount = tone * 8.0f;
+    combPosition = position;
     softClipGain = tone * 5.0f + 1.0f;
 }
 
@@ -25,7 +26,7 @@ float Operator::processOperator()
     float modulator = inputPhase * fmAmount;
     
     // soft clip and comb filter
-    combFilter.setDelayTime(2.0f);
+    combFilter.setDelayTime(combPosition);
     modulator = combFilter.processComb(std::tanh(modulator * softClipGain));
     
     float outputWaveform = std::sin(operatorAngle * juce::MathConstants<float>::pi * 2.0f + modulator);

@@ -36,10 +36,10 @@ public:
 private:
     void setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, UserInterfaceGraphics& lookAndFeel);
 
-    juce::Label freqLabel, toneLabel, modLabel, probLabel;
-    UserInterfaceGraphics freqLookAndFeel { 3 }, toneLookAndFeel { 0 }, modLookAndFeel { 2 }, probLookAndFeel { 4 };
-    juce::Slider freqSlider, toneSlider, modSlider, probSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> freqAttachment, toneAttachment, modAttachment, probAttachment;
+    juce::Label freqLabel, toneLabel, modLabel, repeatLabel;
+    UserInterfaceGraphics freqLookAndFeel { 3 }, toneLookAndFeel { 0 }, modLookAndFeel { 2 }, repeatLookAndFeel { 4 };
+    juce::Slider freqSlider, toneSlider, modSlider, repeatSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> freqAttachment, toneAttachment, modAttachment, repeatAttachment;
 
     int stepIndex;
     float amplitude = 0.0f;
@@ -57,37 +57,39 @@ public:
         auto bounds = getLocalBounds().toFloat();
         float width = bounds.getWidth() * 1.2f;
         
-        setStepParams(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", tensionGraphics);
+        setStepParams(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", " %", tensionGraphics);
         tensionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "tension", tensionSlider);
 
-        setStepParams(inharmLabel, inharmSlider, juce::Slider::TextBoxBelow, "Inharmoncity", inharmGraphics);
+        setStepParams(inharmLabel, inharmSlider, juce::Slider::TextBoxBelow, "Inharmoncity", " %", inharmGraphics);
         inharmAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "inharmonicity", inharmSlider);
 
-        setStepParams(positionLabel, positionSlider, juce::Slider::TextBoxBelow, "Position", positionGraphics);
+        setStepParams(positionLabel, positionSlider, juce::Slider::TextBoxBelow, "Position", " %", positionGraphics);
         positionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "position", positionSlider);
 
-        setStepParams(algorithmLabel, algorithmSlider, juce::Slider::NoTextBox, "Algorithm", algorithmGraphics);
+        setStepParams(algorithmLabel, algorithmSlider, juce::Slider::NoTextBox, "Algorithm", "", algorithmGraphics);
         algorithmAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "algorithm", algorithmSlider);
         
-        setStepParams(op1Label, op1Slider, juce::Slider::NoTextBox, "Op 1", smallDialGraphics);
+        setStepParams(op1Label, op1Slider, juce::Slider::NoTextBox, "Op 1", "", smallDialGraphics);
         op1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op1Level", op1Slider);
         
-        setStepParams(op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", smallDialGraphics);
+        setStepParams(op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", "", smallDialGraphics);
         op2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op2Level", op2Slider);
 
         
-        setStepParams(op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", smallDialGraphics);
+        setStepParams(op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", "", smallDialGraphics);
         op3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op3Level", op3Slider);
 
         
-        setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", smallDialGraphics);
+        setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", "", smallDialGraphics);
         noiseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseLevel", noiseSlider);
 
+        setStepParams(noiseFreqLabel, noiseFreqSlider, juce::Slider::TextBoxBelow, "Freq", " Hz", noiseFreqGraphics);
+        noiseFreqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseFreq", noiseFreqSlider);
+
+        //setStepParams(algorithmLabel, testSlider, juce::Slider::NoTextBox, "Algorithm", testGraphics);
         
-        setStepParams(algorithmLabel, testSlider, juce::Slider::NoTextBox, "Algorithm", testGraphics);
-        
-        setStepParams(algorithmLabel, testSlider2, juce::Slider::TextBoxBelow, "Algorithm", testGraphics2);
-        rateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "seqRate", testSlider2);
+        setStepParams(outputLabel, outputSlider, juce::Slider::TextBoxBelow, "Output", " dB", testGraphics2);
+        outputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "outputGain", outputSlider);
     }
     
     ~DrumMainInterface()
@@ -105,7 +107,7 @@ public:
         juce::Path bgFill;
         bgFill.addRoundedRectangle(bg, 5);
         
-        juce::Colour mainColour = Colours::InterfaceMain::backgroundFill;
+        juce::Colour mainColour = Colours::Main::backgroundFill;
         
         g.setColour(mainColour);
         g.fillPath(bgFill);
@@ -121,37 +123,41 @@ public:
         tensionLabel.setBounds(x + 10, y + height * 0.1f, height * 0.7f, height * 0.1f);
         tensionSlider.setBounds(x + 10, y + height * 0.175f, height * 0.7f, height * 0.775f);
         
-        inharmLabel.setBounds(x + 120, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        inharmSlider.setBounds(x + 120, y + height * 0.175f, height * 0.7f, height * 0.775f);
+        inharmLabel.setBounds(x + 130, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        inharmSlider.setBounds(x + 130, y + height * 0.175f, height * 0.7f, height * 0.775f);
         
-        positionLabel.setBounds(x + 220, y + height * 0.15f, height * 0.5f, height * 0.1f);
-        positionSlider.setBounds(x + 220, y + height * 0.25f, height * 0.5f, height * 0.6f);
+        positionLabel.setBounds(x + 250, y + height * 0.15f, height * 0.5f, height * 0.1f);
+        positionSlider.setBounds(x + 250, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        algorithmLabel.setBounds(x + 500, y + height * 0.1f, height * 0.6f, height * 0.1f);
-        algorithmSlider.setBounds(x + 500, y + height * 0.2, height * 0.7f, height * 0.7f);
+        algorithmLabel.setBounds(x + 550, y + height * 0.1f, height * 0.6f, height * 0.1f);
+        algorithmSlider.setBounds(x + 550, y + height * 0.2, height * 0.7f, height * 0.7f);
         
-        op1Label.setBounds(x + 300, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op1Slider.setBounds(x + 300, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op1Label.setBounds(x + 380, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op1Slider.setBounds(x + 380, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        op2Label.setBounds(x + 300, y + height * 0.55f, height * 0.3f, height * 0.1f);
-        op2Slider.setBounds(x + 300, y + height * 0.65, height * 0.3f, height * 0.3f);
+        op2Label.setBounds(x + 380, y + height * 0.55f, height * 0.3f, height * 0.1f);
+        op2Slider.setBounds(x + 380, y + height * 0.65, height * 0.3f, height * 0.3f);
 
-        op3Label.setBounds(x + 350, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op3Slider.setBounds(x + 350, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op3Label.setBounds(x + 440, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op3Slider.setBounds(x + 440, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        noiseLabel.setBounds(x + 350, y + height * 0.55f, height * 0.3f, height * 0.1f);
-        noiseSlider.setBounds(x + 350, y + height * 0.65, height * 0.3f, height * 0.3f);
+        noiseLabel.setBounds(x + 440, y + height * 0.55f, height * 0.3f, height * 0.1f);
+        noiseSlider.setBounds(x + 440, y + height * 0.65, height * 0.3f, height * 0.3f);
         
-        testSlider2.setBounds(x + 650, y + height * 0.175, height * 0.7f, height * 0.775f);
+        noiseFreqLabel.setBounds(x + 490, y + height * 0.15f, height * 0.5f, height * 0.1f);
+        noiseFreqSlider.setBounds(x + 490, y + height * 0.25f, height * 0.5f, height * 0.6f);
+
+        outputLabel.setBounds(x + 675, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        outputSlider.setBounds(x + 675, y + height * 0.175, height * 0.7f, height * 0.775f);
     }
     
     
-    void setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, UserInterfaceGraphics& lookAndFeel)
+    void setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel)
     {
         // initialize label
         addAndMakeVisible(label);
         label.setText(labelText, juce::dontSendNotification);
-        label.setColour(juce::Label::textColourId, Colours::InterfaceMain::textColor);
+        label.setColour(juce::Label::textColourId, Colours::Main::textColor);
         label.setJustificationType(juce::Justification::centred);
         label.setFont(12.0f);
 
@@ -159,18 +165,19 @@ public:
         addAndMakeVisible(slider);
         slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
         slider.setTextBoxStyle(textBoxPosition, false, 50, 20);
+        slider.setTextValueSuffix(suffix);
         slider.setLookAndFeel(&lookAndFeel);
     }
     
     
 private:
-    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 }, testGraphics2 { 10 }, smallDialGraphics { 11 };
+    UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 }, testGraphics2 { 10 }, smallDialGraphics { 11 }, noiseFreqGraphics { 1 };
     
-    juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider, testSlider2;
+    juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider, testSlider2, noiseFreqSlider, outputSlider;
     
-    juce::Label tensionLabel, inharmLabel, positionLabel, algorithmLabel, op1Label, op2Label, op3Label, noiseLabel;
+    juce::Label tensionLabel, inharmLabel, positionLabel, algorithmLabel, op1Label, op2Label, op3Label, noiseLabel, noiseFreqLabel, outputLabel;
     
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tensionAttachment, inharmAttachment, positionAttachment, op1Attachment, op2Attachment, op3Attachment, noiseAttachment, algorithmAttachment, testAttachment, rateAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tensionAttachment, inharmAttachment, positionAttachment, op1Attachment, op2Attachment, op3Attachment, noiseAttachment, noiseFreqAttachment, algorithmAttachment, testAttachment, outputAttachment;
 
     MotherlyAudioProcessor& audioProcessor;
 };

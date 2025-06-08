@@ -32,7 +32,7 @@ public:
     {
         float pitchFrom0to1 = pitchIn0to1 * 1170.0f + 30.0f;
         float tensionFrom0to1 = tensionIn0to1 * 1990.0f + 10.0f;
-        ampEnvelope.setEnvelopeSlew(1.0f, 1000.0f/pitchFrom0to1 * tensionFrom0to1);
+        ampEnvelope.setEnvelopeSlew(2.0f, 1000.0f/pitchFrom0to1 * tensionFrom0to1);
     }
 
     void triggerEnvelope(float gate)
@@ -42,7 +42,7 @@ public:
     
     struct VoiceParams
     {
-        float envelope, modEnvelope, pitch, tone, inharm, op0Level, op1Level, op2Level, operLevel, noiseLevel;
+        float envelope, modEnvelope, pitch, tone, inharm, position, op0Level, op1Level, op2Level, operLevel, noiseLevel;
         
     };
     
@@ -100,6 +100,7 @@ private:
     
     float outputGain = 0.0f, operatorLevel = 1.0f, op0Level = 1.0f, op1Level = 1.0f, op2Level = 1.0f, noiseLevel = 1.0f, noiseFreq = 1000.0f, noiseBandwidth = 10.0f;
     
+    
     // patchbay
     std::array<float, 8> outputsIn0to1;
     std::array<float, 12> inputsIn0to1;
@@ -107,8 +108,8 @@ private:
         
     float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionInIn0to1, stepIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, noiseBandIn0to1, algoIn0to1, vcaMixIn0to1;
     
-    
-    
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, tensionSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth;
+
 
     
     

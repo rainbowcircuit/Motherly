@@ -39,29 +39,6 @@ void StepSequencer::suppressMIDIInput(juce::MidiBuffer& midiBuffer)
     midiBuffer.swapWith(filteredBuffer);
 }
 
-/*
-void StepSequencer::triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition)
-{
-    DBG("sequencer triggernote, with step index:" << currentStepIndex % 7);
-    // run this method every sample.
-    juce::MidiMessage noteOn = juce::MidiMessage::noteOn(1, 0, (juce::uint8)127);
-    midiBuffer.addEvent(noteOn, samplePosition);
-
-    // Add the noteOff at the next sample position
-    int noteOffSamplePosition = samplePosition + 128;
-    juce::MidiMessage noteOff = juce::MidiMessage::noteOff(1, 0);
-    
-    if (noteOffSamplePosition < samplePerBlock){
-
-        juce::MidiMessage noteOff = juce::MidiMessage::noteOff(1, 0);
-        midiBuffer.addEvent(noteOff, noteOffSamplePosition);
-    } else {
-        pendingNoteOff = true;
-    }
- 
-}
-*/
-
 void StepSequencer::flushNote(juce::MidiBuffer& midiBuffer)
 {
     if (pendingNoteOff)
