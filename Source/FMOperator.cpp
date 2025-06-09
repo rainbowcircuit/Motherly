@@ -3,22 +3,28 @@
 void Operator::prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels)
 {
     this->sampleRate = sampleRate;
+    resetPhase();
+    resetAngle();
     combFilter.prepareToPlay(sampleRate, samplesPerBlock, numChannels);
 }
 
-void Operator::reset()
+void Operator::resetPhase()
+{
+    operatorPhase = 1.0;
+}
+
+void Operator::resetAngle()
 {
     operatorAngle = 0.0;
-    operatorPhase = 0.0;
 }
 
 void Operator::setOperatorInputs(float frequency, double inputPhase, float tone, float position)
 {
     operatorPhase = frequency/sampleRate;
     this->inputPhase = inputPhase;
-    fmAmount = tone * 8.0f;
+    fmAmount = tone * 6.0f;
     combPosition = position;
-    softClipGain = tone * 5.0f + 1.0f;
+    softClipGain = tone * 3.5f + 1.0f;
 }
 
 float Operator::processOperator()
@@ -43,8 +49,8 @@ void NoiseGenerator::prepareToPlay(double sampleRate)
 {
     filter.setSampleRate(sampleRate);
     filter.reset();
-    
 }
+
 void NoiseGenerator::setFilter(float frequency, float Q)
 {
     filter.setCoefficients(frequency, Q);
@@ -54,6 +60,6 @@ float NoiseGenerator::processNoiseGenerator()
 {
     float noise = noiseSource.nextFloat();
     float filteredNoise = filter.processSample(noise, 2);
-    
+
     return filteredNoise;
 }

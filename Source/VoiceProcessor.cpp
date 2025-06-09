@@ -4,17 +4,19 @@
 void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels)
 {
     this->sampleRate = sampleRate;
-    ampEnvelope.setSampleRate(sampleRate);
-
+    
     for(int i = 0; i < 3; i++)
     {
         op[i].prepareToPlay(sampleRate, samplesPerBlock, numChannels);
-        op[i].reset();
+        op[i].resetPhase();
+        op[i].resetAngle();
     }
     ns.prepareToPlay(sampleRate);
-    
-    pitchSmooth.reset(sampleRate, 0.0001f);
-    toneSmooth.reset(sampleRate, 0.0001f);
+    ampEnvelope.setSampleRate(sampleRate);
+
+    // smoothening
+    pitchSmooth.reset(sampleRate, 0.01f);
+    toneSmooth.reset(sampleRate, 0.01f);
     tensionSmooth.reset(sampleRate, 0.001f);
     inharmSmooth.reset(sampleRate, 0.001f);
     positionSmooth.reset(sampleRate, 0.001f);
@@ -33,11 +35,7 @@ bool SynthVoice::canPlaySound (juce::SynthesiserSound* sound)
     return dynamic_cast<juce::SynthesiserSound*>(sound) != nullptr;
 }
 
-
-void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *sound, int currentPitchWheelPosition)
-{
-
-}
+void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *sound, int currentPitchWheelPosition) {}
 
 void SynthVoice::stopNote(float velocity, bool allowTailOff)
 {
@@ -50,49 +48,45 @@ void SynthVoice::stopNote(float velocity, bool allowTailOff)
 
 void SynthVoice::pitchWheelMoved(int newPitchWheelValue)
 {
-    pitchWheel = newPitchWheelValue;
+    pitchWheelRawValue = newPitchWheelValue;
 }
 
 void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue)
 {
     if (controllerNumber == 1)
     {
-        modWheel = newControllerValue;
+        modWheelRawValue = newControllerValue;
     }
 }
 
 void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples)
 {
-    pitchSmooth.setTargetValue(pitchIn0to1);
-    float pitchFrom0to1 = pitchSmooth.getNextValue() * 1170.0f + 30.0f;
-    
-    toneSmooth.setTargetValue(toneIn0to1);
-    float toneFrom0to1 = toneSmooth.getNextValue();
     float inharmFrom0to1 = inharmIn0to1 * 2.5 + 0.5f;
     float positionFrom0to1 = positionInIn0to1 * 15.0f + 5.0f;
-    
     float algoFrom0to1 = algoIn0to1 * 9.0f;
-    float op0LevelFrom0to1 = op0Level;
-    float op1LevelFrom0to1 = op1Level;
-    float op2LevelFrom0to1 = op2Level;
+    algoFrom0to1 = std::floor(algoFrom0to1);
+    
+    float op0LevelFrom0to1 = op0LevelRawValue;
+    float op1LevelFrom0to1 = op1LevelRawValue;
+    float op2LevelFrom0to1 = op2LevelRawValue;
     float operLevelFrom0to1 = operLevelIn0to1;
     
     float noiseLevelFrom0to1 = noiseLevelIn0to1;
     float noiseFreqFrom0to1 = noiseFreqIn0to1 * 7900.0f + 100;
-    float noiseBandFrom0to1 = noiseBandIn0to1 * 9.0f + 1.0f;
-
+    
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
+        // envelopes are incremented at sample value
+        pitchSmooth.setTargetValue(pitchIn0to1);
+        float pitchFrom0to1 = pitchSmooth.getNextValue() * 1170.0f + 30.0f;
+        toneSmooth.setTargetValue(toneIn0to1);
+        float toneFrom0to1 = toneSmooth.getNextValue();
+
         float envelope = ampEnvelope.generateEnvelope();
-        float modEnvelope = std::pow(2.0f, envelope * mod[stepIndex]/12.0f);
-        
+        float modEnvelope = std::pow(2.0f, envelope * modRawValues[stepIndex]/12.0f);
+        ns.setFilter(noiseFreqFrom0to1, 2.5f);
 
-        ns.setFilter(noiseFreqFrom0to1, noiseBandFrom0to1);
-        
         VoiceParams params { envelope, modEnvelope, pitchFrom0to1, toneFrom0to1, inharmFrom0to1, positionFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, operLevelFrom0to1, noiseLevelFrom0to1 };
-        
-        algoFrom0to1 = std::floor(algoFrom0to1);
 
-   //     op[0]
         float output;
         switch((int)algoFrom0to1)
         {
@@ -127,9 +121,9 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
                 output = processAlgorithm9(params);
                 break;
         }
-
+        
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
-            buffer.addSample(channel, sample, output * outputGain);
+            buffer.addSample(channel, sample, output * outputGainRawValue);
         }
     }
 }
@@ -139,49 +133,67 @@ void SynthVoice::setStepIndex(int index)
     stepIndex = index;
 }
 
-void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue, float modValue, float probValue)
+void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue)
 {
-    pitch[index] = pitchValue;
-    tone[index] = toneValue;
-    mod[index] = modValue;
+    pitchRawValues[index] = pitchValue;
+    toneRawValues[index] = toneValue;
+    modRawValues[index] = modValue;
+    repeatRawValues[index] = repeatValue;
 }
 
 void SynthVoice::setGlobalParameters(float tensionValue, float inharmValue, float positionValue)
 {
     tensionSmooth.setTargetValue(tensionValue);
-    tension = tensionSmooth.getNextValue();
+    tensionRawValue = tensionSmooth.getNextValue();
     inharmSmooth.setTargetValue(inharmValue);
-    inharmonicity = inharmSmooth.getNextValue();
+    inharmonicityRawValue = inharmSmooth.getNextValue();
     positionSmooth.setTargetValue(positionValue);
-    position = positionSmooth.getNextValue();
+    positionRawValue = positionSmooth.getNextValue();
     
     setEnvelope();
 }
 
-void SynthVoice::setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue, float noiseBandwidthValue)
+void SynthVoice::setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue)
 {
     outputSmooth.setTargetValue(outputGainValue);
-    outputGain = juce::Decibels::decibelsToGain(outputSmooth.getNextValue());
-
+    outputGainRawValue = juce::Decibels::decibelsToGain(outputSmooth.getNextValue());
     op0LevelSmooth.setTargetValue(op0LevelValue/100.0f);
-    op0Level = op0LevelSmooth.getNextValue();
-
+    op0LevelRawValue = op0LevelSmooth.getNextValue();
     op1LevelSmooth.setTargetValue(op1LevelValue/100.0f);
-    op1Level = op1LevelSmooth.getNextValue();
-
+    op1LevelRawValue = op1LevelSmooth.getNextValue();
     op2LevelSmooth.setTargetValue(op2LevelValue/100.0f);
-    op2Level = op2LevelSmooth.getNextValue();
-
+    op2LevelRawValue = op2LevelSmooth.getNextValue();
     noiseLevelSmooth.setTargetValue(noiseLevelValue/100.0f);
-    noiseLevel = noiseLevelSmooth.getNextValue();
-
+    noiseLevelRawValue = noiseLevelSmooth.getNextValue();
     noiseFreqSmooth.setTargetValue(noiseFreqValue);
-    noiseBandwidth = noiseFreqSmooth.getNextValue();
+    noiseFreqRawValue = noiseFreqSmooth.getNextValue();
+}
+
+void SynthVoice::setEnvelope()
+{
+    float pitchFrom0to1 = (1.0f - pitchIn0to1) * 40.0f + 10.0f;
+    float tensionFrom0to1 = tensionIn0to1 * 40.0f + 10.0f;
+    float repeatScaling = 1.0f/(repeatRawValues[stepIndex] + 1);
+    
+    float decayTime = pitchFrom0to1 * tensionFrom0to1 * repeatScaling;
+    ampEnvelope.setEnvelopeSlew(5.0f, decayTime);
+}
+
+void SynthVoice::triggerEnvelope(float gate)
+{
+    if (gate > 0.0f && previousGate <= 0.0f)
+    {
+        op[0].resetPhase();
+        op[1].resetPhase();
+        op[2].resetPhase();
+    }
+    ampEnvelope.triggerEnvelope(gate);
+    previousGate = gate;
 }
 
 void SynthVoice::setAlgorithm(int algorithmValue)
 {
-    algorithm = algorithmValue;
+    algorithmRawValue = algorithmValue;
 }
 
 float SynthVoice::processAlgorithm0(VoiceParams p)
@@ -308,29 +320,27 @@ float SynthVoice::processAlgorithm9(VoiceParams p)
 void SynthVoice::paramsIn0to1()
 {
     // outputs
-    float pitchIn0to1 = Utility::scale(pitch[stepIndex], 30.0f, 1200.0f, 0.0f, 1.0f);
-    float toneIn0to1 = tone[stepIndex]/100.0f;
-    float modIn0to1 = Utility::scale(mod[stepIndex], -12.0f, 12.0f, 0.0, 1.0f);
-    float probIn0to1 = prob[stepIndex]/100.0f;
+    float pitchIn0to1 = Utility::scale(pitchRawValues[stepIndex], 30.0f, 1200.0f, 0.0f, 1.0f);
+    float toneIn0to1 = toneRawValues[stepIndex]/100.0f;
+    float modIn0to1 = Utility::scale(modRawValues[stepIndex], -12.0f, 12.0f, 0.0, 1.0f);
+    float repeatIn0to1 = repeatRawValues[stepIndex]/4.0f;
     float envIn0to1 = ampEnvelope.generateEnvelope();
     float stepIn0to1 = Utility::scale(stepIndex, 0.0f, 7.0f, 0.0, 1.0f);
-    float modWheelIn0to1 = modWheel/127.0f;
-    float pBendIn0to1 = Utility::scale(pitchWheel, 0.0f, 16383.0f, 0.0f, 1.0f);
+    float modWheelIn0to1 = modWheelRawValue/127.0f;
+    float pBendIn0to1 = Utility::scale(pitchWheelRawValue, 0.0f, 16383.0f, 0.0f, 1.0f);
 
     // other defaults
-    float tensionIn0to1 = tension/100.0f;
-    float inharmIn0to1 = inharmonicity/100.0f;
-    float positionIn0to1 = position/100.0f;
+    float tensionIn0to1 = tensionRawValue/100.0f;
+    float inharmIn0to1 = inharmonicityRawValue/100.0f;
+    float positionIn0to1 = positionRawValue/100.0f;
     float operLevelIn0to1 = 1.0f;
-    float noiseLevelIn0to1 = noiseLevel;
-    float noiseFreqIn0to1 = Utility::scale(noiseFreq, 100.0f, 8000.0f, 0.0f, 1.0f);
-    float noiseBandIn0to1 = noiseBandwidth/10.0f;
-    float algoIn0to1 = Utility::scale(algorithm, 0.0f, 9.0f, 0.0f, 1.0f);
+    float noiseLevelIn0to1 = noiseLevelRawValue;
+    float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 100.0f, 8000.0f, 0.0f, 1.0f);
+    float noiseBandIn0to1 = noiseBandwidthRawValue/10.0f;
+    float algoIn0to1 = Utility::scale(algorithmRawValue, 0.0f, 9.0f, 0.0f, 1.0f);
 
-    outputsIn0to1  = { pitchIn0to1, toneIn0to1, modIn0to1, probIn0to1, envIn0to1, stepIn0to1, modWheelIn0to1, pBendIn0to1 };
-    
+    outputsIn0to1  = { pitchIn0to1, toneIn0to1, modIn0to1, repeatIn0to1, envIn0to1, stepIn0to1, modWheelIn0to1, pBendIn0to1 };
     defaultsIn0to1  = { pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionIn0to1, stepIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, noiseBandIn0to1, algoIn0to1, 0.0f };
-    
 }
 
 void SynthVoice::setDefaults()
@@ -339,7 +349,6 @@ void SynthVoice::setDefaults()
     {
         inputsIn0to1[i] = defaultsIn0to1[i];
     }
-    
 }
 
 void SynthVoice::overrideDefaults(int outputIndex, int inputIndex)
@@ -365,4 +374,3 @@ void SynthVoice::newParamsIn0to1()
     algoIn0to1 = inputsIn0to1[10];
     vcaMixIn0to1 = inputsIn0to1[11];
 }
-

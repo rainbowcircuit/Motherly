@@ -77,28 +77,24 @@ float Metro::getGate()
         if (counterAccum >= 1.0) counterAccum -= 1.0;
         
         switch(repeatIndex){
-            case 0: { // off
-                gate = 0.0f;
-                break;
-                
-            } case 1: {
+            case 0: {
                 gate = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
                 break;
                 
-            } case 2: { // repeat 2
+            } case 1: { // repeat 2
                 bool gateBool1 = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
                 bool gateBool2 = counterAccum >= 0.5 && counterAccum < 0.5 + gateSize;
                 gate = gateBool1 || gateBool2;
                 break;
                 
-            } case 3: { // repeat 3
+            } case 2: { // repeat 3
                 bool gateBool1 = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
                 bool gateBool2 = counterAccum >= 0.333 && counterAccum < 0.333 + gateSize;
                 bool gateBool3 = counterAccum >= 0.666 && counterAccum < 0.666 + gateSize;
                 gate = gateBool1 || gateBool2 || gateBool3;
                 break;
                 
-            } case 4: { // repeat 4
+            } case 3: { // repeat 4
                 bool gateBool1 = counterAccum >= 0.0 && counterAccum < 0.0 + gateSize;
                 bool gateBool2 = counterAccum >= 0.25 && counterAccum < 0.25 + gateSize;
                 bool gateBool3 = counterAccum >= 0.5 && counterAccum < 0.5 + gateSize;

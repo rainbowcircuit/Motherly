@@ -465,7 +465,7 @@ void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, f
     dialOutlinePath.addCentredArc(x + width/2, x + width/2,
                                   dialOutlineRadius, dialOutlineRadius,
                                   0.0f, dialStart, dialEnd, true);
-    g.setColour(Colours::StepColour::iconWhite); //
+    g.setColour(Colours::Main::iconWhite); //
 
     juce::PathStrokeType strokeType(lineWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
     g.strokePath(dialOutlinePath, juce::PathStrokeType(strokeType));

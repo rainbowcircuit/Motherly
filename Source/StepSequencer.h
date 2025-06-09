@@ -28,7 +28,7 @@ public:
     
     float getGate()
     {
-        counter.setStepIndex(getStepIndex());
+        counter.setStepIndex(currentStepIndex % 8);
         return counter.getGate();
     }
     

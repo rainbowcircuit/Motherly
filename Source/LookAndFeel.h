@@ -24,29 +24,8 @@ namespace Colours
     const juce::Colour iconWhite = { 190, 192, 191 };
     const juce::Colour iconWhiteHover = { 200, 202, 201 };
     const juce::Colour iconLightGrey = { 150, 152, 151 };
-    const juce::Colour iconDarkGrey = { 80, 82, 81 };
-
-    }
-
-    namespace StepColour
-    {
-        const juce::Colour iconWhite = { 190, 192, 191 };
-        const juce::Colour iconWhiteAlt = { 190, 192, 191 };
-        const juce::Colour iconShadow = { 150, 152, 151 };
-
-    
-    const std::array<juce::Colour, 8> stepMainColour = {
-        juce::Colour { 219, 153, 147 }, // Top: light rosy
-        juce::Colour { 208, 144, 127 },
-        juce::Colour { 204, 147, 114 },
-        juce::Colour { 195, 150, 110 }, // Desaturated orange
-        juce::Colour { 183, 152, 96 },
-        juce::Colour { 173, 155, 103 },
-        juce::Colour { 166, 157, 114 },
-        juce::Colour { 161, 160, 124 }  // Bottom: light earthy gray-green
-    };
-
-    
+    const juce::Colour iconDarkGrey = { 50, 52, 51 };
+    const juce::Colour iconBlack = { 25, 22, 24 };
     }
 
     namespace Gradient

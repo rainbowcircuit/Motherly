@@ -23,10 +23,14 @@ PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
     for (auto param : params){
         param->addListener(this);
     }
+    addAndMakeVisible(patchBayLabel);
+    patchBayLabel.setText("Input/Output", juce::dontSendNotification);
+    patchBayLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
+    patchBayLabel.setFont(12.0f);
+    patchBayLabel.setJustificationType(juce::Justification::centred);
     
     parameterIndexAtomic = 0;
     newValueAtomic = 0.0f;
-
     resized();
 }
  
@@ -36,7 +40,6 @@ PatchBay::~PatchBay()
     for (auto param : params){
         param->removeListener(this);
     }
-
 }
 
 void PatchBay::paint(juce::Graphics& g)
@@ -53,8 +56,7 @@ void PatchBay::paint(juce::Graphics& g)
 void PatchBay::resized()
 {
     auto bounds = getLocalBounds().toFloat();
-
-    patchBayLabel.setBounds(bounds.getCentreX(), bounds.getCentreY(), bounds.getWidth(), bounds.getHeight() * 0.1f);
+    patchBayLabel.setBounds(bounds.getX(), bounds.getY() + bounds.getHeight() * 0.075f, bounds.getWidth(), bounds.getHeight() * 0.05f);
     
     float xIncr = (bounds.getWidth() * 0.9f)/4;
     float yIncr = (bounds.getHeight() * 0.8f)/5;
@@ -371,15 +373,8 @@ PatchPoint::PatchPoint()
 
 void PatchPoint::paint(juce::Graphics &g)
 {
-    juce::Colour bgFillColour = !isInput ? Colours::StepColour::iconWhite : Colours::Main::backgroundHoverFill; // for now
-    
-    juce::Colour patchColour = { 100, 100, 100 };
-    
-    if (available){
-        patchColour = { 100, 100, 100 };
-    } else if (!available){
-        patchColour = { 150, 150, 150 };
-    }
+    juce::Colour bgFillColour = !isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey; // for now
+    juce::Colour patchColour = !isInput ? Colours::Main::iconBlack : Colours::Main::iconWhite;
     auto bounds = getLocalBounds().toFloat();
     
     juce::Path bgPath, graphicsPath;
@@ -387,13 +382,13 @@ void PatchPoint::paint(juce::Graphics &g)
     g.setColour(bgFillColour);
     g.fillPath(bgPath);
     
-    graphicsPath.addCentredArc(x, y, 2, 2, 0.0f, 0.0f, 6.28f, true);
+    graphicsPath.addCentredArc(x, y, 2.75, 2.75, 0.0f, 0.0f, 6.28f, true);
     g.setColour(patchColour);
     g.fillPath(graphicsPath);
     
     float radius = mouseOver ? 7.0f : 6.0f;
     graphicsPath.addCentredArc(x, y, radius, radius, 0.0f, 0.0f, 6.28f, true);
-    g.strokePath(graphicsPath, juce::PathStrokeType(2.0f));
+    g.strokePath(graphicsPath, juce::PathStrokeType(1.5f));
 }
 
 void PatchPoint::resized()
@@ -449,7 +444,7 @@ void PatchPoint::setIsAvailable(bool availablity)
 void PatchPoint::setIsInput(bool input)
 {
     isInput = input;
-    juce::Colour labelTextColour = isInput ? Colours::Main::textColor : Colours::Main::backgroundFillAlt;
+    juce::Colour labelTextColour = isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
 
@@ -458,7 +453,7 @@ PatchCable::PatchCable() {}
 void PatchCable::paint(juce::Graphics& g)
 {
     juce::Path cablePath, cableEndPath;
-    juce::Colour fillColour = Colours::StepColour::stepMainColour[getConnectionIndex(true)];
+    juce::Colour fillColour = Colours::Gradient::gradient[7];
     g.setColour(fillColour);
 
     if (cableInUse){

@@ -20,7 +20,8 @@ public:
     Since the EG is shared, it is handled externally in synth voice.
     */
     void prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels);
-    void reset();
+    void resetPhase();
+    void resetAngle();
     void setOperatorInputs(float frequency, double inputPhase, float fmAmount, float position);
     float processOperator();
     

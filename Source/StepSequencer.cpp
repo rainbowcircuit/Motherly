@@ -43,7 +43,6 @@ void StepSequencer::flushNote(juce::MidiBuffer& midiBuffer)
 {
     if (pendingNoteOff)
     {
-     //   DBG("flushnote");
         midiBuffer.addEvent(juce::MidiMessage::noteOff(1, 0), 0); // start of next block
         pendingNoteOff = false;
     }
