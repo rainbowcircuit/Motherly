@@ -36,7 +36,6 @@ public:
     void drawPitchMod(juce::Graphics& g, float x, float y, float width, float height, float position);
     
     void drawProbability(juce::Graphics& g, float x, float y, float width, float height, float position);
-
     
     void drawTensionIcon(juce::Graphics& g, float x, float y, float size, float length);
 
@@ -47,6 +46,8 @@ public:
     void drawNoiseFreq(juce::Graphics& g, float x, float y, float width, float height, float position);
     
     void drawAlgorithm(juce::Graphics& g, float x, float y, float width, float height, float position);
+    
+    void drawRate(juce::Graphics& g, float x, float y, float width, float height, float position);
     
     void drawRateIcon(juce::Graphics& g, float x, float y, float size, int div);
 

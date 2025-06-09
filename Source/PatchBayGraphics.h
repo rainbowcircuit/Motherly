@@ -93,38 +93,46 @@ public:
     }
 
 private:
+    
+    std::vector<std::pair<int, float>> pendingChanges;
+    juce::SpinLock pendingLock;
+    
     void parameterValueChanged(int parameterIndex, float newValue) override
     {
-        parameterIndexAtomic.store(parameterIndex);
-        newValueAtomic.store(newValue);
+        const juce::SpinLock::ScopedLockType lock(pendingLock);
+        pendingChanges.emplace_back(parameterIndex, newValue);
         triggerAsyncUpdate();
     }
     
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
     
     void handleAsyncUpdate() override {
-        int parameterIndex = parameterIndexAtomic.load();
-        float newValue = newValueAtomic.load();
         
-        juce::AudioProcessorParameter* parameter = audioProcessor.getParameters()[parameterIndex];
-        auto* paramWithID = dynamic_cast<juce::AudioProcessorParameterWithID*>(parameter);
-        
-        if (auto* rangedParam = dynamic_cast<juce::RangedAudioParameter*>(paramWithID))
+        std::vector<std::pair<int, float>> updatesCopy;
+
         {
-            if (paramWithID != nullptr){
-                auto input = rangedParam->convertFrom0to1(newValue);
-                juce::String parameterID = paramWithID->paramID;
-             //   int input = audioProcessor.apvts.getRawParameterValue(parameterID)->load();
-                juce::NormalisableRange<float> paramRange = audioProcessor.apvts.getParameterRange(parameterID);
-                
-                for (int point = 0; point < 20; point++)
+            const juce::SpinLock::ScopedLockType lock(pendingLock);
+            updatesCopy.swap(pendingChanges); // safely move all pending updates
+        }
+
+        for (const auto& [parameterIndex, newValue] : updatesCopy)
+        {
+            if (auto* param = dynamic_cast<juce::AudioProcessorParameterWithID*>(audioProcessor.getParameters()[parameterIndex]))
+            {
+                if (auto* rangedParam = dynamic_cast<juce::RangedAudioParameter*>(param))
                 {
-                    if (patchPointLayout[point].paramID == parameterID) // this means its an output
+                    auto input = rangedParam->convertFrom0to1(newValue);
+                    juce::String parameterID = param->paramID;
+                    auto paramRange = audioProcessor.apvts.getParameterRange(parameterID);
+
+                    for (int point = 0; point < 20; ++point)
                     {
-                        int output = patchPointLayout[point].localOutputIndex;
-                        setCableFromParameter(output - 1, input);
-                        
-                        DBG("cable set from" << parameterID << " output: " << output - 1 << " input: " << input);
+                        if (patchPointLayout[point].paramID == parameterID)
+                        {
+                            int output = patchPointLayout[point].localOutputIndex;
+                            setCableFromParameter(output - 1, input);
+                            DBG("cable set from " << parameterID << " output: " << output - 1 << " input: " << input);
+                        }
                     }
                 }
             }

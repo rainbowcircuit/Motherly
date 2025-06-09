@@ -15,9 +15,8 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numCh
     ampEnvelope.setSampleRate(sampleRate);
 
     // smoothening
-    pitchSmooth.reset(sampleRate, 0.01f);
-    toneSmooth.reset(sampleRate, 0.01f);
-    tensionSmooth.reset(sampleRate, 0.001f);
+    pitchSmooth.reset(sampleRate, 0.02f);
+    toneSmooth.reset(sampleRate, 0.02f);
     inharmSmooth.reset(sampleRate, 0.001f);
     positionSmooth.reset(sampleRate, 0.001f);
     outputSmooth.reset(sampleRate, 0.001f);
@@ -61,19 +60,6 @@ void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue)
 
 void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples)
 {
-    float inharmFrom0to1 = inharmIn0to1 * 2.5 + 0.5f;
-    float positionFrom0to1 = positionInIn0to1 * 15.0f + 5.0f;
-    float algoFrom0to1 = algoIn0to1 * 9.0f;
-    algoFrom0to1 = std::floor(algoFrom0to1);
-    
-    float op0LevelFrom0to1 = op0LevelRawValue;
-    float op1LevelFrom0to1 = op1LevelRawValue;
-    float op2LevelFrom0to1 = op2LevelRawValue;
-    float operLevelFrom0to1 = operLevelIn0to1;
-    
-    float noiseLevelFrom0to1 = noiseLevelIn0to1;
-    float noiseFreqFrom0to1 = noiseFreqIn0to1 * 7900.0f + 100;
-    
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
         // envelopes are incremented at sample value
         pitchSmooth.setTargetValue(pitchIn0to1);
@@ -83,6 +69,26 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
 
         float envelope = ampEnvelope.generateEnvelope();
         float modEnvelope = std::pow(2.0f, envelope * modRawValues[stepIndex]/12.0f);
+
+        inharmSmooth.setTargetValue(inharmIn0to1);
+        float inharmFrom0to1 = inharmSmooth.getNextValue() * 2.5 + 0.5f;
+        positionSmooth.setTargetValue(positionInIn0to1);
+        float positionFrom0to1 = positionSmooth.getNextValue() * 15.0f + 5.0f;
+        float algoFrom0to1 = algoIn0to1 * 9.0f;
+        algoFrom0to1 = std::floor(algoFrom0to1);
+
+        op0LevelSmooth.setTargetValue(op0LevelRawValue);
+        float op0LevelFrom0to1 = op0LevelSmooth.getNextValue();
+        op1LevelSmooth.setTargetValue(op1LevelRawValue);
+        float op1LevelFrom0to1 = op1LevelSmooth.getNextValue();
+        op2LevelSmooth.setTargetValue(op2LevelRawValue);
+        float op2LevelFrom0to1 = op2LevelSmooth.getNextValue();
+        float operLevelFrom0to1 = operLevelIn0to1;
+        
+        noiseLevelSmooth.setTargetValue(noiseLevelIn0to1);
+        float noiseLevelFrom0to1 = noiseLevelSmooth.getNextValue();
+        noiseFreqSmooth.setTargetValue(noiseFreqIn0to1);
+        float noiseFreqFrom0to1 = noiseFreqSmooth.getNextValue() * 7900.0f + 100;
         ns.setFilter(noiseFreqFrom0to1, 2.5f);
 
         VoiceParams params { envelope, modEnvelope, pitchFrom0to1, toneFrom0to1, inharmFrom0to1, positionFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, operLevelFrom0to1, noiseLevelFrom0to1 };
@@ -143,30 +149,20 @@ void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue,
 
 void SynthVoice::setGlobalParameters(float tensionValue, float inharmValue, float positionValue)
 {
-    tensionSmooth.setTargetValue(tensionValue);
-    tensionRawValue = tensionSmooth.getNextValue();
-    inharmSmooth.setTargetValue(inharmValue);
-    inharmonicityRawValue = inharmSmooth.getNextValue();
-    positionSmooth.setTargetValue(positionValue);
-    positionRawValue = positionSmooth.getNextValue();
-    
+    tensionRawValue = tensionValue;
+    inharmonicityRawValue = inharmValue;
+    positionRawValue = positionValue;
     setEnvelope();
 }
 
 void SynthVoice::setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue)
 {
-    outputSmooth.setTargetValue(outputGainValue);
-    outputGainRawValue = juce::Decibels::decibelsToGain(outputSmooth.getNextValue());
-    op0LevelSmooth.setTargetValue(op0LevelValue/100.0f);
-    op0LevelRawValue = op0LevelSmooth.getNextValue();
-    op1LevelSmooth.setTargetValue(op1LevelValue/100.0f);
-    op1LevelRawValue = op1LevelSmooth.getNextValue();
-    op2LevelSmooth.setTargetValue(op2LevelValue/100.0f);
-    op2LevelRawValue = op2LevelSmooth.getNextValue();
-    noiseLevelSmooth.setTargetValue(noiseLevelValue/100.0f);
-    noiseLevelRawValue = noiseLevelSmooth.getNextValue();
-    noiseFreqSmooth.setTargetValue(noiseFreqValue);
-    noiseFreqRawValue = noiseFreqSmooth.getNextValue();
+    outputGainRawValue = juce::Decibels::decibelsToGain(outputGainValue);
+    op0LevelRawValue = op0LevelValue/100.0f;
+    op1LevelRawValue = op1LevelValue/100.0f;
+    op2LevelRawValue = op2LevelValue/100.0f;
+    noiseLevelRawValue = noiseLevelValue/100.0f;
+    noiseFreqRawValue = noiseFreqValue;
 }
 
 void SynthVoice::setEnvelope()
@@ -283,7 +279,7 @@ float SynthVoice::processAlgorithm6(VoiceParams p)
 float SynthVoice::processAlgorithm7(VoiceParams p)
 {
     float noise = ns.processNoiseGenerator() * p.envelope * p.noiseLevel;
-    op[2].setOperatorInputs(p.pitch * p.modEnvelope, noise, 0.0f, p.position);
+    op[2].setOperatorInputs(p.pitch * p.modEnvelope, noise * 2.0f, 0.0f, p.position);
     float operator2 = op[2].processOperator() * p.envelope * p.op2Level;
     op[1].setOperatorInputs(p.pitch * p.inharm * p.modEnvelope, 0.0f, p.tone, p.position);
     float operator1 = op[1].processOperator() * p.envelope * p.op1Level;
@@ -295,7 +291,7 @@ float SynthVoice::processAlgorithm7(VoiceParams p)
 float SynthVoice::processAlgorithm8(VoiceParams p)
 {
     float noise = ns.processNoiseGenerator() * p.envelope * p.noiseLevel;
-    op[2].setOperatorInputs(p.pitch * p.modEnvelope, noise, 0.0f, p.position);
+    op[2].setOperatorInputs(p.pitch * p.modEnvelope, noise * 2.0f, 0.0f, p.position);
     float operator2 = op[2].processOperator() * p.envelope * p.op2Level;
     op[1].setOperatorInputs(p.pitch * p.inharm * p.modEnvelope, 0.0f, p.tone, p.position);
     float operator1 = op[1].processOperator() * p.envelope * p.op1Level;
@@ -308,7 +304,7 @@ float SynthVoice::processAlgorithm9(VoiceParams p)
 {
     // scaling to 0.75 to reduce aliasing on 2nd order modulation
     float noise = ns.processNoiseGenerator() * p.envelope * p.noiseLevel;
-    op[2].setOperatorInputs(p.pitch * p.modEnvelope, noise, 0.0f, p.position);
+    op[2].setOperatorInputs(p.pitch * p.modEnvelope, noise * 2.0f, 0.0f, p.position);
     float operator2 = op[2].processOperator() * p.envelope * p.op2Level * 0.75f;
     op[1].setOperatorInputs(p.pitch * p.inharm * p.modEnvelope, operator2, p.tone, p.position);
     float operator1 = op[1].processOperator() * p.envelope * p.op1Level * 0.75f;

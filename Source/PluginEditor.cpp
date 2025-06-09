@@ -10,6 +10,7 @@ MotherlyAudioProcessorEditor::MotherlyAudioProcessorEditor (MotherlyAudioProcess
     mainInterface = std::make_unique<DrumMainInterface>(audioProcessor);
     patchBayInterface = std::make_unique<PatchBay>(audioProcessor);
     presetInterface = std::make_unique<PresetInterface>(audioProcessor, audioProcessor.apvts);
+    patchBayInterface->refreshFromParameters();
 
     addAndMakeVisible(*mainInterface);
     addAndMakeVisible(*patchBayInterface);

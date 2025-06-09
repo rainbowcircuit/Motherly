@@ -68,7 +68,7 @@ float Metro::getGate()
     // this must be called every sample.
     double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
     
-    float gateSize = 0.05;
+    float gateSize = 0.075;
     int repeatIndex = repeat[stepIndex];
     
     float gate;

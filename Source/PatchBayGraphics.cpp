@@ -337,7 +337,6 @@ void PatchBay::setCableFromParameter(int output, int input)
     prevInputIndex = inputIndex;
     
     activeCableIndex.reset();
-    // prevCableIndex.reset();
     repaint();
 }
 
@@ -453,7 +452,7 @@ PatchCable::PatchCable() {}
 void PatchCable::paint(juce::Graphics& g)
 {
     juce::Path cablePath, cableEndPath;
-    juce::Colour fillColour = Colours::Gradient::gradient[7];
+    juce::Colour fillColour = Colours::Gradient::gradientDarker[7];
     g.setColour(fillColour);
 
     if (cableInUse){

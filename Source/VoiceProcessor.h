@@ -93,7 +93,7 @@ private:
         
     float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionInIn0to1, stepIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, noiseBandIn0to1, algoIn0to1, vcaMixIn0to1;
     
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, tensionSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth;
 };
 
 

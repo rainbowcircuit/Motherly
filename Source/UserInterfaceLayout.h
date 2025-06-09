@@ -187,6 +187,19 @@ class PresetInterface : public juce::Component, juce::ComboBox::Listener, juce::
 public:
     PresetInterface(MotherlyAudioProcessor& p, juce::AudioProcessorValueTreeState& apvts) : presetManager(apvts), audioProcessor(p)
     {
+        addAndMakeVisible(rateLabel);
+        rateLabel.setText("Rate", juce::dontSendNotification);
+        rateLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
+        rateLabel.setJustificationType(juce::Justification::left);
+        rateLabel.setFont(12.0f);
+
+        addAndMakeVisible(rateSlider);
+        rateSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 30, 30);
+        rateSlider.setLookAndFeel(&rateGraphics);
+        rateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "seqRate", rateSlider);
+
+        
         addAndMakeVisible(saveButton);
         saveButton.addListener(this);
         saveButton.setLookAndFeel(&saveLAF);
@@ -221,9 +234,13 @@ public:
     void resized() override
     {
         auto bounds = getLocalBounds().toFloat();
+        
+        rateLabel.setBounds(bounds.getX() + 503, bounds.getY(), 120, 30);
+        rateSlider.setBounds(bounds.getX() + 500, bounds.getY() + bounds.getHeight() * 0.25f, 120, 30);
+
         saveButton.setBounds(bounds.getX(), bounds.getY(), 40, 40);
-        nextButton.setBounds(bounds.getX() + 75, bounds.getY(), 40, 40);
-        prevButton.setBounds(bounds.getX() + 125, bounds.getY(), 40, 40);
+        nextButton.setBounds(bounds.getX() + 125, bounds.getY(), 40, 40);
+        prevButton.setBounds(bounds.getX() + 75, bounds.getY(), 40, 40);
         presetComboBox.setBounds(bounds.getX() + 175, bounds.getY(), 300, 40);
     }
     
@@ -272,12 +289,16 @@ public:
     }
     
 private:
+    UserInterfaceGraphics rateGraphics { 9 };
     ButtonGraphics saveLAF { 0 }, nextLAF { 1 }, prevLAF { 2 };
     ComboBoxGraphics comboBoxLAF;
     
     juce::TextButton saveButton, nextButton, prevButton;
     juce::ComboBox presetComboBox;
+    juce::Slider rateSlider;
+    juce::Label rateLabel;
     
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rateAttachment;
     std::unique_ptr<juce::FileChooser> fileChooser;
     std::unique_ptr<PatchBay> patchBayInterface;
 

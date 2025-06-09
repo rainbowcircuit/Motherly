@@ -73,17 +73,17 @@ void StepInterface::resized()
     float width = bounds.getWidth();
     float height = bounds.getHeight();
 
-    freqLabel.setBounds(x, y + height * 0.025f, width, width/4);
-    freqSlider.setBounds(x, y + height * 0.025f, width, width);
+    freqLabel.setBounds(x, y + height * 0.035f, width, width/4);
+    freqSlider.setBounds(x, y + height * 0.035f, width, width);
 
-    toneLabel.setBounds(x, y + height * 0.3, width, width/4);
-    toneSlider.setBounds(x, y + height * 0.3, width, width);
+    toneLabel.setBounds(x, y + height * 0.325, width, width/4);
+    toneSlider.setBounds(x, y + height * 0.325, width, width * 1.15f);
 
-    modLabel.setBounds(x, y + height * 0.575f, width, width/4);
-    modSlider.setBounds(x, y + height * 0.575f, width, width * 0.75f);
+    modLabel.setBounds(x, y + height * 0.625f, width, width/4);
+    modSlider.setBounds(x, y + height * 0.625f, width, width * 0.75f);
 
-    repeatLabel.setBounds(x, y + height * 0.725f, width, width/4);
-    repeatSlider.setBounds(x, y + height * 0.725f, width, width);
+    repeatLabel.setBounds(x, y + height * 0.785f, width, width/4);
+    repeatSlider.setBounds(x, y + height * 0.785f, width, width * 0.75f);
 }
 
 void StepInterface::setIsStepIndex(int step)

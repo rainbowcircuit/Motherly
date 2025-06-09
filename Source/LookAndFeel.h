@@ -24,7 +24,7 @@ namespace Colours
     const juce::Colour iconWhite = { 190, 192, 191 };
     const juce::Colour iconWhiteHover = { 200, 202, 201 };
     const juce::Colour iconLightGrey = { 150, 152, 151 };
-    const juce::Colour iconDarkGrey = { 50, 52, 51 };
+    const juce::Colour iconDarkGrey = { 70, 72, 71 };
     const juce::Colour iconBlack = { 25, 22, 24 };
     }
 
@@ -51,6 +51,16 @@ namespace Colours
             juce::Colour { 176, 167, 124 },
             juce::Colour { 171, 170, 134 }
         };
+    
+        const std::array<juce::Colour, 8> gradientDarker = {
+            juce::Colour { 209, 143, 137 },
+            juce::Colour { 198, 134, 117 },
+            juce::Colour { 194, 137, 104 },
+            juce::Colour { 185, 140, 100 },
+            juce::Colour { 173, 142, 86 },
+            juce::Colour { 163, 145, 93 },
+            juce::Colour { 156, 147, 104 },
+            juce::Colour { 151, 150, 114 }
+        };
     }
-
 }

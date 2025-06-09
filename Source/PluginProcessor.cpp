@@ -190,7 +190,6 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     {
         if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
         {
-
             for (int step = 0; step < 8; step++){
                 juce::String freqParamID = "freq" + juce::String(step);
                 juce::String toneParamID = "tone" + juce::String(step);
@@ -288,7 +287,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
         layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { freqParamID, 1},
                                                                freqParamName,
-                                                                juce::NormalisableRange<float> { 30.0f, 1200.0f, 0.1f, 0.25f },
+                                                                juce::NormalisableRange<float> { 30.0f, 1200.0f, 0.1f, 0.5f },
                                                                 220.0f));
 
         juce::String toneParamID = "tone" + juce::String(step);
@@ -296,7 +295,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
         layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { toneParamID, 1},
                                                                toneParamName,
-                                                                juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 0.25f },
+                                                                juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 0.5f },
                                                                 10.0f, "%"));
 
         juce::String modParamID = "mod" + juce::String(step);

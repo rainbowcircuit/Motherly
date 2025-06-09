@@ -87,8 +87,8 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawPosition(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
         
     } else if (graphicIndex == 9){
-      //  drawStepCount(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-        
+        drawRate(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
+
     } else if (graphicIndex == 10){
         // amp
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
@@ -256,32 +256,25 @@ void UserInterfaceGraphics::drawPitchMod(juce::Graphics& g, float x, float y, fl
 void UserInterfaceGraphics::drawProbability(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
     // coordinates
-    float radius = width * 0.175f;
-    float segmentSize = 6.28f/6;
-    float gap = 0.05f;
-    float centerGap = 0.5f;
-    int positionScaled = std::floor(position * 6.0f);
-    
+    int positionScaled = std::floor(position * 3.0f + 1);
+    float widthMargin = width * 0.2;
+    width = width * 0.6;
+    float segmentSize = width/positionScaled;
+
+    float heightMargin = height * 0.4f;
+    height = height * 0.2f;
+    float blockMargin = segmentSize * 0.1f;
+    float blockSize = segmentSize * 0.8f;
     //==============================================================================
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < positionScaled; i++)
     {
-        float startAngle = segmentSize * i + gap;
-        float endAngle = segmentSize * (i + 1) - gap;
-        float midAngle = startAngle + endAngle/2;
-        juce::Point<float> centerOffset = { (x + width/2) + std::sin(midAngle) * centerGap ,
-            (x + width/2) + std::cos(midAngle) * centerGap };
-        
         juce::Path graphicPath;
-        graphicPath.startNewSubPath(centerOffset);
-        graphicPath.addCentredArc(centerOffset.x, centerOffset.y, radius, radius, 0.0f, startAngle, endAngle);
-        graphicPath.lineTo(centerOffset);
+        float xPosition = widthMargin + blockMargin + i * (blockSize + blockMargin * 2);
+        graphicPath.addRoundedRectangle(xPosition, heightMargin, blockSize, height, 3);
         graphicPath = graphicPath.createPathWithRoundedCorners(2);
         
-        if (i < positionScaled){
-            g.setColour(iconGradientColor);
-        } else {
-            g.setColour(iconDarkGreyColour);
-        }
+        float alpha = (1.0f/(i + 1)) * 0.5f + 0.5f;
+        g.setColour(iconGradientColor.withAlpha(alpha));
         g.fillPath(graphicPath);
     }
 }
@@ -307,6 +300,7 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
         std::array<int, 4> blockToUse;
         std::array<int, 4> fillValue;
         std::array<int, 4> connectValue;
+        std::array<juce::String, 4> label = { "3","2", "1", "N" };
     };
     
     blockValues block;
@@ -315,60 +309,71 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
             block.blockToUse = { 4, 7, 10, 11 };
             block.fillValue = { OPER, OPER, OPER, NOISE };
             block.connectValue = { DOWN, DOWN, DOWN, DOWN };
+            block.label = { "3","2", "1", "N" };
             break;
             
         case 1:
             block.blockToUse = { 6, 9, 10, 11 };
             block.fillValue = { OPER, OPER, OPER, NOISE };
             block.connectValue = { RIGHTDOWN, DOWN, DOWN, DOWN };
+            block.label = { "3","1", "2", "N" };
             break;
             
         case 2:
             block.blockToUse = { 7, 8, 9, 10 };
             block.fillValue = { OPER, OPER, OPER, NOISE };
             block.connectValue = { DOWN, DOWNLEFT, DOWN, DOWN };
+            block.label = { "3","2", "N", "1" };
+
             break;
             
         case 3:
             block.blockToUse = { 4, 6, 7, 10 };
             block.fillValue = { OPER, NOISE, OPER, OPER };
             block.connectValue = { DOWN, DOWNRIGHT, DOWN, DOWN };
+            block.label = { "3","N", "2", "1" };
             break;
 
         case 4:
             block.blockToUse = { 6, 7, 10, 11 };
             block.fillValue = { OPER, NOISE, OPER, OPER };
             block.connectValue = { DOWNRIGHT, RIGHTDOWN, DOWN, DOWN };
+            block.label = { "N","3", "1", "2" };
             break;
             
         case 5:
             block.blockToUse = { 6, 7, 8, 10 };
             block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWNRIGHT, DOWN, DOWNLEFT, DOWN };
+            block.label = { "N","3", "2", "1" };
             break;
 
         case 6:
             block.blockToUse = { 3, 5, 7, 10 };
             block.fillValue = { OPER, NOISE, OPER, OPER };
             block.connectValue = { DOWNRIGHT, DOWNLEFT, DOWN, DOWN };
+            block.label = { "N","3", "2", "1" };
             break;
 
         case 7:
             block.blockToUse = { 4, 7, 10, 11 };
             block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWN, DOWN, DOWN, DOWN };
+            block.label = { "N","3", "1", "2" };
             break;
 
         case 8:
             block.blockToUse = { 4, 7, 8, 10 };
             block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWN, DOWN, DOWNLEFT, DOWN };
+            block.label = { "N","3", "2", "1" };
             break;
             
         case 9:
             block.blockToUse = { 1, 4, 7, 10 };
             block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWN, DOWN, DOWN, DOWN };
+            block.label = { "N","3", "2", "1" };
             break;
     }
     
@@ -386,7 +391,6 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
 
             } else {
                 if (block.fillValue[j] == OPER) {
-                    
                     g.setColour(iconWhiteColor);
                     g.fillPath(blockPath);
                     g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
@@ -403,7 +407,7 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
     for (int i = 0; i < 12; i++){ // column
         float xIncr = x + widthMargin + (graphicWidth/3) * (i % 3);
         float yIncr = y + heightMargin + (graphicHeight/4) * (i / 3);
-
+        
         juce::Path linePath;
         for (int j = 0; j < 4; j++) {
             if (i == block.blockToUse[j]){
@@ -442,7 +446,21 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
         
         juce::PathStrokeType strokeType(lineWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
         g.strokePath(linePath, juce::PathStrokeType(strokeType));
+        
     }
+        for (int i = 0; i < 12; i++){ // column
+            float xIncr = x + widthMargin + (graphicWidth/3) * (i % 3);
+            float yIncr = y + heightMargin + (graphicHeight/4) * (i / 3);
+            g.setColour(iconDarkGreyColour);
+            g.setFont(11.0f);
+            
+            for (int j = 0; j < 4; j++) {
+                if (i == block.blockToUse[j]) {
+                        g.drawText(block.label[j], xIncr + 0.75f, yIncr + 0.5f, blockSize, blockSize,juce::Justification::centred);
+                }
+            }
+        }
+    
 }
 
 void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position)
@@ -619,7 +637,38 @@ void UserInterfaceGraphics::drawNoiseFreq(juce::Graphics& g, float x, float y, f
 
 }
 
+void UserInterfaceGraphics::drawRate(juce::Graphics& g, float x, float y, float width, float height, float position)
+{
+    float posIndex = position * 6.0f;
+    posIndex = std::floor(posIndex);
 
+    float graphicWidth = width * 0.8f;
+    float graphicMargin = width * 0.1f;
+    
+    for (int i = 0; i < 7; i++)
+    {
+        float graphicIncr = (graphicWidth/7) * i;
+
+        juce::Path linePath;
+        juce::Point<float> topCoords = { x + graphicMargin + graphicIncr, y + height * 0.1f };
+        juce::Point<float> botCoords = { x + graphicMargin + graphicIncr, y + height * 0.25f };
+
+        linePath.startNewSubPath(topCoords);
+        linePath.lineTo(botCoords);
+        g.setColour(iconWhiteColor);
+        
+        float width = lineWidth;
+        if ((int)posIndex == i)
+        {
+            width = lineWidth * 2.5f;
+        }
+
+        juce::PathStrokeType lineStroke(width, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
+        g.strokePath(linePath, juce::PathStrokeType(lineStroke));
+
+
+    }
+}
 
 void UserInterfaceGraphics::drawRateIcon(juce::Graphics& g, float x, float y, float size, int radius)
 {
