@@ -156,18 +156,6 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     }
 
     int rate = apvts.getRawParameterValue("seqRate")->load();
-    stepSequencer.setRate(rate);
-    
-    for (int sample = 0; sample < buffer.getNumSamples(); ++sample){
-        // step sequencer has to be accumulated every sample.
-        stepSequencer.runSequencer(midiMessages, sample);
-        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(0)))
-        {
-            voice->triggerEnvelope(stepSequencer.getGate());
-        }
-    }
-    
-    int stepIndex = stepSequencer.getStepIndex();
     
     //************** Drum DSP **************//
     float tension = apvts.getRawParameterValue("tension")->load();
@@ -186,57 +174,45 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     // patch bay parameters
     std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
 
-    for (int i = 0; i < synth.getNumVoices(); ++i)
+    if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(0)))
     {
-        if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
-        {
-            for (int step = 0; step < 8; step++){
-                juce::String freqParamID = "freq" + juce::String(step);
-                juce::String toneParamID = "tone" + juce::String(step);
-                juce::String modParamID = "mod" + juce::String(step);
-                juce::String probParamID = "repeat" + juce::String(step);
+        for (int step = 0; step < 8; step++){
+            juce::String freqParamID = "freq" + juce::String(step);
+            juce::String toneParamID = "tone" + juce::String(step);
+            juce::String modParamID = "mod" + juce::String(step);
+            juce::String probParamID = "repeat" + juce::String(step);
 
-                float pitch = apvts.getRawParameterValue(freqParamID)->load();
-                float tone = apvts.getRawParameterValue(toneParamID)->load();
-                float mod = apvts.getRawParameterValue(modParamID)->load();
-                float repeat = apvts.getRawParameterValue(probParamID)->load();
-
-                voice->setStepParameters(step, pitch, tone, mod, repeat);
-                stepSequencer.setRepeat(step, repeat);
-            }
+            float pitch = apvts.getRawParameterValue(freqParamID)->load();
+            float tone = apvts.getRawParameterValue(toneParamID)->load();
+            float mod = apvts.getRawParameterValue(modParamID)->load();
+            float repeat = apvts.getRawParameterValue(probParamID)->load();
             
-            // patch bay params
-            voice->paramsIn0to1();
-            voice->setDefaults();
-            for (int output = 0; output < 8; ++output)
-            {
-                juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
-                float input = apvts.getRawParameterValue(patchBayParamID)->load();
-                voice->overrideDefaults(output, input);
-                voice->newParamsIn0to1();
-            }
-            voice->setGlobalParameters(tension, inharmonicity, position);
-            voice->setVoiceLevels(output, op1Level, op2Level, op3Level, noiseLevel, noiseFreq);
-            voice->setAlgorithm(algorithm);
-            voice->setStepIndex(stepIndex);
+            voice->setSequencer(*getPlayHead(), rate);
+            voice->setStepParameters(step, pitch, tone, mod, repeat);
         }
+        
+        // patch bay params
+        voice->paramsIn0to1();
+        voice->setDefaults();
+        for (int output = 0; output < 8; ++output)
+        {
+            juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
+            float input = apvts.getRawParameterValue(patchBayParamID)->load();
+            voice->overrideDefaults(output, input);
+            voice->newParamsIn0to1();
+        }
+        voice->setGlobalParameters(tension, inharmonicity, position);
+        voice->setVoiceLevels(output, op1Level, op2Level, op3Level, noiseLevel, noiseFreq);
+        voice->setAlgorithm(algorithm);
+        
+        int stepIndex = voice->getStepIndex();
+        stepIndexAtomic.store(stepIndex);
     }
     
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     midiMessages.clear();
     
-    // write to atomic
-    float sumSquares = 0.0f;
-    auto channelData = buffer.getReadPointer(0);
-    for (int sample = 0; sample < buffer.getNumSamples(); ++sample){
-        float sampleData = channelData[sample];
-        sumSquares += sampleData * sampleData;
-        
-    }
-    float rms = std::sqrt(sumSquares / static_cast<float>(buffer.getNumSamples()));
-   // DBG(rms);
-    stepIndexAtomic.store(stepIndex);
-    amplitudeAtomic.store(rms);
+    amplitudeAtomic.store(0.0f);
     
 }
 

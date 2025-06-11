@@ -11,6 +11,7 @@
 class SynthVoice : public juce::SynthesiserVoice
 {
 public:
+
     void prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels);
     bool canPlaySound (juce::SynthesiserSound* sound) override;
     void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *sound, int currentPitchWheelPosition) override;
@@ -19,9 +20,24 @@ public:
     void controllerMoved(int controllerNumber, int newControllerValue) override;
     void renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples) override;
     
+    struct VoiceParams
+    {
+        float envelope, modEnvelope, pitch, tone, inharm, position, algorithm, op0Level, op1Level, op2Level, operLevel, noiseLevel;
+    };
+    
+    SynthVoice::VoiceParams processParameters(float gate);
+    float processSynthVoice(SynthVoice::VoiceParams params);
+
+    
     //==============================================================================
     
-    void setStepIndex(int index);
+    int getStepIndex()
+    {
+        return stepIndex;
+    }
+    
+    
+    void setSequencer(juce::AudioPlayHead &p, int rate);
     void setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue);
     void setGlobalParameters(float tensionValue, float inharmValue, float positionValue);
     void setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue);
@@ -30,15 +46,11 @@ public:
 
     void setEnvelope();
     void triggerEnvelope(float gate);
-
+    float lastGate;
     //==============================================================================
     
     void setAlgorithm(int algorithmValue);
     
-    struct VoiceParams
-    {
-        float envelope, modEnvelope, pitch, tone, inharm, position, op0Level, op1Level, op2Level, operLevel, noiseLevel;
-    };
 
     float processAlgorithm0(VoiceParams p);
     float processAlgorithm1(VoiceParams p);
@@ -59,6 +71,8 @@ public:
     void newParamsIn0to1();
 
 private:
+    StepSequencer seq;
+    
     // initial preparation
     double sampleRate = 0.0;
     bool isPrepared { false };
@@ -74,6 +88,7 @@ private:
     std::array<Operator, 3> op;
     NoiseGenerator ns;
     
+ //   LowPassGate ampEnvelope;
     LowPassGate ampEnvelope;
     
     // Synth Parameters

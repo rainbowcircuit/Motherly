@@ -24,7 +24,7 @@ public:
     void reset();
     int getStepIndex();
     void setRate(int sequencerRate);
-    void runSequencer(juce::MidiBuffer& midiBuffer, int samplePosition);
+    void runSequencer();
     
     float getGate()
     {

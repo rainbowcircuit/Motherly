@@ -68,7 +68,7 @@ float Metro::getGate()
     // this must be called every sample.
     double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
     
-    float gateSize = 0.075;
+    float gateSize = 0.15;
     int repeatIndex = repeat[stepIndex];
     
     float gate;
@@ -155,16 +155,15 @@ void LowPassGate::triggerEnvelope(float gateValue)
 }
 
 
-float LowPassGate::generateEnvelope()
+float LowPassGate::generateEnvelope(float gate)
 {
-    bool gateThreshold = gate >= 0.5f;
+    bool gateThreshold = gate != 0.0f;
     
     float segmentSelect = gateThreshold ? envelopeRise : envelopeFall;
     segmentSelect = std::max(segmentSelect, 1.0f);
     
     float segmentTimeT60 = processT60(segmentSelect);
     envelope = (1.0f - segmentTimeT60) * gate + segmentTimeT60 * unitDelay;
-    
     unitDelay = envelope;
     return envelope;
 }

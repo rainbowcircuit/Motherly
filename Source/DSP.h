@@ -35,7 +35,6 @@ public:
     
     bool getImpulse();
     float getGate();
-    
     void getTransport(juce::AudioPlayHead* playhead);
     bool getIsPlaying();
     
@@ -71,14 +70,14 @@ public:
 
     void triggerEnvelope(float gate);
     
-    float generateEnvelope();
+    float generateEnvelope(float gate);
     bool isActive();
     
 private:
     float processT60(float input);
     float safediv(float numerator, float denominator);
     
-    int count = 0;
+    int count = 0, gateHoldCounter = 0;
     double sampleRate = 0.0;
     float unitDelay = 0.0f;
     static constexpr float epsilon = 1e-6f; // safety for dividing by 0

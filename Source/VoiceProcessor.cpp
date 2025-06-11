@@ -5,6 +5,9 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numCh
 {
     this->sampleRate = sampleRate;
     
+    seq.prepareToPlay(sampleRate, samplesPerBlock);
+    seq.reset();
+    
     for(int i = 0; i < 3; i++)
     {
         op[i].prepareToPlay(sampleRate, samplesPerBlock, numChannels);
@@ -12,10 +15,10 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numCh
         op[i].resetAngle();
     }
     ns.prepareToPlay(sampleRate);
-    ampEnvelope.setSampleRate(sampleRate);
-
+    ampEnvelope.setSampleRate(sampleRate);    
+    
     // smoothening
-    pitchSmooth.reset(sampleRate, 0.02f);
+    pitchSmooth.reset(sampleRate, 0.001f);
     toneSmooth.reset(sampleRate, 0.02f);
     inharmSmooth.reset(sampleRate, 0.001f);
     positionSmooth.reset(sampleRate, 0.001f);
@@ -61,82 +64,114 @@ void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue)
 void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples)
 {
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
-        // envelopes are incremented at sample value
-        pitchSmooth.setTargetValue(pitchIn0to1);
-        float pitchFrom0to1 = pitchSmooth.getNextValue() * 1170.0f + 30.0f;
-        toneSmooth.setTargetValue(toneIn0to1);
-        float toneFrom0to1 = toneSmooth.getNextValue();
+        seq.runSequencer();
+        stepIndex = seq.getStepIndex();
+        float gate = seq.getGate();
 
-        float envelope = ampEnvelope.generateEnvelope();
-        float modEnvelope = std::pow(2.0f, envelope * modRawValues[stepIndex]/12.0f);
-
-        inharmSmooth.setTargetValue(inharmIn0to1);
-        float inharmFrom0to1 = inharmSmooth.getNextValue() * 2.5 + 0.5f;
-        positionSmooth.setTargetValue(positionInIn0to1);
-        float positionFrom0to1 = positionSmooth.getNextValue() * 15.0f + 5.0f;
-        float algoFrom0to1 = algoIn0to1 * 9.0f;
-        algoFrom0to1 = std::floor(algoFrom0to1);
-
-        op0LevelSmooth.setTargetValue(op0LevelRawValue);
-        float op0LevelFrom0to1 = op0LevelSmooth.getNextValue();
-        op1LevelSmooth.setTargetValue(op1LevelRawValue);
-        float op1LevelFrom0to1 = op1LevelSmooth.getNextValue();
-        op2LevelSmooth.setTargetValue(op2LevelRawValue);
-        float op2LevelFrom0to1 = op2LevelSmooth.getNextValue();
-        float operLevelFrom0to1 = operLevelIn0to1;
+        VoiceParams params = processParameters(gate);
         
-        noiseLevelSmooth.setTargetValue(noiseLevelIn0to1);
-        float noiseLevelFrom0to1 = noiseLevelSmooth.getNextValue();
-        noiseFreqSmooth.setTargetValue(noiseFreqIn0to1);
-        float noiseFreqFrom0to1 = noiseFreqSmooth.getNextValue() * 7900.0f + 100;
-        ns.setFilter(noiseFreqFrom0to1, 2.5f);
-
-        VoiceParams params { envelope, modEnvelope, pitchFrom0to1, toneFrom0to1, inharmFrom0to1, positionFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, operLevelFrom0to1, noiseLevelFrom0to1 };
-
-        float output;
-        switch((int)algoFrom0to1)
-        {
-            case 0:
-                output = processAlgorithm0(params);
-                break;
-            case 1:
-                output = processAlgorithm1(params);
-                break;
-            case 2:
-                output = processAlgorithm2(params);
-                break;
-            case 3:
-                output = processAlgorithm3(params);
-                break;
-            case 4:
-                output = processAlgorithm4(params);
-                break;
-            case 5:
-                output = processAlgorithm5(params);
-                break;
-            case 6:
-                output = processAlgorithm6(params);
-                break;
-            case 7:
-                output = processAlgorithm7(params);
-                break;
-            case 8:
-                output = processAlgorithm8(params);
-                break;
-            case 9:
-                output = processAlgorithm9(params);
-                break;
-        }
-        
+        float output = processSynthVoice(params);
         for (int channel = 0; channel < buffer.getNumChannels(); ++channel) {
             buffer.addSample(channel, sample, output * outputGainRawValue);
         }
     }
+
 }
 
-void SynthVoice::setStepIndex(int index)
+SynthVoice::VoiceParams SynthVoice::processParameters(float gate)
 {
-    stepIndex = index;
+    // step params
+    pitchSmooth.setTargetValue(pitchIn0to1);
+    float pitchFrom0to1 = pitchSmooth.getNextValue() * 1170.0f + 30.0f;
+    
+    toneSmooth.setTargetValue(toneIn0to1);
+    float toneFrom0to1 = toneSmooth.getNextValue();
+    
+    // envelopes
+    float envelope = ampEnvelope.generateEnvelope(gate);
+    float modEnvelope = std::pow(2.0f, envelope * modRawValues[stepIndex]/12.0f);
+
+    // voice params
+    inharmSmooth.setTargetValue(inharmIn0to1);
+    float inharmFrom0to1 = inharmSmooth.getNextValue() * 2.5 + 0.5f;
+    
+    positionSmooth.setTargetValue(positionInIn0to1);
+    float positionFrom0to1 = positionSmooth.getNextValue() * 15.0f + 5.0f;
+    
+    float algoFrom0to1 = algoIn0to1 * 9.0f;
+    algoFrom0to1 = std::floor(algoFrom0to1);
+
+    // operator levels
+    float operLevelFrom0to1 = operLevelIn0to1;
+    
+    op0LevelSmooth.setTargetValue(op0LevelRawValue);
+    float op0LevelFrom0to1 = op0LevelSmooth.getNextValue();
+    
+    op1LevelSmooth.setTargetValue(op1LevelRawValue);
+    float op1LevelFrom0to1 = op1LevelSmooth.getNextValue();
+    
+    op2LevelSmooth.setTargetValue(op2LevelRawValue);
+    float op2LevelFrom0to1 = op2LevelSmooth.getNextValue();
+    
+    // noise level and frequency
+    noiseLevelSmooth.setTargetValue(noiseLevelIn0to1);
+    float noiseLevelFrom0to1 = noiseLevelSmooth.getNextValue();
+    
+    noiseFreqSmooth.setTargetValue(noiseFreqIn0to1);
+    float noiseFreqFrom0to1 = noiseFreqSmooth.getNextValue() * 7900.0f + 100;
+    
+    ns.setFilter(noiseFreqFrom0to1, 2.5f);
+
+    VoiceParams params { envelope, modEnvelope, pitchFrom0to1, toneFrom0to1, inharmFrom0to1, positionFrom0to1, algoFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, operLevelFrom0to1, noiseLevelFrom0to1 };
+    
+    return params;
+}
+
+
+float SynthVoice::processSynthVoice(VoiceParams params)
+{
+    float output;
+    switch((int)params.algorithm)
+    {
+        case 0:
+            output = processAlgorithm0(params);
+            break;
+        case 1:
+            output = processAlgorithm1(params);
+            break;
+        case 2:
+            output = processAlgorithm2(params);
+            break;
+        case 3:
+            output = processAlgorithm3(params);
+            break;
+        case 4:
+            output = processAlgorithm4(params);
+            break;
+        case 5:
+            output = processAlgorithm5(params);
+            break;
+        case 6:
+            output = processAlgorithm6(params);
+            break;
+        case 7:
+            output = processAlgorithm7(params);
+            break;
+        case 8:
+            output = processAlgorithm8(params);
+            break;
+        case 9:
+            output = processAlgorithm9(params);
+            break;
+    }
+    return output;
+}
+
+
+void SynthVoice::setSequencer(juce::AudioPlayHead &p, int rate)
+{
+    seq.updateTransport(&p);
+    seq.setRate(rate);
 }
 
 void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue)
@@ -145,6 +180,8 @@ void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue,
     toneRawValues[index] = toneValue;
     modRawValues[index] = modValue;
     repeatRawValues[index] = repeatValue;
+    seq.setRepeat(index, repeatValue);
+
 }
 
 void SynthVoice::setGlobalParameters(float tensionValue, float inharmValue, float positionValue)
@@ -172,7 +209,7 @@ void SynthVoice::setEnvelope()
     float repeatScaling = 1.0f/(repeatRawValues[stepIndex] + 1);
     
     float decayTime = pitchFrom0to1 * tensionFrom0to1 * repeatScaling;
-    ampEnvelope.setEnvelopeSlew(5.0f, decayTime);
+    ampEnvelope.setEnvelopeSlew(5.0f, decayTime/2.0f);
 }
 
 void SynthVoice::triggerEnvelope(float gate)
@@ -182,8 +219,8 @@ void SynthVoice::triggerEnvelope(float gate)
         op[0].resetPhase();
         op[1].resetPhase();
         op[2].resetPhase();
+        
     }
-    ampEnvelope.triggerEnvelope(gate);
     previousGate = gate;
 }
 
@@ -320,7 +357,7 @@ void SynthVoice::paramsIn0to1()
     float toneIn0to1 = toneRawValues[stepIndex]/100.0f;
     float modIn0to1 = Utility::scale(modRawValues[stepIndex], -12.0f, 12.0f, 0.0, 1.0f);
     float repeatIn0to1 = repeatRawValues[stepIndex]/4.0f;
-    float envIn0to1 = ampEnvelope.generateEnvelope();
+    float envIn0to1 = 0.0f;
     float stepIn0to1 = Utility::scale(stepIndex, 0.0f, 7.0f, 0.0, 1.0f);
     float modWheelIn0to1 = modWheelRawValue/127.0f;
     float pBendIn0to1 = Utility::scale(pitchWheelRawValue, 0.0f, 16383.0f, 0.0f, 1.0f);

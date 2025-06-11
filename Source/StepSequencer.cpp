@@ -64,13 +64,12 @@ void StepSequencer::setRate(int sequencerRate)
     counter.setRate(sequencerRate);
 }
 
-void StepSequencer::runSequencer(juce::MidiBuffer& midiBuffer, int samplePosition)
+void StepSequencer::runSequencer()
 {
     if (counter.getIsPlaying()){
         if (counter.getImpulse()){
             currentStepIndex += 1;
         }
-
     } else {
         reset();
     }
