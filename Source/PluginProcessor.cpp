@@ -205,15 +205,14 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         voice->setVoiceLevels(output, op1Level, op2Level, op3Level, noiseLevel, noiseFreq);
         voice->setAlgorithm(algorithm);
         
+        // get step index;
         int stepIndex = voice->getStepIndex();
         stepIndexAtomic.store(stepIndex);
+
     }
     
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
     midiMessages.clear();
-    
-    amplitudeAtomic.store(0.0f);
-    
 }
 
 //==============================================================================

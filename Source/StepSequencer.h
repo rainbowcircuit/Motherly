@@ -19,7 +19,6 @@ public:
     void updateTransport(juce::AudioPlayHead* playhead);
     void suppressMIDIInput(juce::MidiBuffer& midiBuffer);
     
-//    void triggerNote(juce::MidiBuffer& midiBuffer, int samplePosition);
     void flushNote(juce::MidiBuffer& midiBuffer);
     void reset();
     int getStepIndex();
