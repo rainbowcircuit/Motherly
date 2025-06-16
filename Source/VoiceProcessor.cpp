@@ -92,8 +92,8 @@ SynthVoice::VoiceParams SynthVoice::processParameters(float gate)
     float positionFrom0to1 = positionSmooth.getNextValue() * 15.0f + 5.0f;
     
     // algorithm
-    float algoFrom0to1 = algoIn0to1 * 9.0f;
-    algoFrom0to1 = std::floor(algoFrom0to1);
+    float algoScaled = algoIn0to1 * 9.0f;
+    int algoFrom0to1 = (int)std::floor(algoScaled) % 9;
 
     // operator levels
     float op0LevelFrom0to1 = op0LevelSmooth.getNextValue();
@@ -103,7 +103,7 @@ SynthVoice::VoiceParams SynthVoice::processParameters(float gate)
     // noise level and frequency
     float noiseLevelFrom0to1 = noiseLevelSmooth.getNextValue();
     float noiseFreqFrom0to1 = noiseFreqSmooth.getNextValue() * 7900.0f + 100;
-    ns.setFilter(noiseFreqFrom0to1, 1.0f);
+    ns.setFilter(noiseFreqFrom0to1, 3.0f);
 
     VoiceParams params { envelope, modEnvelope, pitchFrom0to1, toneFrom0to1, inharmFrom0to1, positionFrom0to1, algoFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, noiseLevelFrom0to1 };
     
@@ -367,7 +367,7 @@ void SynthVoice::paramsIn0to1()
     float positionIn0to1 = positionRawValue/100.0f;
     float algoIn0to1 = Utility::scale(algorithmRawValue, 0.0f, 9.0f, 0.0f, 1.0f);
     float noiseLevelIn0to1 = noiseLevelRawValue/100.0f;
-    float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 100.0f, 8000.0f, 0.0f, 1.0f);
+    float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 0.0f, 100.0f, 0.0f, 1.0f);
     float op1In0to1 = op0LevelRawValue/100.0f;
     float op2In0to1 = op1LevelRawValue/100.0f;
     float op3In0to1 = op2LevelRawValue/100.0f;
@@ -406,6 +406,7 @@ void SynthVoice::newParamsIn0to1()
     positionSmooth.setTargetValue(positionInIn0to1);
     algoIn0to1 = inputsIn0to1[5];
     noiseLevelIn0to1 = inputsIn0to1[6];
+    noiseLevelSmooth.setTargetValue(noiseLevelIn0to1);
     noiseFreqIn0to1 = inputsIn0to1[7];
     noiseFreqSmooth.setTargetValue(noiseFreqIn0to1);
     op0In0to1 = inputsIn0to1[8];

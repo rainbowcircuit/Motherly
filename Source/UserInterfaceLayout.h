@@ -53,9 +53,7 @@ class DrumMainInterface : public juce::Component
 {
 public:
     DrumMainInterface(MotherlyAudioProcessor& p) : audioProcessor(p)
-    {
-        auto bounds = getLocalBounds().toFloat();
-        
+    {        
         setStepParams(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", " %", tensionGraphics);
         tensionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "tension", tensionSlider);
 
@@ -82,7 +80,7 @@ public:
         setStepParams(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", "", smallDialGraphics);
         noiseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseLevel", noiseSlider);
 
-        setStepParams(noiseFreqLabel, noiseFreqSlider, juce::Slider::TextBoxBelow, "Freq", " Hz", noiseFreqGraphics);
+        setStepParams(noiseFreqLabel, noiseFreqSlider, juce::Slider::TextBoxBelow, "Freq", " % ", noiseFreqGraphics);
         noiseFreqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseFreq", noiseFreqSlider);
 
         //setStepParams(algorithmLabel, testSlider, juce::Slider::NoTextBox, "Algorithm", testGraphics);
@@ -123,11 +121,11 @@ public:
         tensionLabel.setBounds(x + width * 0.01f, y + height * 0.1f, height * 0.7f, height * 0.1f);
         tensionSlider.setBounds(x + width * 0.01f, y + height * 0.175f, height * 0.7f, height * 0.775f);
         
-        inharmLabel.setBounds(x + width * 0.155f, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        inharmSlider.setBounds(x + width * 0.155f, y + height * 0.175f, height * 0.7f, height * 0.775f);
+        inharmLabel.setBounds(x + width * 0.1625f, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        inharmSlider.setBounds(x + width * 0.1625f, y + height * 0.175f, height * 0.7f, height * 0.775f);
         
-        positionLabel.setBounds(x + width * 0.3f, y + height * 0.175f, height * 0.5f, height * 0.1f);
-        positionSlider.setBounds(x + width * 0.3f, y + height * 0.25f, height * 0.5f, height * 0.6f);
+        positionLabel.setBounds(x + width * 0.315f, y + height * 0.175f, height * 0.5f, height * 0.1f);
+        positionSlider.setBounds(x + width * 0.315f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
         op1Label.setBounds(x + width * 0.475f, y + height * 0.1f, height * 0.3f, height * 0.1f);
         op1Slider.setBounds(x + width * 0.475f, y + height * 0.2, height * 0.3f, height * 0.3f);
@@ -249,12 +247,11 @@ public:
         auto bounds = getLocalBounds().toFloat();
         float x = bounds.getX();
         float y = bounds.getY();
-        float width = bounds.getWidth();
         float height = bounds.getHeight();
 
-        rateLabel.setBounds(x + width * 0.75f, y, 120, height * 0.25f);
-        rateValueLabel.setBounds(x + width * 0.8f, y, 120, height * 0.25f);
-        rateSlider.setBounds(x + width * 0.75f, y + height * 0.3f, 140, height * 0.5f);
+        rateLabel.setBounds(605, y + height * 0.25f, 164, height * 0.35f);
+        rateValueLabel.setBounds(605, y + height * 0.25f, 164, height * 0.35f);
+        rateSlider.setBounds(605, y + height * 0.6f, 164, height * 0.4f - 5);
 
         saveButton.setBounds(x, y, height, height);
         prevButton.setBounds(x + height, y, height, height);

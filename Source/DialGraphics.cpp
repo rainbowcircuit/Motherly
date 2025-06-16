@@ -87,7 +87,7 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawPosition(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
         
     } else if (graphicIndex == 9){
-        drawRate(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
+        drawRate(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
 
     } else if (graphicIndex == 10){
         // amp
@@ -622,32 +622,27 @@ void UserInterfaceGraphics::drawNoiseFreq(juce::Graphics& g, float x, float y, f
 
 void UserInterfaceGraphics::drawRate(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
-    float posIndex = position * 6.0f;
-    posIndex = std::floor(posIndex);
+    int positionScaled = std::floor(position * 7.0f);
+    float segmentSize = width/7;
     
-    float graphicWidth = width * 0.8f - 2.5f;
-    height = height/4;
-    
+    float blockMargin = segmentSize * 0.1f;
+    float blockSize = segmentSize * 0.8f;
+    //==============================================================================
     for (int i = 0; i < 7; i++)
     {
-        float graphicIncr = (graphicWidth/7) * i;
-
-        juce::Path linePath;
-        juce::Point<float> topCoords = { x + graphicIncr + 2.5f, y + height * 0.1f };
-        juce::Point<float> botCoords = { x + graphicIncr + 2.5f, y + height * 0.6f };
-
-        linePath.startNewSubPath(topCoords);
-        linePath.lineTo(botCoords);
-        g.setColour(iconWhiteColor);
+        juce::Path graphicPath;
+        float xPosition = i * (blockSize + blockMargin * 2);
+        graphicPath.addRoundedRectangle(xPosition, y, blockSize, height, 3);
+        graphicPath = graphicPath.createPathWithRoundedCorners(2);
         
-        float width = lineWidth;
-        if ((int)posIndex == i)
+        if (i <= positionScaled)
         {
-            width = lineWidth * 2.5f;
-        }
+            g.setColour(iconWhiteColor);
 
-        juce::PathStrokeType lineStroke(width, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
-        g.strokePath(linePath, juce::PathStrokeType(lineStroke));
+        } else {
+            g.setColour(iconDarkGreyColour);
+        }
+        g.fillPath(graphicPath);
     }
 }
 

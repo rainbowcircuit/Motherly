@@ -323,7 +323,7 @@ MotherlyAudioProcessor::createParameterLayout()
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseFreq", 1},
                                                             "Noise Frequency",
-                                                            juce::NormalisableRange<float> { 100.0f, 8000.0f, 0.1, 0.25f },
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1, 0.5f },
                                                             1000.0f, "Hz"));
         
     layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID { "algorithm", 1},

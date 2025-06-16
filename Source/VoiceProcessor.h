@@ -22,7 +22,9 @@ public:
     
     struct VoiceParams
     {
-        float envelope, modEnvelope, pitch, tone, inharm, position, algorithm, op0Level, op1Level, op2Level, noiseLevel;
+        float envelope, modEnvelope, pitch, tone, inharm, position;
+        int algorithm;
+        float op0Level, op1Level, op2Level, noiseLevel;
     };
     
     SynthVoice::VoiceParams processParameters(float gate);
