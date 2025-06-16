@@ -28,7 +28,7 @@ PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
     patchBayLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
     patchBayLabel.setFont(12.0f);
     patchBayLabel.setJustificationType(juce::Justification::centred);
-    
+
     parameterIndexAtomic = 0;
     newValueAtomic = 0.0f;
     resized();
@@ -277,14 +277,11 @@ void PatchBay::setParameterValues(int output, int input)
 {
     juce::String outputParam = patchPointLayout[output].paramID;
     int inputIndex = patchPointLayout[input].localInputIndex;
-    
     auto* param = audioProcessor.apvts.getParameter(outputParam);
     const juce::NormalisableRange<float> range = param->getNormalisableRange();
     float normalised = range.convertTo0to1(inputIndex);
     
     audioProcessor.apvts.getParameter(outputParam)->setValueNotifyingHost(normalised);
-    
- //   DBG(outputParam << "with index: " << inputIndex << " normalised: " << normalised);
 }
 
 void PatchBay::clearParameterValues(int output)
@@ -447,12 +444,16 @@ void PatchPoint::setIsInput(bool input)
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
 
-PatchCable::PatchCable() {}
+PatchCable::PatchCable()
+{
+    juce::Random cableRand;
+    cableColor = cableRand.nextInt(7);
+}
 
 void PatchCable::paint(juce::Graphics& g)
 {
     juce::Path cablePath, cableEndPath;
-    juce::Colour fillColour = Colours::Gradient::gradientDarker[7];
+    juce::Colour fillColour = Colours::Gradient::gradientDarker[cableColor];
     g.setColour(fillColour);
 
     if (cableInUse){

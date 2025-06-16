@@ -12,12 +12,15 @@ void CombFilter::prepareToPlay(double sampleRate, uint32_t maximumBlockSize, uin
     combDelay.prepare(spec);
     combDelay.setMaximumDelayInSamples((int)std::ceil(sampleRate));
     combDelay.setDelay(30.0f);
+    
+    delayTimeSmooth.reset(sampleRate, 0.01);
 }
 
 void CombFilter::setDelayTime(float delayTime)
 {
     float delayTimeInSamples = delayTime/1000.0f * sampleRate;
-    combDelay.setDelay(delayTimeInSamples);
+    delayTimeSmooth.setTargetValue(delayTimeInSamples);
+    combDelay.setDelay(delayTimeSmooth.getNextValue());
 }
 
 float CombFilter::processComb(float input)
@@ -35,9 +38,7 @@ void Metro::setSampleRate(double sampleRate)
 
 void Metro::reset()
 {
-    // this ensures that upon first playback the impulse bool returns true.
     counterAccum = 0.0;
-    previousCounterAccum = 0.9;
 }
 
 void Metro::setRate(int rate)
@@ -45,34 +46,26 @@ void Metro::setRate(int rate)
     this->rate = rate;
 }
 
-bool Metro::getImpulse()
+void Metro::setRepeat(int index, int repeatValue)
 {
-    // this must be called every sample.
-    double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
-    
-    bool impulse;
-    if (isPlaying){ // temporary switch, previously isPlaying
-        counterAccum += bpmToHz/sampleRate;
-        if (counterAccum >= 1.0) counterAccum -= 1.0;
-    impulse = (counterAccum < previousCounterAccum);
-    } else {
-        reset();
-        impulse = false;
-    }
-    previousCounterAccum = counterAccum;
-    return impulse;
+    repeat[index] = repeatValue;
 }
 
-float Metro::getGate()
+void Metro::setStepIndex(int stepIndex)
 {
-    // this must be called every sample.
+    this->stepIndex = stepIndex;
+}
+
+float Metro::getGate(bool getBaseRate)
+{
     double bpmToHz = (bpm/60.0) * subdivisionMultiplier[rate];
     
-    float gateSize = 0.15;
+    float gateSize = 0.025;
     int repeatIndex = repeat[stepIndex];
+    if (getBaseRate) repeatIndex = 0;
     
-    float gate;
-    if (isPlaying){ 
+    float gate = 0.0f;
+    if (isPlaying){
         counterAccum += bpmToHz/sampleRate;
         if (counterAccum >= 1.0) counterAccum -= 1.0;
         
@@ -107,13 +100,12 @@ float Metro::getGate()
         reset();
         gate = 0.0f;
     }
+    
     return gate;
 }
 
 void Metro::getTransport(juce::AudioPlayHead* playhead)
 {
-    // call this method every processBlock to keep track of timing changes.
-    // get tempo
     if (playhead == nullptr){ return; }
     
     const auto opt = playhead->getPosition();

@@ -24,7 +24,7 @@ void Operator::setOperatorInputs(float frequency, double inputPhase, float tone,
     this->inputPhase = inputPhase;
     fmAmount = tone * 6.0f;
     combPosition = position;
-    softClipGain = tone * 3.5f + 1.0f;
+    softClipGain = tone * 1.5f + 1.0f;
 }
 
 float Operator::processOperator()
@@ -35,7 +35,7 @@ float Operator::processOperator()
     combFilter.setDelayTime(combPosition);
     modulator = combFilter.processComb(std::tanh(modulator * softClipGain));
     
-    float outputWaveform = std::sin(operatorAngle * juce::MathConstants<float>::pi * 2.0f + modulator);
+    float outputWaveform = std::sin(operatorAngle * juce::MathConstants<float>::twoPi + modulator);
 
     //increment and limit phase
     operatorAngle += operatorPhase;
@@ -59,7 +59,7 @@ void NoiseGenerator::setFilter(float frequency, float Q)
 float NoiseGenerator::processNoiseGenerator()
 {
     float noise = noiseSource.nextFloat();
-    float filteredNoise = filter.processSample(noise, 2);
+    float filteredNoise = filter.processSample(noise, 1);
 
     return filteredNoise;
 }

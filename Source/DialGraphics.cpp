@@ -293,12 +293,10 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
 
     //==============================================================================
     // simple struct
-    enum blockFill { FILL, OPER, NOISE};
     enum blockConnect { NONE, DOWN, DOWNLEFT, DOWNRIGHT, LEFTDOWN, RIGHTDOWN };
     struct blockValues
     {
         std::array<int, 4> blockToUse;
-        std::array<int, 4> fillValue;
         std::array<int, 4> connectValue;
         std::array<juce::String, 4> label = { "3","2", "1", "N" };
     };
@@ -307,21 +305,18 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
     switch((int)algorithmIndex){
         case 0:
             block.blockToUse = { 4, 7, 10, 11 };
-            block.fillValue = { OPER, OPER, OPER, NOISE };
             block.connectValue = { DOWN, DOWN, DOWN, DOWN };
             block.label = { "3","2", "1", "N" };
             break;
             
         case 1:
             block.blockToUse = { 6, 9, 10, 11 };
-            block.fillValue = { OPER, OPER, OPER, NOISE };
             block.connectValue = { RIGHTDOWN, DOWN, DOWN, DOWN };
             block.label = { "3","1", "2", "N" };
             break;
             
         case 2:
             block.blockToUse = { 7, 8, 9, 10 };
-            block.fillValue = { OPER, OPER, OPER, NOISE };
             block.connectValue = { DOWN, DOWNLEFT, DOWN, DOWN };
             block.label = { "3","2", "N", "1" };
 
@@ -329,49 +324,42 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
             
         case 3:
             block.blockToUse = { 4, 6, 7, 10 };
-            block.fillValue = { OPER, NOISE, OPER, OPER };
             block.connectValue = { DOWN, DOWNRIGHT, DOWN, DOWN };
             block.label = { "3","N", "2", "1" };
             break;
 
         case 4:
             block.blockToUse = { 6, 7, 10, 11 };
-            block.fillValue = { OPER, NOISE, OPER, OPER };
             block.connectValue = { DOWNRIGHT, RIGHTDOWN, DOWN, DOWN };
             block.label = { "N","3", "1", "2" };
             break;
             
         case 5:
             block.blockToUse = { 6, 7, 8, 10 };
-            block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWNRIGHT, DOWN, DOWNLEFT, DOWN };
             block.label = { "N","3", "2", "1" };
             break;
 
         case 6:
             block.blockToUse = { 3, 5, 7, 10 };
-            block.fillValue = { OPER, NOISE, OPER, OPER };
             block.connectValue = { DOWNRIGHT, DOWNLEFT, DOWN, DOWN };
             block.label = { "N","3", "2", "1" };
             break;
 
         case 7:
             block.blockToUse = { 4, 7, 10, 11 };
-            block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWN, DOWN, DOWN, DOWN };
             block.label = { "N","3", "1", "2" };
             break;
 
         case 8:
             block.blockToUse = { 4, 7, 8, 10 };
-            block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWN, DOWN, DOWNLEFT, DOWN };
             block.label = { "N","3", "2", "1" };
             break;
             
         case 9:
             block.blockToUse = { 1, 4, 7, 10 };
-            block.fillValue = { NOISE, OPER, OPER, OPER };
             block.connectValue = { DOWN, DOWN, DOWN, DOWN };
             block.label = { "N","3", "2", "1" };
             break;
@@ -390,17 +378,12 @@ void UserInterfaceGraphics::drawAlgorithm(juce::Graphics& g, float x, float y, f
                 g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
 
             } else {
-                if (block.fillValue[j] == OPER) {
-                    g.setColour(iconWhiteColor);
-                    g.fillPath(blockPath);
-                    g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
-
-                } else if (block.fillValue[j] == NOISE) {
-                    g.setColour(iconWhiteColor);
-                    g.fillPath(blockPath);
-                    g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
-                }
+                g.setColour(iconWhiteColor);
+                g.fillPath(blockPath);
+                g.strokePath(blockPath, juce::PathStrokeType(lineWidth));
+                break;
             }
+
         }
     }
     
@@ -641,17 +624,17 @@ void UserInterfaceGraphics::drawRate(juce::Graphics& g, float x, float y, float 
 {
     float posIndex = position * 6.0f;
     posIndex = std::floor(posIndex);
-
-    float graphicWidth = width * 0.8f;
-    float graphicMargin = width * 0.1f;
+    
+    float graphicWidth = width * 0.8f - 2.5f;
+    height = height/4;
     
     for (int i = 0; i < 7; i++)
     {
         float graphicIncr = (graphicWidth/7) * i;
 
         juce::Path linePath;
-        juce::Point<float> topCoords = { x + graphicMargin + graphicIncr, y + height * 0.1f };
-        juce::Point<float> botCoords = { x + graphicMargin + graphicIncr, y + height * 0.25f };
+        juce::Point<float> topCoords = { x + graphicIncr + 2.5f, y + height * 0.1f };
+        juce::Point<float> botCoords = { x + graphicIncr + 2.5f, y + height * 0.6f };
 
         linePath.startNewSubPath(topCoords);
         linePath.lineTo(botCoords);
@@ -665,8 +648,6 @@ void UserInterfaceGraphics::drawRate(juce::Graphics& g, float x, float y, float 
 
         juce::PathStrokeType lineStroke(width, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
         g.strokePath(linePath, juce::PathStrokeType(lineStroke));
-
-
     }
 }
 

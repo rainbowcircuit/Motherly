@@ -22,20 +22,18 @@ public:
     
     struct VoiceParams
     {
-        float envelope, modEnvelope, pitch, tone, inharm, position, algorithm, op0Level, op1Level, op2Level, operLevel, noiseLevel;
+        float envelope, modEnvelope, pitch, tone, inharm, position, algorithm, op0Level, op1Level, op2Level, noiseLevel;
     };
     
     SynthVoice::VoiceParams processParameters(float gate);
     float processSynthVoice(SynthVoice::VoiceParams params);
 
-    
     //==============================================================================
     
     int getStepIndex()
     {
         return stepIndex;
     }
-    
     
     void setSequencer(juce::AudioPlayHead &p, int rate);
     void setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue);
@@ -97,16 +95,16 @@ private:
     std::array<float, 8> modRawValues = {}; // carrier pitch mod amount
     std::array<float, 8> repeatRawValues = {}; // carrier pitch mod amount
 
-    float tensionRawValue = 0.0f, inharmonicityRawValue = 0.0f, positionRawValue = 0.0f, operatorLevelRawValue = 1.0f, op0LevelRawValue = 1.0f, op1LevelRawValue = 1.0f, op2LevelRawValue = 1.0f, noiseLevelRawValue = 1.0f, noiseFreqRawValue = 1000.0f, noiseBandwidthRawValue = 10.0f, pitchWheelRawValue = 0.0f, modWheelRawValue = 0.0f, outputGainRawValue = 0.0f;
+    float envRawValue = 0.0f, chaosRawValue = 0.0f, tensionRawValue = 0.0f, inharmonicityRawValue = 0.0f, positionRawValue = 0.0f, operatorLevelRawValue = 1.0f, vcaSignalRawValue = 0.0f, noiseSignalRawValue = 0.0f, noiseLevelRawValue = 1.0f, noiseFreqRawValue = 1000.0f, op0LevelRawValue = 1.0f, op1LevelRawValue = 1.0f, op2LevelRawValue = 1.0f, modWheelRawValue = 0.0f, outputGainRawValue = 0.0f; 
 
     int algorithmRawValue = 0;
 
     // patchbay
-    std::array<float, 8> outputsIn0to1;
-    std::array<float, 12> inputsIn0to1;
-    std::array<float, 12> defaultsIn0to1;
+    std::array<float, 9> outputsIn0to1;
+    std::array<float, 11> inputsIn0to1;
+    std::array<float, 11> defaultsIn0to1;
         
-    float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionInIn0to1, stepIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, noiseBandIn0to1, algoIn0to1, vcaMixIn0to1;
+    float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionInIn0to1, algoIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, op0In0to1, op1In0to1, op2In0to1;
     
     juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth;
 };

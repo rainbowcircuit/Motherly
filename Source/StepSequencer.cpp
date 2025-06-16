@@ -67,9 +67,11 @@ void StepSequencer::setRate(int sequencerRate)
 void StepSequencer::runSequencer()
 {
     if (counter.getIsPlaying()){
-        if (counter.getImpulse()){
+        float gate = counter.getGate(true);
+        if (gate > prevGate){
             currentStepIndex += 1;
         }
+        prevGate = gate;
     } else {
         reset();
     }

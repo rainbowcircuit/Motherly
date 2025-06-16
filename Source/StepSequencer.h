@@ -28,7 +28,7 @@ public:
     float getGate()
     {
         counter.setStepIndex(currentStepIndex % 8);
-        return counter.getGate();
+        return counter.getGate(false);
     }
     
     void setRepeat(int index, int repeatValue)
@@ -42,6 +42,6 @@ private:
     int samplePerBlock = 0;
     bool pendingNoteOff = false, rateUpdatePending = false;
     int currentStepIndex = 0, sequencerRate = 0;
-
+    float prevGate;
     
 };

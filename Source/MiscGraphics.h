@@ -42,7 +42,6 @@ public:
         bodyPath = bodyPath.createPathWithRoundedCorners(1.0f);
         g.setColour(Colours::Main::textColor);
         g.fillPath(bodyPath);
-
     }
 
     
@@ -98,11 +97,11 @@ public:
     
     void drawComboBox(juce::Graphics& g, int width, int height, bool isButtonDown, int buttonX, int buttonY, int buttonW, int buttonH, juce::ComboBox& comboBox) override
     {
-        auto bounds = juce::Rectangle<int>(0, 0, width, height).toFloat();
-
+        auto bounds = juce::Rectangle<int>(width, height).toFloat();
+        bounds.reduce(5, 5);
         juce::Path comboBoxPath, trianglePath, buttonPath;
         
-        comboBoxPath.addRoundedRectangle(bounds, 8.0f);
+        comboBoxPath.addRoundedRectangle(bounds, 5.0f);
         g.setColour(Colours::Main::backgroundFill);
         g.fillPath(comboBoxPath);
         g.setColour(Colours::Main::backgroundFillAlt);

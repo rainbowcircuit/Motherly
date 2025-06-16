@@ -96,8 +96,6 @@ void MotherlyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
             voice->prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
         }
     }
-    stepSequencer.prepareToPlay(sampleRate, samplesPerBlock);
-    stepIndexAtomic.store(0);
 }
 
 void MotherlyAudioProcessor::releaseResources()
@@ -141,10 +139,6 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
-    //************** Sequencer **************//
-    stepSequencer.suppressMIDIInput(midiMessages);
-    stepSequencer.updateTransport(getPlayHead());
-        
     auto playhead = getPlayHead();
     const auto opt = playhead->getPosition();
     const auto& pos = *opt;
@@ -172,7 +166,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
 
     // patch bay parameters
-    std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
+    std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Chaos", "VCA", "Noise", "MWheel" };
 
     if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(0)))
     {
@@ -194,7 +188,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         // patch bay params
         voice->paramsIn0to1();
         voice->setDefaults();
-        for (int output = 0; output < 8; ++output)
+        for (int output = 0; output < 9; ++output)
         {
             juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
             float input = apvts.getRawParameterValue(patchBayParamID)->load();
@@ -349,16 +343,16 @@ MotherlyAudioProcessor::createParameterLayout()
     
     //********************* Patch Bay Parameters *********************//
     
-    std::array<juce::String, 8> pbParamID = { "Pitch", "Tone", "Mod", "Prob", "EG", "Step", "MWheel", "PBend" };
+    std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Chaos", "VCA", "Noise", "MWheel" };
 
-    for (int output = 0; output < 8; ++output)
+    for (int output = 0; output < 9; ++output)
     {
         juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
         juce::String patchBayParamName = pbParamID[output] + " Out";
         
         layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { patchBayParamID, 1},
                                                                 patchBayParamName,
-                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Tension in", "Inharm In", "Position In", "Step In", "Operator Level In", "Noise Level In", "Noise Freq In", "Noise Bandwidth In", "Algorithm In", "VCA In" }, 0));
+                                                                juce::StringArray { "No Input", "Pitch In", "Tone In", "Tension in", "Inharm In", "Position In", "Algorithm In", "Noise Level In", "Noise Freq In", "Operator 1 In", "Operator 2 In", "Operator 3 In" }, 0));
     }
     
     return layout;

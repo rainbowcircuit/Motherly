@@ -23,7 +23,7 @@ MotherlyAudioProcessorEditor::MotherlyAudioProcessorEditor (MotherlyAudioProcess
     }
     
     startTimerHz(30);
-    setSize (775, 475);
+    setSize (780, 485);
 }
 
 MotherlyAudioProcessorEditor::~MotherlyAudioProcessorEditor()
@@ -45,16 +45,17 @@ void MotherlyAudioProcessorEditor::paint (juce::Graphics& g)
 
 void MotherlyAudioProcessorEditor::resized()
 {
-    mainInterface->setBounds(0, 350, 775, 125);
+    presetInterface->setBounds(5, 5, 765, 50);
+
     for (int step = 0; step < 8; step++)
     {
         int xIncrement = step * 75;
-        stepInterface[step]->setBounds(xIncrement, 50, 75, 300);
+        stepInterface[step]->setBounds(5 + xIncrement, 55, 75, 300);
     }
     
-    patchBayInterface->setBounds(600, 50, 170, 300);
+    patchBayInterface->setBounds(605, 55, 170, 300);
     patchBayInterface->resized();
-    presetInterface->setBounds(5, 5, 600, 50);
+    mainInterface->setBounds(5, 355, 770, 125);
 }
 
 void MotherlyAudioProcessorEditor::timerCallback()

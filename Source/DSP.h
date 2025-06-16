@@ -11,39 +11,26 @@ public:
 private:
     juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> combDelay;
     float delayTime = 48000.0f;
+    juce::SmoothedValue<float> delayTimeSmooth;
     double sampleRate = 0.0;
 };
 
 class Metro
 {
 public:
-    // tempo synced sample accurate counter that runs on the audio thread.
     void setSampleRate(double sampleRate);
     void reset();
     
     void setRate(int rate);
-    
-    void setRepeat(int index, int repeatValue)
-    {
-        repeat[index] = repeatValue;
-    }
-    
-    void setStepIndex(int stepIndex)
-    {
-        this->stepIndex = stepIndex;
-    }
-    
-    bool getImpulse();
-    float getGate();
+    void setRepeat(int index, int repeatValue);
+    void setStepIndex(int stepIndex);
+    float getGate(bool getBaseRate);
     void getTransport(juce::AudioPlayHead* playhead);
     bool getIsPlaying();
     
-    
 private:
-    double sampleRate;
-    double counterAccum = 0.0, previousCounterAccum = 0.0;
-    double bpm = 120.0;
-    int rate;
+    double bpm = 120.0, sampleRate, counterAccum = 0.0;
+    int rate, stepIndex = 7;
     bool isPlaying = false;
     
     std::array <double, 7> subdivisionMultiplier =
@@ -56,10 +43,8 @@ private:
          4.0 / 3.0,
          2.0,
      };
+    std::array<int, 8> repeat = {};
     
-    int stepIndex = 7;
-    std::array<int, 8> repeat = { 1, 1, 1, 1, 1, 1, 1, 1 }; // 0 silence
-
 };
 
 class LowPassGate

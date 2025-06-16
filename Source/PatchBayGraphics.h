@@ -55,6 +55,7 @@ public:
     void setYOffset(float yOffset);
 
 private:
+    int cableColor;
     float yOffset;
     juce::Point<float> mousePoint { 0, 0 };
     juce::Point<float> outputPoint { 0, 0 };
@@ -139,7 +140,6 @@ private:
         }
     }
     
-    
     void setParameterValues(int output, int input);
     void clearParameterValues(int output);
     void setCableFromParameter(int output, int input);
@@ -166,30 +166,30 @@ private:
     
     std::array<patchPointValues, 20> patchPointLayout
     {{
-        { false, "Pitch", "pbPitchOut", 0, 1 },
-        { false, "Tone", "pbToneOut", 0, 2 },
-        { false, "Mod", "pbModOut", 0, 3 },
-        { false, "Prob", "pbProbOut", 0, 4 },
+        { false, "Pitch", "pbPitchOut"   , 0, 1 },
+        { false, "Tone", "pbToneOut"     , 0, 2 },
+        { false, "EG", "pbEGOut"         , 0, 3 },
+        { false, "Rpt", "pbRepeatOut"    , 0, 4 },
 
-        { true,  "Pitch", "pbPitchIn", 1, 0 },
-        { true,  "Tone", "pbToneIn", 2, 0 },
-        { false,  "EG", "pbEGOut", 0, 5 },
-        { false,  "Step", "pbStepOut", 0, 6 },
+        { true,  "Pitch", "pbPitchIn"    , 1, 0 },
+        { true,  "Tone", "pbToneIn"      , 2, 0 },
+        { false,  "Step", "pbStepOut"    , 0, 5 },
+        { false,  "Chao", "pbChaosOut"   , 0, 6 },
         
-        { true,  "Tens", "pbTensionIn", 3, 0 },
-        { true,  "Inhr", "pbInharmIn", 4, 0 },
-        { true,  "Pos", "pbPositionIn", 5, 0 },
-        { true,  "Step", "pbStepIn", 6, 0 },
+        { true,  "Tens", "pbTensionIn"   , 3, 0 },
+        { true,  "Inhr", "pbInharmIn"    , 4, 0 },
+        { true,  "Pos", "pbPositionIn"   , 5, 0 },
+        { true,  "Algo", "pbAlgoIn"      , 6, 0 },
         
-        { true,  "O.Lv", "pbOperLevelIn", 7, 0 },
-        { true,  "N.Lv", "pbNoiseLevelIn", 8, 0 },
-        { true,  "N.Fq", "pbNoiseFreqIn", 9, 0 },
-        { true,  "N.Bw", "pbNoiseBWIn", 10, 0 },
+        { false,  "VCA", "pbVCAOut"      , 0, 7 },
+        { false,  "Nois", "pbNoiseOut"   , 0, 8 },
+        { true,  "N.Lv", "pbNoiseLevelIn", 7, 0 },
+        { true,  "N.Fq", "pbNoiseFreqIn" , 8, 0 },
 
-        { true, "Algo", "pbAlgoIn", 11, 0 },
-        { true, "VCA", "pbVCAIn", 12, 0 },
-        { false, "M.Wh", "pbMWheelOut", 0, 7 },
-        { false,  "P.Bd", "pbPBendOut", 0, 8 },
+        { true, "Op1", "pbOper1In"       , 9, 0 },
+        { true, "Op2", "pbOper2In"       , 10, 0 },
+        { true, "Op3", "pbOper3In"       , 11, 0 },
+        { false,  "M.Wh", "pbMWheelOut"  , 0, 9 },
     }};
     
     std::atomic<int> parameterIndexAtomic;

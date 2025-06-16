@@ -65,7 +65,6 @@ private:
     std::atomic<int> stepIndexAtomic;
     std::atomic<float> amplitudeAtomic;
 
-    StepSequencer stepSequencer;
     juce::Synthesiser synth;
 
     //==============================================================================

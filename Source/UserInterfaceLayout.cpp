@@ -19,7 +19,7 @@ StepInterface::StepInterface(MotherlyAudioProcessor& p, int index) : audioProces
     repeatLookAndFeel.setStepIndex(stepIndex);
 
     // initialize sliders and labels
-    setStepParams(freqLabel, freqSlider, juce::Slider::TextBoxBelow, "Freq", freqLookAndFeel);
+    setStepParams(freqLabel, freqSlider, juce::Slider::TextBoxBelow, "Pitch", freqLookAndFeel);
     juce::String freqID = "freq" + juce::String(stepIndex);
     freqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, freqID, freqSlider);
 
@@ -27,7 +27,7 @@ StepInterface::StepInterface(MotherlyAudioProcessor& p, int index) : audioProces
     juce::String toneID = "tone" + juce::String(stepIndex);
     toneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, toneID, toneSlider);
 
-    setStepParams(modLabel, modSlider, juce::Slider::NoTextBox, "Mod", modLookAndFeel);
+    setStepParams(modLabel, modSlider, juce::Slider::NoTextBox, "P.Env", modLookAndFeel);
     juce::String modID = "mod" + juce::String(stepIndex);
     modAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, modID, modSlider);
 

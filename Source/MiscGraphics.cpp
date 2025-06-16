@@ -18,9 +18,10 @@ ButtonGraphics::ButtonGraphics(int graphicIndex)
 void ButtonGraphics::drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto bounds = juce::Rectangle<int>(button.getWidth(), button.getWidth()).toFloat();
+    bounds.reduce(5, 5);
     
     juce::Path bgPath;
-    bgPath.addRoundedRectangle(bounds, 8.0f);
+    bgPath.addRoundedRectangle(bounds, 5.0f);
     juce::Colour buttonColour = shouldDrawButtonAsDown ? Colours::Main::backgroundHoverFill : Colours::Main::backgroundFill;
     g.setColour(buttonColour);
     g.fillPath(bgPath);

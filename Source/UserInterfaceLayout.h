@@ -55,7 +55,6 @@ public:
     DrumMainInterface(MotherlyAudioProcessor& p) : audioProcessor(p)
     {
         auto bounds = getLocalBounds().toFloat();
-        float width = bounds.getWidth() * 1.2f;
         
         setStepParams(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", " %", tensionGraphics);
         tensionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "tension", tensionSlider);
@@ -118,37 +117,38 @@ public:
         auto bounds = getLocalBounds().toFloat();
         float x = bounds.getX();
         float y = bounds.getY();
+        float width = bounds.getWidth();
         float height = bounds.getHeight();
 
-        tensionLabel.setBounds(x + 10, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        tensionSlider.setBounds(x + 10, y + height * 0.175f, height * 0.7f, height * 0.775f);
+        tensionLabel.setBounds(x + width * 0.01f, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        tensionSlider.setBounds(x + width * 0.01f, y + height * 0.175f, height * 0.7f, height * 0.775f);
         
-        inharmLabel.setBounds(x + 130, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        inharmSlider.setBounds(x + 130, y + height * 0.175f, height * 0.7f, height * 0.775f);
+        inharmLabel.setBounds(x + width * 0.155f, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        inharmSlider.setBounds(x + width * 0.155f, y + height * 0.175f, height * 0.7f, height * 0.775f);
         
-        positionLabel.setBounds(x + 250, y + height * 0.15f, height * 0.5f, height * 0.1f);
-        positionSlider.setBounds(x + 250, y + height * 0.25f, height * 0.5f, height * 0.6f);
+        positionLabel.setBounds(x + width * 0.3f, y + height * 0.175f, height * 0.5f, height * 0.1f);
+        positionSlider.setBounds(x + width * 0.3f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        algorithmLabel.setBounds(x + 550, y + height * 0.1f, height * 0.6f, height * 0.1f);
-        algorithmSlider.setBounds(x + 550, y + height * 0.2, height * 0.7f, height * 0.7f);
+        op1Label.setBounds(x + width * 0.475f, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op1Slider.setBounds(x + width * 0.475f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        op1Label.setBounds(x + 380, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op1Slider.setBounds(x + 380, y + height * 0.2, height * 0.3f, height * 0.3f);
-        
-        op2Label.setBounds(x + 380, y + height * 0.55f, height * 0.3f, height * 0.1f);
-        op2Slider.setBounds(x + 380, y + height * 0.65, height * 0.3f, height * 0.3f);
+        op2Label.setBounds(x + width * 0.475f, y + height * 0.55f, height * 0.3f, height * 0.1f);
+        op2Slider.setBounds(x + width * 0.475f, y + height * 0.65, height * 0.3f, height * 0.3f);
 
-        op3Label.setBounds(x + 440, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op3Slider.setBounds(x + 440, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op3Label.setBounds(x + width * 0.55f, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op3Slider.setBounds(x + width * 0.55f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        noiseLabel.setBounds(x + 440, y + height * 0.55f, height * 0.3f, height * 0.1f);
-        noiseSlider.setBounds(x + 440, y + height * 0.65, height * 0.3f, height * 0.3f);
+        noiseLabel.setBounds(x + width * 0.55f, y + height * 0.55f, height * 0.3f, height * 0.1f);
+        noiseSlider.setBounds(x + width * 0.55f, y + height * 0.65, height * 0.3f, height * 0.3f);
         
-        noiseFreqLabel.setBounds(x + 490, y + height * 0.15f, height * 0.5f, height * 0.1f);
-        noiseFreqSlider.setBounds(x + 490, y + height * 0.25f, height * 0.5f, height * 0.6f);
+        noiseFreqLabel.setBounds(x + width * 0.62f, y + height * 0.15f, height * 0.5f, height * 0.1f);
+        noiseFreqSlider.setBounds(x + width * 0.62f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        outputLabel.setBounds(x + 675, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        outputSlider.setBounds(x + 675, y + height * 0.175, height * 0.7f, height * 0.775f);
+        algorithmLabel.setBounds(x + width * 0.7f, y + height * 0.1f, height * 0.6f, height * 0.1f);
+        algorithmSlider.setBounds(x + width * 0.7f, y + height * 0.2, height * 0.7f, height * 0.7f);
+
+        outputLabel.setBounds(x + width * 0.875f, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        outputSlider.setBounds(x + width * 0.875f, y + height * 0.175, height * 0.7f, height * 0.775f);
     }
     
     
@@ -182,23 +182,28 @@ private:
     MotherlyAudioProcessor& audioProcessor;
 };
 
-class PresetInterface : public juce::Component, juce::ComboBox::Listener, juce::Button::Listener
+class PresetInterface : public juce::Component, juce::Timer, juce::ComboBox::Listener, juce::Button::Listener
 {
 public:
     PresetInterface(MotherlyAudioProcessor& p, juce::AudioProcessorValueTreeState& apvts) : presetManager(apvts), audioProcessor(p)
     {
+        addAndMakeVisible(rateSlider);
+        rateSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+        rateSlider.setLookAndFeel(&rateGraphics);
+        rateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "seqRate", rateSlider);
+
         addAndMakeVisible(rateLabel);
         rateLabel.setText("Rate", juce::dontSendNotification);
         rateLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
         rateLabel.setJustificationType(juce::Justification::left);
         rateLabel.setFont(12.0f);
-
-        addAndMakeVisible(rateSlider);
-        rateSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-        rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 30, 30);
-        rateSlider.setLookAndFeel(&rateGraphics);
-        rateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "seqRate", rateSlider);
-
+        
+        addAndMakeVisible(rateValueLabel);
+        rateValueLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
+        rateValueLabel.setJustificationType(juce::Justification::right);
+        rateValueLabel.setFont(12.0f);
+        
         
         addAndMakeVisible(saveButton);
         saveButton.addListener(this);
@@ -219,6 +224,7 @@ public:
         loadPresetList();
         patchBayInterface = std::make_unique<PatchBay>(audioProcessor);
         
+        startTimerHz(20);
     }
     
     ~PresetInterface()
@@ -229,19 +235,31 @@ public:
         presetComboBox.removeListener(this);
     }
     
+    void changeRateValueSlider()
+    {
+        int rate = audioProcessor.apvts.getRawParameterValue("seqRate")->load();
+        std::array<juce::String, 7> rateValue = { "1/2", "3/8", "1/4", "3/16", "1/8", "3/16", "1/16" };
+        rateValueLabel.setText(rateValue[rate], juce::dontSendNotification);
+    }
+    
     void paint(juce::Graphics& g) override {}
     
     void resized() override
     {
         auto bounds = getLocalBounds().toFloat();
-        
-        rateLabel.setBounds(bounds.getX() + 503, bounds.getY(), 120, 30);
-        rateSlider.setBounds(bounds.getX() + 500, bounds.getY() + bounds.getHeight() * 0.25f, 120, 30);
+        float x = bounds.getX();
+        float y = bounds.getY();
+        float width = bounds.getWidth();
+        float height = bounds.getHeight();
 
-        saveButton.setBounds(bounds.getX(), bounds.getY(), 40, 40);
-        nextButton.setBounds(bounds.getX() + 125, bounds.getY(), 40, 40);
-        prevButton.setBounds(bounds.getX() + 75, bounds.getY(), 40, 40);
-        presetComboBox.setBounds(bounds.getX() + 175, bounds.getY(), 300, 40);
+        rateLabel.setBounds(x + width * 0.75f, y, 120, height * 0.25f);
+        rateValueLabel.setBounds(x + width * 0.8f, y, 120, height * 0.25f);
+        rateSlider.setBounds(x + width * 0.75f, y + height * 0.3f, 140, height * 0.5f);
+
+        saveButton.setBounds(x, y, height, height);
+        prevButton.setBounds(x + height, y, height, height);
+        nextButton.setBounds(x + height * 9.0f, y, height, height);
+        presetComboBox.setBounds(x + height * 2.0f, bounds.getY(), height * 7.0f, height);
     }
     
     void comboBoxChanged(juce::ComboBox *comboBoxThatHasChanged) override
@@ -289,6 +307,11 @@ public:
     }
     
 private:
+    void timerCallback() override
+    {
+        changeRateValueSlider();
+    }
+    
     UserInterfaceGraphics rateGraphics { 9 };
     ButtonGraphics saveLAF { 0 }, nextLAF { 1 }, prevLAF { 2 };
     ComboBoxGraphics comboBoxLAF;
@@ -296,7 +319,7 @@ private:
     juce::TextButton saveButton, nextButton, prevButton;
     juce::ComboBox presetComboBox;
     juce::Slider rateSlider;
-    juce::Label rateLabel;
+    juce::Label rateLabel, rateValueLabel;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> rateAttachment;
     std::unique_ptr<juce::FileChooser> fileChooser;
