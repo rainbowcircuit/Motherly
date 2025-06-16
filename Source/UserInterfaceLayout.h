@@ -130,14 +130,14 @@ public:
         op1Label.setBounds(x + width * 0.475f, y + height * 0.1f, height * 0.3f, height * 0.1f);
         op1Slider.setBounds(x + width * 0.475f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        op2Label.setBounds(x + width * 0.475f, y + height * 0.55f, height * 0.3f, height * 0.1f);
-        op2Slider.setBounds(x + width * 0.475f, y + height * 0.65, height * 0.3f, height * 0.3f);
+        op2Label.setBounds(x + width * 0.475f, y + height * 0.525f, height * 0.3f, height * 0.1f);
+        op2Slider.setBounds(x + width * 0.475f, y + height * 0.625, height * 0.3f, height * 0.3f);
 
         op3Label.setBounds(x + width * 0.55f, y + height * 0.1f, height * 0.3f, height * 0.1f);
         op3Slider.setBounds(x + width * 0.55f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        noiseLabel.setBounds(x + width * 0.55f, y + height * 0.55f, height * 0.3f, height * 0.1f);
-        noiseSlider.setBounds(x + width * 0.55f, y + height * 0.65, height * 0.3f, height * 0.3f);
+        noiseLabel.setBounds(x + width * 0.55f, y + height * 0.525f, height * 0.3f, height * 0.1f);
+        noiseSlider.setBounds(x + width * 0.55f, y + height * 0.625, height * 0.3f, height * 0.3f);
         
         noiseFreqLabel.setBounds(x + width * 0.62f, y + height * 0.15f, height * 0.5f, height * 0.1f);
         noiseFreqSlider.setBounds(x + width * 0.62f, y + height * 0.25f, height * 0.5f, height * 0.6f);
@@ -249,7 +249,7 @@ public:
         float y = bounds.getY();
         float height = bounds.getHeight();
 
-        rateLabel.setBounds(605, y + height * 0.25f, 164, height * 0.35f);
+        rateLabel.setBounds(600, y + height * 0.25f, 164, height * 0.35f);
         rateValueLabel.setBounds(605, y + height * 0.25f, 164, height * 0.35f);
         rateSlider.setBounds(605, y + height * 0.6f, 164, height * 0.4f - 5);
 

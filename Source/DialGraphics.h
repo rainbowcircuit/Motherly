@@ -35,7 +35,7 @@ public:
     
     void drawPitchMod(juce::Graphics& g, float x, float y, float width, float height, float position);
     
-    void drawProbability(juce::Graphics& g, float x, float y, float width, float height, float position);
+    void drawRepeat(juce::Graphics& g, float x, float y, float width, float height, float position);
     
     void drawTensionIcon(juce::Graphics& g, float x, float y, float size, float length);
 

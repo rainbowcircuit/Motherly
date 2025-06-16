@@ -54,7 +54,7 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawFrequency(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     } else if (graphicIndex == 4){
-        drawProbability(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        drawRepeat(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     } else if (graphicIndex == 5){
         drawAlgorithm(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
@@ -253,7 +253,7 @@ void UserInterfaceGraphics::drawPitchMod(juce::Graphics& g, float x, float y, fl
     g.strokePath(graphicLines, juce::PathStrokeType(lineWidth));
 }
 
-void UserInterfaceGraphics::drawProbability(juce::Graphics& g, float x, float y, float width, float height, float position)
+void UserInterfaceGraphics::drawRepeat(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
     // coordinates
     int positionScaled = std::floor(position * 3.0f + 1);

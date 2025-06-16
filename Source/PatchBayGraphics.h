@@ -189,7 +189,7 @@ private:
         { true, "Op1", "pbOper1In"       , 9, 0 },
         { true, "Op2", "pbOper2In"       , 10, 0 },
         { true, "Op3", "pbOper3In"       , 11, 0 },
-        { false,  "M.Wh", "pbMWheelOut"  , 0, 9 },
+        { false,  "Whl", "pbMWheelOut"  , 0, 9 },
     }};
     
     std::atomic<int> parameterIndexAtomic;

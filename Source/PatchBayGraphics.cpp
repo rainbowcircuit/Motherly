@@ -464,15 +464,25 @@ void PatchCable::paint(juce::Graphics& g)
         
         if (cableConnected)
         {
+            float dx = inputPoint.x - outputPoint.x;
+            float slack = std::abs(dx) * 0.2f + 10.0f; // amount of vertical slack
+            juce::Point<float> bezierCoords1(outputPoint.x + dx * 0.25f, outputPoint.y + slack);
+            juce::Point<float> bezierCoords2(outputPoint.x + dx * 0.75f, inputPoint.y + slack);
+
             // draw to input point and its arc
-            cablePath.cubicTo(outputPoint.x, outputPoint.x + 10, inputPoint.x, inputPoint.y + 10, inputPoint.x, inputPoint.y);
+            cablePath.cubicTo(bezierCoords1, bezierCoords2, inputPoint);
             g.strokePath(cablePath, juce::PathStrokeType(4.0));
             cableEndPath.addCentredArc(inputPoint.x, inputPoint.y, 4, 4, 0.0f, 0.0f, 6.28f, true);
             g.fillPath(cableEndPath);
             
         } else {
+            float dx = mousePoint.x - outputPoint.x;
+            float slack = std::abs(dx) * 0.2f + 10.0f; // amount of vertical slack
+            juce::Point<float> bezierCoords1(outputPoint.x + dx * 0.25f, outputPoint.y + slack);
+            juce::Point<float> bezierCoords2(outputPoint.x + dx * 0.75f, mousePoint.y + slack);
+
             // draw to mouse
-            cablePath.cubicTo(outputPoint.x, outputPoint.x + 10, mousePoint.x, mousePoint.y + 10, mousePoint.x, mousePoint.y);
+            cablePath.cubicTo(bezierCoords1, bezierCoords2, mousePoint);
             g.strokePath(cablePath, juce::PathStrokeType(4.0));
             cableEndPath.addCentredArc(mousePoint.x, mousePoint.y, 4, 4, 0.0f, 0.0f, 6.28f, true);
             g.fillPath(cableEndPath);
