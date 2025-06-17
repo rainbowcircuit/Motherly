@@ -34,7 +34,7 @@ public:
     
 
 private:
-    void setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, UserInterfaceGraphics& lookAndFeel);
+    void setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel);
 
     juce::Label freqLabel, toneLabel, modLabel, repeatLabel;
     UserInterfaceGraphics freqLookAndFeel { 3 }, toneLookAndFeel { 0 }, modLookAndFeel { 2 }, repeatLookAndFeel { 4 };
@@ -94,6 +94,13 @@ public:
         tensionSlider.setLookAndFeel(nullptr);
         inharmSlider.setLookAndFeel(nullptr);
         positionSlider.setLookAndFeel(nullptr);
+        op1Slider.setLookAndFeel(nullptr);
+        op2Slider.setLookAndFeel(nullptr);
+        op3Slider.setLookAndFeel(nullptr);
+        noiseSlider.setLookAndFeel(nullptr);
+        noiseFreqSlider.setLookAndFeel(nullptr);
+        algorithmSlider.setLookAndFeel(nullptr);
+        outputSlider.setLookAndFeel(nullptr);
     }
     
     void paint(juce::Graphics& g) override
@@ -104,9 +111,7 @@ public:
         juce::Path bgFill;
         bgFill.addRoundedRectangle(bg, 5);
         
-        juce::Colour mainColour = Colours::Main::backgroundFill;
-        
-        g.setColour(mainColour);
+        g.setColour(Colours::Main::backgroundFill);
         g.fillPath(bgFill);
     }
     

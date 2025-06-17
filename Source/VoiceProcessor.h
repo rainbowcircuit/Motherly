@@ -22,12 +22,12 @@ public:
     
     struct VoiceParams
     {
-        float envelope, modEnvelope, pitch, tone, inharm, position;
+        float envelope, modEnvelope, pitch, tone, inharm;
         int algorithm;
         float op0Level, op1Level, op2Level, noiseLevel;
     };
     
-    SynthVoice::VoiceParams processParameters(float gate);
+    SynthVoice::VoiceParams processParameters(float numSamples);
     float processSynthVoice(SynthVoice::VoiceParams params);
 
     //==============================================================================
@@ -47,11 +47,13 @@ public:
     void setEnvelope();
     void triggerEnvelope(float gate);
     float lastGate;
+    
     //==============================================================================
     
-    void setAlgorithm(int algorithmValue);
+    float generateRand();
     
-
+    //==============================================================================
+    void setAlgorithm(int algorithmValue);
     float processAlgorithm0(VoiceParams p);
     float processAlgorithm1(VoiceParams p);
     float processAlgorithm2(VoiceParams p);
@@ -90,14 +92,14 @@ private:
     
  //   LowPassGate ampEnvelope;
     LowPassGate ampEnvelope;
-    
+    CombFilter combFilter;
     // Synth Parameters
     std::array<float, 8> pitchRawValues = {}; // carrier pitch
     std::array<float, 8> toneRawValues = {}; // fm ratio and feedback
     std::array<float, 8> modRawValues = {}; // carrier pitch mod amount
     std::array<float, 8> repeatRawValues = {}; // carrier pitch mod amount
 
-    float envRawValue = 0.0f, chaosRawValue = 0.0f, tensionRawValue = 0.0f, inharmonicityRawValue = 0.0f, positionRawValue = 0.0f, operatorLevelRawValue = 1.0f, vcaSignalRawValue = 0.0f, noiseSignalRawValue = 0.0f, noiseLevelRawValue = 1.0f, noiseFreqRawValue = 1000.0f, op0LevelRawValue = 1.0f, op1LevelRawValue = 1.0f, op2LevelRawValue = 1.0f, modWheelRawValue = 0.0f, outputGainRawValue = 0.0f; 
+    float envRawValue = 0.0f, randRawValue = 0.0f, tensionRawValue = 0.0f, inharmonicityRawValue = 0.0f, positionRawValue = 0.0f, operatorLevelRawValue = 1.0f, vcaSignalRawValue = 0.0f, noiseSignalRawValue = 0.0f, noiseLevelRawValue = 1.0f, noiseFreqRawValue = 1000.0f, op0LevelRawValue = 1.0f, op1LevelRawValue = 1.0f, op2LevelRawValue = 1.0f, modWheelRawValue = 0.0f, outputGainRawValue = 0.0f; 
 
     int algorithmRawValue = 0;
 
@@ -106,9 +108,10 @@ private:
     std::array<float, 11> inputsIn0to1;
     std::array<float, 11> defaultsIn0to1;
         
-    float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionInIn0to1, algoIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, op0In0to1, op1In0to1, op2In0to1;
+    float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionIn0to1, algoIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, op0In0to1, op1In0to1, op2In0to1;
     
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth;
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth, randSmooth;
+    
 };
 
 

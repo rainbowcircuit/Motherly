@@ -14,11 +14,11 @@ namespace Colours
 {
     namespace Main
     {
-    const juce::Colour backgroundFill = { 35, 32, 34 };
-    const juce::Colour backgroundHoverFill = { 40, 37, 39 };
-    const juce::Colour backgroundActiveFill = { 45, 42, 44 };
+    const juce::Colour backgroundFill = { 42, 40, 42 };//35 32 34
+    const juce::Colour backgroundHoverFill = { 47, 45, 47 };
+    const juce::Colour backgroundActiveFill = { 52, 50, 52 };
 
-    const juce::Colour backgroundFillAlt = { 30, 27, 29 };
+    const juce::Colour backgroundFillAlt = { 37, 35, 37 };
     const juce::Colour textColor = { 115, 117, 116 };
     
     const juce::Colour iconWhite = { 190, 192, 191 };

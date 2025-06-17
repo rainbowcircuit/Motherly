@@ -174,7 +174,7 @@ private:
         { true,  "Pitch", "pbPitchIn"    , 1, 0 },
         { true,  "Tone", "pbToneIn"      , 2, 0 },
         { false,  "Step", "pbStepOut"    , 0, 5 },
-        { false,  "Chao", "pbChaosOut"   , 0, 6 },
+        { false,  "Rand", "pbRandOut"   , 0, 6 },
         
         { true,  "Tens", "pbTensionIn"   , 3, 0 },
         { true,  "Inhr", "pbInharmIn"    , 4, 0 },

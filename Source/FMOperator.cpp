@@ -5,7 +5,6 @@ void Operator::prepareToPlay(double sampleRate, int samplesPerBlock, int numChan
     this->sampleRate = sampleRate;
     resetPhase();
     resetAngle();
-    combFilter.prepareToPlay(sampleRate, samplesPerBlock, numChannels);
 }
 
 void Operator::resetPhase()
@@ -18,28 +17,33 @@ void Operator::resetAngle()
     operatorAngle = 0.0;
 }
 
-void Operator::setOperatorInputs(float frequency, double inputPhase, float tone, float position)
+void Operator::setOperatorInputs(float frequency, double inputPhase, float tone)
 {
     operatorPhase = frequency/sampleRate;
     this->inputPhase = inputPhase;
     fmAmount = tone * 6.0f;
-    combPosition = position;
     softClipGain = tone * 1.5f + 1.0f;
+}
+
+inline float wrapToMinusPiToPi(float x)
+{
+    constexpr float twoPi = juce::MathConstants<float>::twoPi;
+    constexpr float pi = juce::MathConstants<float>::pi;
+    x += pi;
+    x -= twoPi * std::floor(x / twoPi);
+    return x - pi;
 }
 
 float Operator::processOperator()
 {
     float modulator = inputPhase * fmAmount;
+    modulator = std::tanh(modulator * softClipGain);
+    float phase = operatorAngle * juce::MathConstants<float>::twoPi + modulator;
+    float outputWaveform = std::sin(phase);
     
-    // soft clip and comb filter
-    combFilter.setDelayTime(combPosition);
-    modulator = combFilter.processComb(std::tanh(modulator * softClipGain));
-    
-    float outputWaveform = std::sin(operatorAngle * juce::MathConstants<float>::twoPi + modulator);
-
     //increment and limit phase
     operatorAngle += operatorPhase;
-    if (operatorAngle >= 1.0) operatorAngle -= 1.0;
+    if (operatorAngle >= 1.0f) operatorAngle -= 1.0f;
 
     // output
     return outputWaveform;

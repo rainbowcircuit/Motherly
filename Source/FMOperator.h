@@ -15,19 +15,15 @@
 class Operator
 {
 public:
-    /*
-    Operator in the loosest sense -- with a comb filter and diode distortion.
-    Since the EG is shared, it is handled externally in synth voice.
-    */
     void prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels);
     void resetPhase();
     void resetAngle();
-    void setOperatorInputs(float frequency, double inputPhase, float fmAmount, float position);
+    void setOperatorInputs(float frequency, double inputPhase, float tone);
+    void setPosition(float position);
     float processOperator();
     
     
 private:
-    CombFilter combFilter;
     double sampleRate, operatorAngle = 0.0, operatorPhase = 0.0, inputPhase = 0.0;
     float fmAmount, softClipGain, combPosition;
          

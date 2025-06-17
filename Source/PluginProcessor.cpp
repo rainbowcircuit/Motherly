@@ -166,7 +166,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
 
     // patch bay parameters
-    std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Chaos", "VCA", "Noise", "MWheel" };
+    std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Rand", "VCA", "Noise", "MWheel" };
 
     if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(0)))
     {
@@ -319,12 +319,12 @@ MotherlyAudioProcessor::createParameterLayout()
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseLevel", 1},
                                                             "Noise Level",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f },
-                                                            50.0f, "%"));
+                                                            25.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseFreq", 1},
                                                             "Noise Frequency",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1, 0.5f },
-                                                            1000.0f, "Hz"));
+                                                            100.0f, "%"));
         
     layout.add(std::make_unique<juce::AudioParameterInt>(juce::ParameterID { "algorithm", 1},
                                                             "Algorithm",
@@ -343,7 +343,7 @@ MotherlyAudioProcessor::createParameterLayout()
     
     //********************* Patch Bay Parameters *********************//
     
-    std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Chaos", "VCA", "Noise", "MWheel" };
+    std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Rand", "VCA", "Noise", "MWheel" };
 
     for (int output = 0; output < 9; ++output)
     {

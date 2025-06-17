@@ -19,19 +19,19 @@ StepInterface::StepInterface(MotherlyAudioProcessor& p, int index) : audioProces
     repeatLookAndFeel.setStepIndex(stepIndex);
 
     // initialize sliders and labels
-    setStepParams(freqLabel, freqSlider, juce::Slider::TextBoxBelow, "Pitch", freqLookAndFeel);
+    setStepParams(freqLabel, freqSlider, juce::Slider::TextBoxBelow, "Pitch", " Hz", freqLookAndFeel);
     juce::String freqID = "freq" + juce::String(stepIndex);
     freqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, freqID, freqSlider);
 
-    setStepParams(toneLabel, toneSlider, juce::Slider::TextBoxBelow, "Tone", toneLookAndFeel);
+    setStepParams(toneLabel, toneSlider, juce::Slider::TextBoxBelow, "Tone", " %", toneLookAndFeel);
     juce::String toneID = "tone" + juce::String(stepIndex);
     toneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, toneID, toneSlider);
 
-    setStepParams(modLabel, modSlider, juce::Slider::NoTextBox, "P.Env", modLookAndFeel);
+    setStepParams(modLabel, modSlider, juce::Slider::NoTextBox, "P.Env", "", modLookAndFeel);
     juce::String modID = "mod" + juce::String(stepIndex);
     modAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, modID, modSlider);
 
-    setStepParams(repeatLabel, repeatSlider, juce::Slider::TextBoxBelow, "Repeat", repeatLookAndFeel);
+    setStepParams(repeatLabel, repeatSlider, juce::Slider::TextBoxBelow, "Repeat", "", repeatLookAndFeel);
     juce::String probID = "repeat" + juce::String(stepIndex);
     repeatAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, probID, repeatSlider);
 
@@ -48,15 +48,15 @@ StepInterface::~StepInterface()
 
 void StepInterface::paint(juce::Graphics& g)
 {
-    auto bg = getLocalBounds().toFloat();
-    bg.reduce(5, 5);
+    auto bounds = getLocalBounds().toFloat();
+    bounds.reduce(5, 5);
         
     juce::Colour mainColour = Colours::Main::backgroundFill;
     juce::Colour hoverColour = Colours::Main::backgroundHoverFill;
     juce::Colour bgFillColour = stepHovered ? hoverColour : mainColour;
 
     juce::Path bgFill;
-    bgFill.addRoundedRectangle(bg, 5);
+    bgFill.addRoundedRectangle(bounds, 5);
 
     juce::Colour blinkerFillColour { Colours::Main::backgroundActiveFill };
     juce::Colour fillColour =  isStepIndex ? blinkerFillColour : bgFillColour;
@@ -101,7 +101,7 @@ void StepInterface::timerCallback()
     stepHovered = isMouseOver(true);
 }
 
-void StepInterface::setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, UserInterfaceGraphics& lookAndFeel)
+void StepInterface::setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel)
 {
     // initialize label
     addAndMakeVisible(label);
@@ -113,6 +113,7 @@ void StepInterface::setStepParams(juce::Label& label, juce::Slider& slider, juce
     // slider
     addAndMakeVisible(slider);
     slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    slider.setTextBoxStyle(textBoxPosition, false, 50, 20);
+    slider.setTextBoxStyle(textBoxPosition, false, 75, 20);
+    slider.setTextValueSuffix(suffix);
     slider.setLookAndFeel(&lookAndFeel);
 }
