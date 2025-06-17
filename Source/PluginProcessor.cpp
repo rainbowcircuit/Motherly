@@ -291,7 +291,7 @@ MotherlyAudioProcessor::createParameterLayout()
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "inharmonicity", 1},
                                                             "Inharmonicity",
-                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.25f, 1.0f },
+                                                            juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f, 1.0f },
                                                             20.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "position", 1},

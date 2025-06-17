@@ -74,6 +74,7 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
         float modEnvExponent = envelope * modRawValues[stepIndex] * (1.0f / 12.0f);
         params.modEnvelope = std::exp2(modEnvExponent);
         params.pitch = pitchSmooth.getNextValue() * 1170.0f + 30.0f;
+        params.tone = toneSmooth.getNextValue();
 
         float noiseFreqFrom0to1 = noiseFreqSmooth.getNextValue() * 7900.0f + 100;
         ns.setFilter(noiseFreqFrom0to1, 3.0f);
@@ -88,8 +89,6 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
 
 SynthVoice::VoiceParams SynthVoice::processParameters(float numSamples)
 {
-
-    float toneFrom0to1 = toneSmooth.skip(numSamples);
     float inharmFrom0to1 = inharmSmooth.skip(numSamples) * 2.5 + 0.5f;
     float positionFrom0to1 = positionSmooth.skip(numSamples) * 45.0f + 5.0f;
     combFilter.setDelayTime(positionFrom0to1);
@@ -109,7 +108,7 @@ SynthVoice::VoiceParams SynthVoice::processParameters(float numSamples)
     float op2LevelFrom0to1 = op2LevelSmooth.skip(numSamples);
     float noiseLevelFrom0to1 = noiseLevelSmooth.skip(numSamples);
 
-    VoiceParams params { 0.0f, 0.0f, 0.0f, toneFrom0to1, inharmFrom0to1, algoFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, noiseLevelFrom0to1 };
+    VoiceParams params { 0.0f, 0.0f, 0.0f, 0.0f, inharmFrom0to1, algoFrom0to1, op0LevelFrom0to1, op1LevelFrom0to1, op2LevelFrom0to1, noiseLevelFrom0to1 };
         
     return params;
 }
@@ -151,7 +150,7 @@ float SynthVoice::processSynthVoice(VoiceParams params)
             output = processAlgorithm9(params);
             break;
     }
-    vcaSignalRawValue = output;
+    vcaSignalRawValue = output * 0.5f + 0.5f;
     return output;
 }
 
@@ -239,7 +238,7 @@ void SynthVoice::setAlgorithm(int algorithmValue)
 float SynthVoice::processAlgorithm0(VoiceParams p)
 {
     float noise = ns.processNoiseGenerator() * p.envelope * p.noiseLevel;
-    noiseSignalRawValue = noise;
+    noiseSignalRawValue = noise * 0.5f + 0.5f;
     op[2].setOperatorInputs(p.pitch * p.modEnvelope, 0.0f, 0.0f);
     float operator2 = op[2].processOperator() * p.envelope * p.op2Level;
     op[1].setOperatorInputs(p.pitch * p.inharm * p.modEnvelope, operator2, p.tone);
@@ -424,7 +423,7 @@ void SynthVoice::overrideDefaults(int outputIndex, int inputIndex)
 
 void SynthVoice::newParamsIn0to1()
 {
-    pitchIn0to1 = juce::jlimit(0.0f, 1.0f, inputsIn0to1[0]);
+    pitchIn0to1 = inputsIn0to1[0];
     pitchSmooth.setTargetValue(pitchIn0to1);
     toneIn0to1 = inputsIn0to1[1];
     toneSmooth.setTargetValue(toneIn0to1);
