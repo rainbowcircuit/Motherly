@@ -139,29 +139,28 @@ public:
         positionLabel.setBounds(x + width * 0.315f, y + height * 0.175f, height * 0.5f, height * 0.1f);
         positionSlider.setBounds(x + width * 0.315f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        op1Label.setBounds(x + width * 0.455f, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op1Slider.setBounds(x + width * 0.455f, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op1Label.setBounds(x + width * 0.4425f, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op1Slider.setBounds(x + width * 0.4425f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        op2Label.setBounds(x + width * 0.455f, y + height * 0.525f, height * 0.3f, height * 0.1f);
-        op2Slider.setBounds(x + width * 0.455f, y + height * 0.625, height * 0.3f, height * 0.3f);
+        op2Label.setBounds(x + width * 0.4425f, y + height * 0.525f, height * 0.3f, height * 0.1f);
+        op2Slider.setBounds(x + width * 0.4425f, y + height * 0.625, height * 0.3f, height * 0.3f);
 
-        op3Label.setBounds(x + width * 0.525f, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op3Slider.setBounds(x + width * 0.525f, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op3Label.setBounds(x + width * 0.5125f, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op3Slider.setBounds(x + width * 0.5125f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        noiseLabel.setBounds(x + width * 0.525f, y + height * 0.525f, height * 0.3f, height * 0.1f);
-        noiseSlider.setBounds(x + width * 0.525f, y + height * 0.625, height * 0.3f, height * 0.3f);
+        noiseLabel.setBounds(x + width * 0.5125f, y + height * 0.525f, height * 0.3f, height * 0.1f);
+        noiseSlider.setBounds(x + width * 0.5125f, y + height * 0.625, height * 0.3f, height * 0.3f);
         
-        noiseFreqLabel.setBounds(x + width * 0.595f, y + height * 0.15f, height * 0.5f, height * 0.1f);
-        noiseFreqSlider.setBounds(x + width * 0.595f, y + height * 0.25f, height * 0.5f, height * 0.6f);
+        noiseFreqLabel.setBounds(x + width * 0.582f, y + height * 0.15f, height * 0.5f, height * 0.1f);
+        noiseFreqSlider.setBounds(x + width * 0.582f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        algorithmLabel.setBounds(x + width * 0.675f, y + height * 0.1f, height * 0.6f, height * 0.1f);
-        algorithmSlider.setBounds(x + width * 0.675f, y + height * 0.2, height * 0.7f, height * 0.7f);
+        algorithmLabel.setBounds(x + width * 0.6625f, y + height * 0.1f, height * 0.6f, height * 0.1f);
+        algorithmSlider.setBounds(x + width * 0.6625f, y + height * 0.2, height * 0.7f, height * 0.7f);
 
-        outputLabel.setBounds(x + width * 0.83f, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        outputSlider.setBounds(x + width * 0.83f, y + height * 0.175, height * 0.7f, height * 0.775f);
+        outputLabel.setBounds(x + width * 0.80f, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        outputSlider.setBounds(x + width * 0.80f, y + height * 0.175, height * 0.7f, height * 0.775f);
         
-        
-        stateButton.setBounds(x + width * 0.95f, y + height * 0.4125f, height * 0.175f, height * 0.175f);
+        stateButton.setBounds(x + width * 0.935f, y + height * 0.4125f, height * 0.175f, height * 0.175f);
     }
     
     

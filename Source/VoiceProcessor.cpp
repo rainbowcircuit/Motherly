@@ -204,7 +204,9 @@ void SynthVoice::setEnvelope()
     float tensionFrom0to1 = tensionIn0to1 * 40.0f + 10.0f;
     float repeatScaling = 1.0f/(repeatRawValues[stepIndex] + 1);
     
-    float decayTime = pitchFrom0to1 * tensionFrom0to1 * repeatScaling;
+    float activeDecayTime = pitchFrom0to1 * tensionFrom0to1 * repeatScaling;
+    float inactiveDecayTime = 50.0f;
+    float decayTime = active ? activeDecayTime : inactiveDecayTime;
     ampEnvelope.setEnvelopeSlew(2.0f, decayTime);
 }
 

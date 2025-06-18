@@ -672,7 +672,7 @@ void UserInterfaceGraphics::drawAmpIcon(juce::Graphics& g, float x, float y, flo
 
 void UserInterfaceGraphics::fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& textEditor)
 {
-    g.setColour(juce::Colour(100, 99, 102));
+    g.setColour(juce::Colours::transparentBlack);
     juce::Path bgPath;
     bgPath.addRoundedRectangle(textEditor.getLocalBounds().reduced(4.0f, 0.0f), 3.0f);
     g.fillPath(bgPath);

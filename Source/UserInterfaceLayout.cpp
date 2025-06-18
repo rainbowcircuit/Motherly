@@ -113,7 +113,7 @@ void StepInterface::setStepParams(juce::Label& label, juce::Slider& slider, juce
     // slider
     addAndMakeVisible(slider);
     slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    slider.setTextBoxStyle(textBoxPosition, false, 75, 20);
+    slider.setTextBoxStyle(textBoxPosition, false, 68, 20);
     slider.setTextValueSuffix(suffix);
     slider.setLookAndFeel(&lookAndFeel);
 }
