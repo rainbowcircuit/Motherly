@@ -465,9 +465,12 @@ void PatchCable::paint(juce::Graphics& g)
         if (cableConnected)
         {
             float dx = inputPoint.x - outputPoint.x;
-            float slack = std::abs(dx) * 0.2f + 10.0f; // amount of vertical slack
-            juce::Point<float> bezierCoords1(outputPoint.x + dx * 0.25f, outputPoint.y + slack);
-            juce::Point<float> bezierCoords2(outputPoint.x + dx * 0.75f, inputPoint.y + slack);
+            float dy = inputPoint.y - outputPoint.y;
+            float outputSlack = std::abs(dy) * 0.5f + 10.0f;
+            float inputSlack = std::abs(dy) + 20.0f;
+
+            juce::Point<float> bezierCoords1(outputPoint.x + dx * 0.25f, inputPoint.y + outputSlack);
+            juce::Point<float> bezierCoords2(inputPoint.x - dx * 0.25f, inputPoint.y + outputSlack);
 
             // draw to input point and its arc
             cablePath.cubicTo(bezierCoords1, bezierCoords2, inputPoint);
