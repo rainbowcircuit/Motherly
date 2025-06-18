@@ -506,7 +506,6 @@ void UserInterfaceGraphics::drawSmallRoundDial(juce::Graphics& g, float x, float
     float sliderPositionScaled = 2.0f + (1.0f - position);
     float dialPositionInRadians = dialStart + sliderPositionScaled * (dialEnd - dialStart);
     
-
     juce::Path dialBodyPath, dialDotPath, dialOutlinePath;
     float dialOutlineRadius = (width * 0.9f)/2;
     float dialBodyRadius = (width * 0.7f)/2;

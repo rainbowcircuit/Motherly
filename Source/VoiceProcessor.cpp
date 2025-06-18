@@ -67,7 +67,10 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
         seq.runSequencer();
         stepIndex = seq.getStepIndex();
+        
         float gate = seq.getGate();
+        if (!active) gate = 0.0f;
+
         float envelope = ampEnvelope.generateEnvelope(gate);
         params.envelope = envelope;
         envRawValue = envelope;
@@ -155,10 +158,11 @@ float SynthVoice::processSynthVoice(VoiceParams params)
 }
 
 
-void SynthVoice::setSequencer(juce::AudioPlayHead &p, int rate)
+void SynthVoice::setSequencer(juce::AudioPlayHead &p, int rate, bool active)
 {
     seq.updateTransport(&p);
     seq.setRate(rate);
+    this->active = active;
 }
 
 void SynthVoice::setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue)

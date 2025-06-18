@@ -139,15 +139,13 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
     
+    //************** Transport **************//
     auto playhead = getPlayHead();
     const auto opt = playhead->getPosition();
     const auto& pos = *opt;
     
-    if (pos.getIsPlaying()) {
-        synth.noteOn(0, 62, 127);
-    } else {
-        synth.noteOff(0, 62, 0.0f, true);
-    }
+    if (pos.getIsPlaying()) { synth.noteOn(0, 62, 127); }
+    else { synth.noteOff(0, 62, 0.0f, true); }
 
     int rate = apvts.getRawParameterValue("seqRate")->load();
     
@@ -155,15 +153,14 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float tension = apvts.getRawParameterValue("tension")->load();
     float inharmonicity = apvts.getRawParameterValue("inharmonicity")->load();
     float position = apvts.getRawParameterValue("position")->load();
-
     int algorithm = apvts.getRawParameterValue("algorithm")->load();
-
-    float output = apvts.getRawParameterValue("outputGain")->load();
     float op1Level = apvts.getRawParameterValue("op1Level")->load();
     float op2Level = apvts.getRawParameterValue("op2Level")->load();
     float op3Level = apvts.getRawParameterValue("op3Level")->load();
     float noiseLevel = apvts.getRawParameterValue("noiseLevel")->load();
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
+    float output = apvts.getRawParameterValue("outputGain")->load();
+    bool active = apvts.getRawParameterValue("active")->load();
 
     // patch bay parameters
     std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Rand", "VCA", "Noise", "MWheel" };
@@ -181,7 +178,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             float mod = apvts.getRawParameterValue(modParamID)->load();
             float repeat = apvts.getRawParameterValue(probParamID)->load();
             
-            voice->setSequencer(*getPlayHead(), rate);
+            voice->setSequencer(*getPlayHead(), rate, active);
             voice->setStepParameters(step, pitch, tone, mod, repeat);
         }
         
@@ -334,6 +331,8 @@ MotherlyAudioProcessor::createParameterLayout()
                                                             "Output Gain",
                                                             juce::NormalisableRange<float> { -72.0f, 6.0f, 0.1f },
                                                             -6.0f));
+    
+    layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID { "active", 1 }, "Active", true));
 
     //********************* Sequencer Parameter *********************//
 

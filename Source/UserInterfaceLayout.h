@@ -87,6 +87,13 @@ public:
         
         setStepParams(outputLabel, outputSlider, juce::Slider::TextBoxBelow, "Output", " dB", testGraphics2);
         outputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "outputGain", outputSlider);
+        
+        addAndMakeVisible(stateButton);
+        stateButton.setToggleable(true);
+        stateButton.setClickingTogglesState(true);
+        stateButton.setLookAndFeel(&stateLAF);
+        stateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.apvts, "active", stateButton);
+
     }
     
     ~DrumMainInterface()
@@ -132,26 +139,29 @@ public:
         positionLabel.setBounds(x + width * 0.315f, y + height * 0.175f, height * 0.5f, height * 0.1f);
         positionSlider.setBounds(x + width * 0.315f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        op1Label.setBounds(x + width * 0.475f, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op1Slider.setBounds(x + width * 0.475f, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op1Label.setBounds(x + width * 0.455f, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op1Slider.setBounds(x + width * 0.455f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        op2Label.setBounds(x + width * 0.475f, y + height * 0.525f, height * 0.3f, height * 0.1f);
-        op2Slider.setBounds(x + width * 0.475f, y + height * 0.625, height * 0.3f, height * 0.3f);
+        op2Label.setBounds(x + width * 0.455f, y + height * 0.525f, height * 0.3f, height * 0.1f);
+        op2Slider.setBounds(x + width * 0.455f, y + height * 0.625, height * 0.3f, height * 0.3f);
 
-        op3Label.setBounds(x + width * 0.55f, y + height * 0.1f, height * 0.3f, height * 0.1f);
-        op3Slider.setBounds(x + width * 0.55f, y + height * 0.2, height * 0.3f, height * 0.3f);
+        op3Label.setBounds(x + width * 0.525f, y + height * 0.1f, height * 0.3f, height * 0.1f);
+        op3Slider.setBounds(x + width * 0.525f, y + height * 0.2, height * 0.3f, height * 0.3f);
         
-        noiseLabel.setBounds(x + width * 0.55f, y + height * 0.525f, height * 0.3f, height * 0.1f);
-        noiseSlider.setBounds(x + width * 0.55f, y + height * 0.625, height * 0.3f, height * 0.3f);
+        noiseLabel.setBounds(x + width * 0.525f, y + height * 0.525f, height * 0.3f, height * 0.1f);
+        noiseSlider.setBounds(x + width * 0.525f, y + height * 0.625, height * 0.3f, height * 0.3f);
         
-        noiseFreqLabel.setBounds(x + width * 0.62f, y + height * 0.15f, height * 0.5f, height * 0.1f);
-        noiseFreqSlider.setBounds(x + width * 0.62f, y + height * 0.25f, height * 0.5f, height * 0.6f);
+        noiseFreqLabel.setBounds(x + width * 0.595f, y + height * 0.15f, height * 0.5f, height * 0.1f);
+        noiseFreqSlider.setBounds(x + width * 0.595f, y + height * 0.25f, height * 0.5f, height * 0.6f);
 
-        algorithmLabel.setBounds(x + width * 0.7f, y + height * 0.1f, height * 0.6f, height * 0.1f);
-        algorithmSlider.setBounds(x + width * 0.7f, y + height * 0.2, height * 0.7f, height * 0.7f);
+        algorithmLabel.setBounds(x + width * 0.675f, y + height * 0.1f, height * 0.6f, height * 0.1f);
+        algorithmSlider.setBounds(x + width * 0.675f, y + height * 0.2, height * 0.7f, height * 0.7f);
 
-        outputLabel.setBounds(x + width * 0.875f, y + height * 0.1f, height * 0.7f, height * 0.1f);
-        outputSlider.setBounds(x + width * 0.875f, y + height * 0.175, height * 0.7f, height * 0.775f);
+        outputLabel.setBounds(x + width * 0.83f, y + height * 0.1f, height * 0.7f, height * 0.1f);
+        outputSlider.setBounds(x + width * 0.83f, y + height * 0.175, height * 0.7f, height * 0.775f);
+        
+        
+        stateButton.setBounds(x + width * 0.95f, y + height * 0.4125f, height * 0.175f, height * 0.175f);
     }
     
     
@@ -170,16 +180,22 @@ public:
         slider.setTextBoxStyle(textBoxPosition, false, 50, 20);
         slider.setTextValueSuffix(suffix);
         slider.setLookAndFeel(&lookAndFeel);
+        
     }
     
     
 private:
     UserInterfaceGraphics tensionGraphics { 6 }, inharmGraphics { 7 }, positionGraphics { 8 }, algorithmGraphics { 5 }, testGraphics { 9 }, testGraphics2 { 10 }, smallDialGraphics { 11 }, noiseFreqGraphics { 1 };
     
+    ButtonGraphics stateLAF { 0 };
+    
     juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider, testSlider2, noiseFreqSlider, outputSlider;
     
     juce::Label tensionLabel, inharmLabel, positionLabel, algorithmLabel, op1Label, op2Label, op3Label, noiseLabel, noiseFreqLabel, outputLabel;
     
+    juce::ToggleButton stateButton;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> stateAttachment;
+
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tensionAttachment, inharmAttachment, positionAttachment, op1Attachment, op2Attachment, op3Attachment, noiseAttachment, noiseFreqAttachment, algorithmAttachment, testAttachment, outputAttachment;
 
     MotherlyAudioProcessor& audioProcessor;
@@ -315,7 +331,7 @@ private:
     }
     
     UserInterfaceGraphics rateGraphics { 9 };
-    ButtonGraphics saveLAF { 0 }, nextLAF { 1 }, prevLAF { 2 };
+    ButtonGraphics saveLAF { 0 }, nextLAF { 1 }, prevLAF { 3 };
     ComboBoxGraphics comboBoxLAF;
     
     juce::TextButton saveButton, nextButton, prevButton;

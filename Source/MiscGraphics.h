@@ -16,7 +16,15 @@ class ButtonGraphics : public juce::LookAndFeel_V4
 {
 public:
     ButtonGraphics(int graphicIndex);
-    
+    void drawToggleButton (juce::Graphics &g, juce::ToggleButton &button, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
+    {
+        auto bounds = juce::Rectangle<int>(button.getWidth(), button.getWidth()).toFloat();
+        float x = bounds.getX();
+        float y = bounds.getY();
+        float size = bounds.getWidth();
+        drawStateButton(g, x, y, size, button.getToggleState());
+    }
+
     void drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
     void drawSaveButton(juce::Graphics& g, float x, float y, float width, float height)
@@ -79,6 +87,22 @@ public:
         g.fillPath(arrowPath);
     }
     
+    void drawStateButton(juce::Graphics& g, float x, float y, float size, bool state)
+    {
+        
+        juce::Path graphicPath;
+        float radius = (size * 0.7f)/2;
+
+        graphicPath.addCentredArc(x + size/2, y + size/2, radius, radius, 0.0f, 5.5f, 0.75f, true);
+        graphicPath.startNewSubPath(x + size/2, y + size * 0.1f);
+        graphicPath.lineTo(x + size/2, y + size * 0.4f);
+
+        juce::Colour lineColor = state ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
+        
+        g.setColour(lineColor);
+        juce::PathStrokeType strokeType(1.5f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
+        g.strokePath(graphicPath, strokeType);
+    }
     
 private:
     int graphicIndex = 0;

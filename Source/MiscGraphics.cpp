@@ -15,6 +15,7 @@ ButtonGraphics::ButtonGraphics(int graphicIndex)
 }
 
 
+
 void ButtonGraphics::drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto bounds = juce::Rectangle<int>(button.getWidth(), button.getWidth()).toFloat();

@@ -37,7 +37,7 @@ public:
         return stepIndex;
     }
     
-    void setSequencer(juce::AudioPlayHead &p, int rate);
+    void setSequencer(juce::AudioPlayHead &p, int rate, bool active);
     void setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue);
     void setGlobalParameters(float tensionValue, float inharmValue, float positionValue);
     void setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue);
@@ -74,7 +74,7 @@ public:
 
 private:
     StepSequencer seq;
-    
+    bool active;
     // initial preparation
     double sampleRate = 0.0;
     bool isPrepared { false };
