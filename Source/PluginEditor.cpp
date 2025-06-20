@@ -1,10 +1,8 @@
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "PatchBayGraphics.h"
 #include "UserInterfaceLayout.h"
 
-//==============================================================================
 MotherlyAudioProcessorEditor::MotherlyAudioProcessorEditor (MotherlyAudioProcessor& p, std::atomic<int>& stepIndexAtomic_, std::atomic<float>& amplitudeAtomic_) : AudioProcessorEditor (&p), stepIndexAtomic(stepIndexAtomic_), amplitudeAtomic(amplitudeAtomic_), audioProcessor (p)
 {
     mainInterface = std::make_unique<DrumMainInterface>(audioProcessor);
@@ -26,9 +24,7 @@ MotherlyAudioProcessorEditor::MotherlyAudioProcessorEditor (MotherlyAudioProcess
     setSize (780, 485);
 }
 
-MotherlyAudioProcessorEditor::~MotherlyAudioProcessorEditor()
-{
-}
+MotherlyAudioProcessorEditor::~MotherlyAudioProcessorEditor() {}
 
 //==============================================================================
 void MotherlyAudioProcessorEditor::paint (juce::Graphics& g)

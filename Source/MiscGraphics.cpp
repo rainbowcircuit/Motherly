@@ -1,14 +1,5 @@
-/*
-  ==============================================================================
-
-    MiscGraphics.cpp
-    Created: 1 Jun 2025 6:06:21pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #include "MiscGraphics.h"
+
 ButtonGraphics::ButtonGraphics(int graphicIndex)
 {
     this->graphicIndex = graphicIndex;

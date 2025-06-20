@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    DialGraphics.cpp
-    Created: 1 Jun 2025 6:05:37pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #include "DialGraphics.h"
 #include "LookAndFeel.h"
 #include "Utility.h"
@@ -27,7 +17,6 @@ void UserInterfaceGraphics::setStepIndex(int stepIndex)
 void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
     auto bounds = slider.getLocalBounds().toFloat();
-    
     float graphicX = bounds.getX();
     float graphicY = bounds.getY();
     float graphicWidth = bounds.getWidth();
@@ -41,9 +30,6 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
     iconGradientColor = hover ? juce::Colour(Colours::Gradient::gradientHover[stepIndex]) : juce::Colour(Colours::Gradient::gradient[stepIndex]);
 
     iconWhiteColor = hover ? juce::Colour(Colours::Main::iconWhiteHover) : juce::Colour(Colours::Main::iconWhite);
-
-    // Path stroke
-
     
     // use enums
     if (graphicIndex == 0){
@@ -103,7 +89,6 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawAmpIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize, iconSize, 1.0f);
     } else if (graphicIndex == 11){
         drawSmallRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-        
     }
 }
 

@@ -1,19 +1,8 @@
-/*
-  ==============================================================================
-
-    This file contains the basic framework code for a JUCE plugin editor.
-
-  ==============================================================================
-*/
-
 #pragma once
-
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 #include "PatchBayGraphics.h"
 #include "UserInterfaceLayout.h"
-
-//==============================================================================
 
 class MotherlyAudioProcessorEditor  : public juce::AudioProcessorEditor, juce::Timer
 {
@@ -26,13 +15,10 @@ public:
     void resized() override;
 
     //==============================================================================
+    
+private:
     void timerCallback() override;
 
-    void updateFromParameter()
-    {
-        DBG("update from parameter called!");
-    }
-private:
     std::atomic<int>& stepIndexAtomic;
     std::atomic<float>& amplitudeAtomic;
 

@@ -15,7 +15,6 @@ public:
 private:
     double sampleRate, operatorAngle = 0.0, operatorPhase = 0.0, inputPhase = 0.0;
     float fmAmount, softClipGain, combPosition;
-         
 };
 
 class NoiseGenerator

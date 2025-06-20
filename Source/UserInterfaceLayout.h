@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    UserInterfaceLayout.h
-    Created: 1 Jun 2025 6:05:44pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #pragma once
 #include <JuceHeader.h>
 #include "PluginProcessor.h"

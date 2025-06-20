@@ -19,7 +19,6 @@ public:
     
     bool isAvailable();
     void setIsAvailable(bool availablity);
-    
     void setIsInput(bool input);
     
 private:
@@ -39,16 +38,19 @@ public:
     void setMousePosition(const juce::MouseEvent &m);
     void setOutputPosition(const juce::Point<float> &p);
     void setInputPosition(const juce::Point<float> &p);
+    
     //********************
 
     void setCableInUse(bool inUse);
     bool isCableInUse();
+    
     //********************
 
     void setCableConnected(bool isConnected);
     void setConnectionIndex(int output, int input);
     int getConnectionIndex(bool getOutput);
     bool isCableConnected();
+    
     //********************
 
     void setYOffset(float yOffset);

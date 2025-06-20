@@ -69,3 +69,13 @@ void StepSequencer::runSequencer()
     }
 }
 
+float StepSequencer::getGate()
+{
+    counter.setStepIndex(currentStepIndex % 8);
+    return counter.getGate(false);
+}
+
+void StepSequencer::setRepeat(int index, int repeatValue)
+{
+    counter.setRepeat(index, repeatValue);
+}

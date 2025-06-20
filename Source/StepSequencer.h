@@ -15,16 +15,8 @@ public:
     void setRate(int sequencerRate);
     void runSequencer();
     
-    float getGate()
-    {
-        counter.setStepIndex(currentStepIndex % 8);
-        return counter.getGate(false);
-    }
-    
-    void setRepeat(int index, int repeatValue)
-    {
-        counter.setRepeat(index, repeatValue);
-    }
+    float getGate();
+    void setRepeat(int index, int repeatValue);
     
 private:
     Metro counter;
@@ -33,5 +25,4 @@ private:
     bool pendingNoteOff = false, rateUpdatePending = false;
     int currentStepIndex = 0, sequencerRate = 0;
     float prevGate;
-    
 };

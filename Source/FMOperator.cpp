@@ -51,6 +51,7 @@ void NoiseGenerator::setFilter(float frequency, float Q)
     filter.setCoefficients(frequency, Q);
     
 }
+
 float NoiseGenerator::processNoiseGenerator()
 {
     float noise = noiseSource.nextFloat();

@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    UserInterfaceLayout.cpp
-    Created: 1 Jun 2025 6:05:44pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #include "UserInterfaceLayout.h"
 #include "Utility.h"
 

@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    MiscGraphics.h
-    Created: 1 Jun 2025 6:06:21pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #pragma once
 #include <JuceHeader.h>
 #include "LookAndFeel.h"
