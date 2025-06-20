@@ -30,7 +30,6 @@ private:
     bool isInput = true, available = true, mouseOver = false;
 };
 
-
 class PatchCable : public juce::Component
 {
 public:
@@ -68,6 +67,7 @@ private:
 class PatchBay : public juce::Component, juce::AudioProcessorParameter::Listener, juce::AsyncUpdater
 {
 public:
+    
     PatchBay(MotherlyAudioProcessor& p);
     ~PatchBay();
     //********************
@@ -76,77 +76,31 @@ public:
     
     //********************
     void mouseDown(const juce::MouseEvent &m) override;
-    void mouseDrag(const juce::MouseEvent &m) override;
     void mouseUp(const juce::MouseEvent &m) override;
+    void mouseDrag(const juce::MouseEvent &m) override;
     
     //********************
-
-    void refreshFromParameters()
-    {
-        for (int i = 0; i < audioProcessor.getParameters().size(); ++i)
-        {
-            if (auto* param = dynamic_cast<juce::AudioProcessorParameterWithID*>(audioProcessor.getParameters()[i]))
-            {
-                float value = param->getValue(); // 0.0–1.0
-                parameterValueChanged(i, value); // manually trigger
-            }
-        }
-    }
-
-private:
-    
-    std::vector<std::pair<int, float>> pendingChanges;
-    juce::SpinLock pendingLock;
-    
-    void parameterValueChanged(int parameterIndex, float newValue) override
-    {
-        const juce::SpinLock::ScopedLockType lock(pendingLock);
-        pendingChanges.emplace_back(parameterIndex, newValue);
-        triggerAsyncUpdate();
-    }
-    
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
-    
-    void handleAsyncUpdate() override {
-        
-        std::vector<std::pair<int, float>> updatesCopy;
-
-        {
-            const juce::SpinLock::ScopedLockType lock(pendingLock);
-            updatesCopy.swap(pendingChanges); // safely move all pending updates
-        }
-
-        for (const auto& [parameterIndex, newValue] : updatesCopy)
-        {
-            if (auto* param = dynamic_cast<juce::AudioProcessorParameterWithID*>(audioProcessor.getParameters()[parameterIndex]))
-            {
-                if (auto* rangedParam = dynamic_cast<juce::RangedAudioParameter*>(param))
-                {
-                    auto input = rangedParam->convertFrom0to1(newValue);
-                    juce::String parameterID = param->paramID;
-                    auto paramRange = audioProcessor.apvts.getParameterRange(parameterID);
-
-                    for (int point = 0; point < 20; ++point)
-                    {
-                        if (patchPointLayout[point].paramID == parameterID)
-                        {
-                            int output = patchPointLayout[point].localOutputIndex;
-                            setCableFromParameter(output - 1, input);
-                            DBG("cable set from " << parameterID << " output: " << output - 1 << " input: " << input);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    void disconnectCable(int cableIdx, bool noTarget = false);
+    void connectCableToInput(int outputIdx, int inputIdx);
+    int getLocalIndex(int indexToFind, bool findInput);
     
     void setParameterValues(int output, int input);
     void clearParameterValues(int output);
     void setCableFromParameter(int output, int input);
-    int getLocalIndex(int indexToFind, bool findInput);
-    void clearUnusedConnection();
 
+    void refreshFromParameters();
+
+private:
+    //********************
+    std::vector<std::pair<int, float>> pendingChanges;
+    juce::SpinLock pendingLock;
     
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {};
+    void handleAsyncUpdate() override;
+    
+    //********************
+
     struct patchPointValues
     {
         bool isInput;

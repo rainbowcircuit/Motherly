@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    FMOperator.h
-    Created: 1 Jun 2025 6:18:15pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #pragma once
 #include <JuceHeader.h>
 #include "DSP.h"
@@ -21,7 +11,6 @@ public:
     void setOperatorInputs(float frequency, double inputPhase, float tone);
     void setPosition(float position);
     float processOperator();
-    
     
 private:
     double sampleRate, operatorAngle = 0.0, operatorPhase = 0.0, inputPhase = 0.0;

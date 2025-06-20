@@ -1,13 +1,3 @@
-/*
-  ==============================================================================
-
-    StepSequencer.h
-    Created: 1 Jun 2025 6:28:14pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #pragma once
 #include <JuceHeader.h>
 #include "DSP.h"
@@ -32,7 +22,7 @@ public:
     }
     
     void setRepeat(int index, int repeatValue)
-    { 
+    {
         counter.setRepeat(index, repeatValue);
     }
     

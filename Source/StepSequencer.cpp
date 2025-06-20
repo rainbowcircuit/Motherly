@@ -1,14 +1,5 @@
-/*
-  ==============================================================================
-
-    StepSequencer.cpp
-    Created: 1 Jun 2025 6:28:14pm
-    Author:  Takuma Matsui
-
-  ==============================================================================
-*/
-
 #include "StepSequencer.h"
+
 void StepSequencer::prepareToPlay(double sampleRate, int samplePerBlock)
 {
     this->sampleRate = sampleRate;
@@ -25,6 +16,7 @@ void StepSequencer::updateTransport(juce::AudioPlayHead* playhead)
 void StepSequencer::suppressMIDIInput(juce::MidiBuffer& midiBuffer)
 {
     juce::MidiBuffer filteredBuffer;
+    filteredBuffer.clear();
     for (const juce::MidiMessageMetadata metadata : midiBuffer)
     {
         auto message = metadata.getMessage();

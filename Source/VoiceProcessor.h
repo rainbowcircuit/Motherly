@@ -6,12 +6,9 @@
 #include "StepSequencer.h"
 #include "Utility.h"
 
-
-
 class SynthVoice : public juce::SynthesiserVoice
 {
 public:
-
     void prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels);
     bool canPlaySound (juce::SynthesiserSound* sound) override;
     void startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound *sound, int currentPitchWheelPosition) override;
@@ -27,33 +24,31 @@ public:
         float op0Level, op1Level, op2Level, noiseLevel;
     };
     
-    SynthVoice::VoiceParams processParameters(float numSamples);
+    SynthVoice::VoiceParams processParametersPerBlock(float numSamples);
+    void processParametersPerSample(SynthVoice::VoiceParams &params);
     float processSynthVoice(SynthVoice::VoiceParams params);
 
     //==============================================================================
     
-    int getStepIndex()
-    {
-        return stepIndex;
-    }
-    
+    int stepIndex = 0;
+    int getStepIndex();
     void setSequencer(juce::AudioPlayHead &p, int rate, bool active);
     void setStepParameters(int index, float pitchValue, float toneValue, float modValue, float repeatValue);
+    
     void setGlobalParameters(float tensionValue, float inharmValue, float positionValue);
     void setVoiceLevels(float outputGainValue, float op0LevelValue, float op1LevelValue, float op2LevelValue, float noiseLevelValue, float noiseFreqValue);
+    void setModWheel(float modWheel);
     
     //==============================================================================
 
     void setEnvelope();
-    void triggerEnvelope(float gate);
-    float lastGate;
-    
-    //==============================================================================
-    
+    void onTrigger(float gate);
+    float previousGate = 0.0f;
     float generateRand();
     
     //==============================================================================
     void setAlgorithm(int algorithmValue);
+    float algorithmChange();
     float processAlgorithm0(VoiceParams p);
     float processAlgorithm1(VoiceParams p);
     float processAlgorithm2(VoiceParams p);
@@ -65,6 +60,9 @@ public:
     float processAlgorithm8(VoiceParams p);
     float processAlgorithm9(VoiceParams p);
 
+    int algorithmRawValue = 0;
+    int prevAlgorithmRawValue;
+
     //==============================================================================
     
     void paramsIn0to1();
@@ -73,44 +71,70 @@ public:
     void newParamsIn0to1();
 
 private:
-    StepSequencer seq;
     bool active;
     // initial preparation
     double sampleRate = 0.0;
     bool isPrepared { false };
     
-    // step Sequencer
-    int stepIndex = 0;
-
-    // global parameters
-    float previousGate = 0.0f;
-    float tailInMs = 8000.0f; // global tail amount
-    
-    // DSP Initialization
+    // DSP Objects
     std::array<Operator, 3> op;
     NoiseGenerator ns;
-    
- //   LowPassGate ampEnvelope;
-    LowPassGate ampEnvelope;
+    StepSequencer seq;
+    juce::Random rand;
+
+    LowPassGate ampEnvelope, algorithmDuck;
     CombFilter combFilter;
-    // Synth Parameters
-    std::array<float, 8> pitchRawValues = {}; // carrier pitch
-    std::array<float, 8> toneRawValues = {}; // fm ratio and feedback
-    std::array<float, 8> modRawValues = {}; // carrier pitch mod amount
-    std::array<float, 8> repeatRawValues = {}; // carrier pitch mod amount
-
-    float envRawValue = 0.0f, randRawValue = 0.0f, tensionRawValue = 0.0f, inharmonicityRawValue = 0.0f, positionRawValue = 0.0f, operatorLevelRawValue = 1.0f, vcaSignalRawValue = 0.0f, noiseSignalRawValue = 0.0f, noiseLevelRawValue = 1.0f, noiseFreqRawValue = 1000.0f, op0LevelRawValue = 1.0f, op1LevelRawValue = 1.0f, op2LevelRawValue = 1.0f, modWheelRawValue = 0.0f, outputGainRawValue = 0.0f; 
-
-    int algorithmRawValue = 0;
-
-    // patchbay
+    
+    // Parameters
     std::array<float, 9> outputsIn0to1;
     std::array<float, 11> inputsIn0to1;
     std::array<float, 11> defaultsIn0to1;
-        
-    float pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionIn0to1, algoIn0to1, operLevelIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, op0In0to1, op1In0to1, op2In0to1;
+
+    std::array<float, 8> pitchRawValues = {};
+    std::array<float, 8> toneRawValues = {};
+    std::array<float, 8> modRawValues = {};
+    std::array<float, 8> repeatRawValues = {};
+
+    float envRawValue =      0.0f,
+    randRawValue =           0.0f,
+    tensionRawValue =        0.0f,
+    inharmonicityRawValue =  0.0f,
+    positionRawValue =       0.0f,
+    operatorLevelRawValue =  1.0f,
+    vcaSignalRawValue =      0.0f,
+    noiseSignalRawValue =    0.0f,
+    noiseLevelRawValue =     1.0f,
+    noiseFreqRawValue =      1000.0f,
+    op0LevelRawValue =       0.0f,
+    op1LevelRawValue =       0.0f,
+    op2LevelRawValue =       0.0f,
+    modWheelRawValue =       0.0f,
+    outputGainRawValue =     0.0f;
     
-    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth, toneSmooth, inharmSmooth, positionSmooth, outputSmooth, op0LevelSmooth, op1LevelSmooth, op2LevelSmooth, noiseLevelSmooth, noiseFreqSmooth, randSmooth;
+    float pitchIn0to1,
+    toneIn0to1,
+    tensionIn0to1,
+    inharmIn0to1,
+    positionIn0to1,
+    algoIn0to1,
+    operLevelIn0to1,
+    noiseLevelIn0to1,
+    noiseFreqIn0to1,
+    op0In0to1,
+    op1In0to1,
+    op2In0to1;
+    
+    juce::SmoothedValue<float, juce::ValueSmoothingTypes::Linear> pitchSmooth,
+    toneSmooth,
+    inharmSmooth,
+    positionSmooth,
+    outputSmooth,
+    op0LevelSmooth,
+    op1LevelSmooth,
+    op2LevelSmooth,
+    noiseLevelSmooth,
+    noiseFreqSmooth,
+    randSmooth;
     
 };
 

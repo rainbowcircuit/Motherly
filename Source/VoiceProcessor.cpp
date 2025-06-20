@@ -16,6 +16,8 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numCh
     }
     ns.prepareToPlay(sampleRate);
     ampEnvelope.setSampleRate(sampleRate);
+    algorithmDuck.setSampleRate(sampleRate);
+    algorithmDuck.setEnvelopeSlew(0.0f, 20.0f);
     combFilter.prepareToPlay(sampleRate, samplesPerBlock, numChannels);
     
     // smoothening
@@ -51,18 +53,11 @@ void SynthVoice::stopNote(float velocity, bool allowTailOff)
 
 void SynthVoice::pitchWheelMoved(int newPitchWheelValue) {}
 
-void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue)
-{
-    if (controllerNumber == 1)
-    {
-        modWheelRawValue = newControllerValue;
-    }
-}
+void SynthVoice::controllerMoved(int controllerNumber, int newControllerValue) {}
 
 void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSample, int numSamples)
 {
-    
-    VoiceParams params = processParameters(numSamples);
+    VoiceParams params = processParametersPerBlock(numSamples);
     
     for (int sample = 0; sample < buffer.getNumSamples(); ++sample) {
         seq.runSequencer();
@@ -70,17 +65,15 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
         
         float gate = seq.getGate();
         if (!active) gate = 0.0f;
-
+        onTrigger(gate);
+        
+        processParametersPerSample(params);
+        
         float envelope = ampEnvelope.generateEnvelope(gate);
         params.envelope = envelope;
         envRawValue = envelope;
         float modEnvExponent = envelope * modRawValues[stepIndex] * (1.0f / 12.0f);
         params.modEnvelope = std::exp2(modEnvExponent);
-        params.pitch = pitchSmooth.getNextValue() * 1170.0f + 30.0f;
-        params.tone = toneSmooth.getNextValue();
-
-        float noiseFreqFrom0to1 = noiseFreqSmooth.getNextValue() * 7900.0f + 100;
-        ns.setFilter(noiseFreqFrom0to1, 3.0f);
 
         float output = processSynthVoice(params);
         
@@ -90,21 +83,16 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float> &buffer, int startSamp
     }
 }
 
-SynthVoice::VoiceParams SynthVoice::processParameters(float numSamples)
+SynthVoice::VoiceParams SynthVoice::processParametersPerBlock(float numSamples)
 {
-    float inharmFrom0to1 = inharmSmooth.skip(numSamples) * 2.5 + 0.5f;
-    float positionFrom0to1 = positionSmooth.skip(numSamples) * 45.0f + 5.0f;
+    float inharmFrom0to1 = Utility::scale(inharmSmooth.skip(numSamples), -1.0f, 1.0f, 0.5f, 3.0f);
+    float positionFrom0to1 = Utility::scale(positionSmooth.skip(numSamples), -1.0f, 1.0f, 5.0f, 35.0f);
     combFilter.setDelayTime(positionFrom0to1);
-
-    // rand
-    float rand = generateRand();
-    randSmooth.setTargetValue(rand);
-    randRawValue = randSmooth.skip(numSamples);
     
     // algorithm
-    float algoScaled = algoIn0to1 * 9.0f;
+    float algoScaled = Utility::scale(algoIn0to1, -1.0f, 1.0f, 0.0f, 9.0f);
     int algoFrom0to1 = (int)std::floor(algoScaled) % 10;
-
+    
     // operator levels
     float op0LevelFrom0to1 = op0LevelSmooth.skip(numSamples);
     float op1LevelFrom0to1 = op1LevelSmooth.skip(numSamples);
@@ -116,10 +104,20 @@ SynthVoice::VoiceParams SynthVoice::processParameters(float numSamples)
     return params;
 }
 
+void SynthVoice::processParametersPerSample(SynthVoice::VoiceParams &params)
+{
+    params.pitch = Utility::scale(pitchIn0to1, -1.0f, 1.0f, 30.0f, 1200.0f);
+    params.tone = toneSmooth.getNextValue();
+
+    float noiseFreqFrom0to1 = Utility::scale(noiseFreqSmooth.getNextValue(), -1.0f, 1.0f, 100.0f, 7900.0f);
+    ns.setFilter(noiseFreqFrom0to1, 3.0f);
+}
 
 float SynthVoice::processSynthVoice(VoiceParams params)
 {
     float output;
+    float algoChange = algorithmChange();
+    float duckEnvelope = 2.0f - algorithmDuck.generateEnvelope(algoChange) * 2.0f;
     switch((int)params.algorithm)
     {
         case 0:
@@ -153,10 +151,14 @@ float SynthVoice::processSynthVoice(VoiceParams params)
             output = processAlgorithm9(params);
             break;
     }
-    vcaSignalRawValue = output * 0.5f + 0.5f;
+    vcaSignalRawValue = output * duckEnvelope;
     return output;
 }
 
+int SynthVoice::getStepIndex()
+{
+    return stepIndex;
+}
 
 void SynthVoice::setSequencer(juce::AudioPlayHead &p, int rate, bool active)
 {
@@ -200,38 +202,37 @@ void SynthVoice::setVoiceLevels(float outputGainValue, float op0LevelValue, floa
 
 void SynthVoice::setEnvelope()
 {
-    float pitchFrom0to1 = (1.0f - pitchIn0to1) * 40.0f + 10.0f;
-    float tensionFrom0to1 = tensionIn0to1 * 40.0f + 10.0f;
-    float repeatScaling = 1.0f/(repeatRawValues[stepIndex] + 1);
+    float pitchFrom0to1 = Utility::scale(pitchIn0to1, -1.0f, 1.0f, 0.0f, 1.0f);
+    float pitchScaled = (1.0f - pitchFrom0to1) * 50.0f + 10.0f;
+    float tensionFrom0to1 = Utility::scale(tensionIn0to1, -1.0f, 1.0f, 10.0f, 50.0f);
+    float repeatScaled = 1.0f/(repeatRawValues[stepIndex] + 1);
     
-    float activeDecayTime = pitchFrom0to1 * tensionFrom0to1 * repeatScaling;
-    float inactiveDecayTime = 50.0f;
+    float activeDecayTime = pitchScaled * tensionFrom0to1 * repeatScaled;
+    float inactiveDecayTime = 200.0f;
     float decayTime = active ? activeDecayTime : inactiveDecayTime;
     ampEnvelope.setEnvelopeSlew(2.0f, decayTime);
 }
 
-
-void SynthVoice::triggerEnvelope(float gate)
+void SynthVoice::onTrigger(float gate)
 {
     if (gate > 0.0f && previousGate <= 0.0f)
     {
         op[0].resetPhase();
         op[1].resetPhase();
         op[2].resetPhase();
-        
+        randRawValue = generateRand();
     }
     previousGate = gate;
 }
 
+void SynthVoice::setModWheel(float modWheel)
+{
+    modWheelRawValue = modWheel;
+}
+
 float SynthVoice::generateRand()
 {
-    static juce::Random rand;
-    static float random = rand.nextFloat();
-
-    if (rand.nextFloat() < 0.00001f)
-    {
-        random = rand.nextFloat();
-    }
+    float random = rand.nextFloat();
     return random * 2.0f - 1.0f;
 }
 
@@ -241,10 +242,21 @@ void SynthVoice::setAlgorithm(int algorithmValue)
     algorithmRawValue = algorithmValue;
 }
 
+float SynthVoice::algorithmChange()
+{
+    float gate =  0.0f;
+    if (algorithmRawValue != prevAlgorithmRawValue)
+    {
+        gate =  1.0f;
+    }
+    prevAlgorithmRawValue = algorithmRawValue;
+    return gate;
+}
+
 float SynthVoice::processAlgorithm0(VoiceParams p)
 {
     float noise = ns.processNoiseGenerator() * p.envelope * p.noiseLevel;
-    noiseSignalRawValue = noise * 0.5f + 0.5f;
+    noiseSignalRawValue = noise;
     op[2].setOperatorInputs(p.pitch * p.modEnvelope, 0.0f, 0.0f);
     float operator2 = op[2].processOperator() * p.envelope * p.op2Level;
     op[1].setOperatorInputs(p.pitch * p.inharm * p.modEnvelope, operator2, p.tone);
@@ -385,31 +397,33 @@ float SynthVoice::processAlgorithm9(VoiceParams p)
 void SynthVoice::paramsIn0to1()
 {
     // outputs
-    float pitchIn0to1 = Utility::scale(pitchRawValues[stepIndex], 30.0f, 1200.0f, 0.0f, 1.0f);
-    float toneIn0to1 = toneRawValues[stepIndex]/100.0f;
-    float envIn0to1 = envRawValue;
-    float repeatIn0to1 = repeatRawValues[stepIndex]/4.0f;
-    float stepIn0to1 = Utility::scale(stepIndex, 0.0f, 7.0f, 0.0, 1.0f);
+    float pitchIn0to1 = Utility::scale(pitchRawValues[stepIndex], 30.0f, 1200.0f, -1.0f, 1.0f); // bipolar
+    float toneIn0to1 = Utility::scale(toneRawValues[stepIndex], 0.0f, 100.0f, -1.0f, 1.0f); // bipolar
+    float envIn0to1 = envRawValue; // unipolar
+    float repeatIn0to1 = Utility::scale(repeatRawValues[stepIndex], 1.0f, 4.0f, -1.0f, 1.0f); // bipolar
+    float stepIn0to1 = Utility::scale(stepIndex, 0.0f, 7.0f, -1.0, 1.0f); // bipolar
     float randIn0to1 = randRawValue;
     float vcaSignalIn0to1 = vcaSignalRawValue; // bipolar
     float noiseSignalIn0to1 = noiseSignalRawValue; // bipolar
-    float modWheelIn0to1 = modWheelRawValue/127.0f; // unipolar
+    float modWheelIn0to1 = Utility::scale(modWheelRawValue, 0.0f, 127.0f, 0.0, 1.0f); // bipolar
 
     // other defaults
-    float tensionIn0to1 = tensionRawValue/100.0f;
-    float inharmIn0to1 = inharmonicityRawValue/100.0f;
-    float positionIn0to1 = positionRawValue/100.0f;
-    float algoIn0to1 = Utility::scale(algorithmRawValue, 0.0f, 9.0f, 0.0f, 1.0f);
-    float noiseLevelIn0to1 = noiseLevelRawValue/100.0f;
-    float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 0.0f, 100.0f, 0.0f, 1.0f);
-    float op1In0to1 = op0LevelRawValue/100.0f;
-    float op2In0to1 = op1LevelRawValue/100.0f;
-    float op3In0to1 = op2LevelRawValue/100.0f;
+    float tensionIn0to1 = tensionRawValue/100.0f; // unipolar
+    float inharmIn0to1 = Utility::scale(inharmonicityRawValue, 0.0f, 100.0f, -1.0f, 1.0f); // bipolar
+    float positionIn0to1 = Utility::scale(positionRawValue, 0.0f, 100.0f, -1.0f, 1.0f); // bipolar
+    float algoIn0to1 = Utility::scale(algorithmRawValue, 0.0f, 9.0f, -1.0f, 1.0f); // bipolar
+    float noiseLevelIn0to1 = noiseLevelRawValue/100.0f; // unipolar
+    float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
+    float op1In0to1 = op0LevelRawValue/100.0f; // unipolar
+    float op2In0to1 = op1LevelRawValue/100.0f; // unipolar
+    float op3In0to1 = op2LevelRawValue/100.0f; // unipolar
     
     outputsIn0to1 = { pitchIn0to1, toneIn0to1, envIn0to1, repeatIn0to1, stepIn0to1, randIn0to1, vcaSignalIn0to1, noiseSignalIn0to1, modWheelIn0to1 };
     
     defaultsIn0to1  = { pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionIn0to1, algoIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, op1In0to1, op2In0to1, op3In0to1 };
 }
+
+
 
 void SynthVoice::setDefaults()
 {
@@ -430,7 +444,6 @@ void SynthVoice::overrideDefaults(int outputIndex, int inputIndex)
 void SynthVoice::newParamsIn0to1()
 {
     pitchIn0to1 = inputsIn0to1[0];
-    pitchSmooth.setTargetValue(pitchIn0to1);
     toneIn0to1 = inputsIn0to1[1];
     toneSmooth.setTargetValue(toneIn0to1);
     tensionIn0to1 = inputsIn0to1[2];
@@ -442,7 +455,7 @@ void SynthVoice::newParamsIn0to1()
     noiseLevelIn0to1 = inputsIn0to1[6];
     noiseLevelSmooth.setTargetValue(noiseLevelIn0to1);
     noiseFreqIn0to1 = inputsIn0to1[7];
-    noiseFreqIn0to1 = juce::jlimit(0.0f, 1.0f, noiseFreqIn0to1);
+    noiseFreqIn0to1 = juce::jlimit(-1.0f, 1.0f, noiseFreqIn0to1);
     noiseFreqSmooth.setTargetValue(noiseFreqIn0to1);
     op0In0to1 = inputsIn0to1[8];
     op0LevelSmooth.setTargetValue(op0In0to1);

@@ -25,15 +25,6 @@ void Operator::setOperatorInputs(float frequency, double inputPhase, float tone)
     softClipGain = tone * 1.5f + 1.0f;
 }
 
-inline float wrapToMinusPiToPi(float x)
-{
-    constexpr float twoPi = juce::MathConstants<float>::twoPi;
-    constexpr float pi = juce::MathConstants<float>::pi;
-    x += pi;
-    x -= twoPi * std::floor(x / twoPi);
-    return x - pi;
-}
-
 float Operator::processOperator()
 {
     float modulator = inputPhase * fmAmount;

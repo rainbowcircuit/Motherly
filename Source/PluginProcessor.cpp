@@ -140,13 +140,14 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         buffer.clear (i, 0, buffer.getNumSamples());
     
     //************** Transport **************//
+    float modWheel = Utility::getModWheelValue(midiMessages);
+    
     auto playhead = getPlayHead();
     const auto opt = playhead->getPosition();
     const auto& pos = *opt;
     
     if (pos.getIsPlaying()) { synth.noteOn(0, 62, 127); }
     else { synth.noteOff(0, 62, 0.0f, true); }
-
     int rate = apvts.getRawParameterValue("seqRate")->load();
     
     //************** Drum DSP **************//
@@ -195,6 +196,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         voice->setGlobalParameters(tension, inharmonicity, position);
         voice->setVoiceLevels(output, op1Level, op2Level, op3Level, noiseLevel, noiseFreq);
         voice->setAlgorithm(algorithm);
+        voice->setModWheel(modWheel);
         
         // get step index;
         int stepIndex = voice->getStepIndex();

@@ -19,6 +19,11 @@ UserInterfaceGraphics::UserInterfaceGraphics(int graphicIndex)
     setColour(juce::Slider::textBoxTextColourId, Colours::Main::textColor);
 }
 
+void UserInterfaceGraphics::setStepIndex(int stepIndex)
+{
+    this->stepIndex = stepIndex;
+}
+
 void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider)
 {
     auto bounds = slider.getLocalBounds().toFloat();

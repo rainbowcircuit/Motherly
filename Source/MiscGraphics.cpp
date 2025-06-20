@@ -14,8 +14,6 @@ ButtonGraphics::ButtonGraphics(int graphicIndex)
     this->graphicIndex = graphicIndex;
 }
 
-
-
 void ButtonGraphics::drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     auto bounds = juce::Rectangle<int>(button.getWidth(), button.getWidth()).toFloat();
@@ -43,6 +41,5 @@ void ButtonGraphics::drawButtonBackground (juce::Graphics& g, juce::Button& butt
         
     } else if (graphicIndex == 2) {
         drawArrowButton(g, x, y, width, height, arrowDirection);
-        
     }
 }

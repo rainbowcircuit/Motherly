@@ -17,11 +17,7 @@ public:
     UserInterfaceGraphics(int graphicIndex);
     ~UserInterfaceGraphics() {}
 
-    void setStepIndex(int stepIndex)
-    {
-        this->stepIndex = stepIndex;
-    }
-    
+    void setStepIndex(int stepIndex);
     void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPosProportional, float rotaryStartAngle, float rotaryEndAngle, juce::Slider& slider) override;
     
     //==============================================================================
@@ -62,19 +58,6 @@ public:
     juce::Label* createSliderTextBox(juce::Slider& slider) override;
 
 private:
-    enum dialSelect {
-        FREQUENCY,
-        TONE,
-        MOD,
-        PROB,
-        TENSION,
-        INHARM,
-        POSITION,
-        ALGORITHM,
-        RATE,
-        STEPCOUNT
-    };
-    
     int graphicIndex = 0, stepIndex = 0;
     float lineWidth = 1.0f;
     
