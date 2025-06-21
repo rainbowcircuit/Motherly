@@ -5,19 +5,33 @@ PatchPoint::PatchPoint()
     addAndMakeVisible(patchLabel);
     patchLabel.setFont(10.0f);
     patchLabel.setJustificationType(juce::Justification::centred);
+    patchLabel.setInterceptsMouseClicks(false, false);
 }
 
 void PatchPoint::paint(juce::Graphics &g)
 {
-    juce::Colour bgFillColour = !isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey; // for now
-    juce::Colour patchColour = !isInput ? Colours::Main::iconBlack : Colours::Main::iconWhite;
+    juce::Colour bgFillColour = !isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
     auto bounds = getLocalBounds().toFloat();
+    auto boundsReduced = getLocalBounds().toFloat();
+    boundsReduced.reduce(1.2f, 1.2f);
     
-    juce::Path bgPath, graphicsPath;
+    juce::Path bgPath, bgReducedPath, graphicsPath;
     bgPath.addRoundedRectangle(bounds, bounds.getWidth() * 0.15f);
+    bgReducedPath.addRoundedRectangle(boundsReduced, boundsReduced.getWidth() * 0.15f);
+
     g.setColour(bgFillColour);
-    g.fillPath(bgPath);
     
+    if (!isInverted) {
+        g.fillPath(bgPath);
+    } else {
+        g.setColour(Colours::Main::iconDarkGrey);
+        g.fillPath(bgReducedPath);
+        g.setColour(Colours::Main::iconWhite);
+        g.strokePath(bgReducedPath, juce::PathStrokeType(1.2f));
+    }
+    
+    // patch points
+    juce::Colour patchColour = !isInput && !isInverted ? Colours::Main::iconBlack : Colours::Main::iconWhite;
     graphicsPath.addCentredArc(x, y, 2.75, 2.75, 0.0f, 0.0f, 6.28f, true);
     g.setColour(patchColour);
     g.fillPath(graphicsPath);
@@ -45,12 +59,20 @@ void PatchPoint::setLabelText(juce::String labelText)
 
 }
 
-bool PatchPoint::isMouseOver(juce::Point<int> mousePos)
+bool PatchPoint::isMouseOverPoint(juce::Point<int> mousePos)
 {
     juce::Rectangle<int> hitArea(x - 9, y - 9, 18, 18);
     bool isMouseOver = hitArea.contains(mousePos);
     return isMouseOver;
 }
+
+bool PatchPoint::isMouseOverPanel(juce::Point<int> mousePos)
+{
+    auto bounds = getLocalBounds();
+    bool isMouseOver = bounds.contains(mousePos);
+    return isMouseOver;
+}
+
 
 void PatchPoint::setMouseOver(bool mouseOver)
 {
@@ -83,6 +105,16 @@ void PatchPoint::setIsInput(bool input)
     juce::Colour labelTextColour = isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
+
+void PatchPoint::setIsOutputInverted(bool invert)
+{
+    isInverted = invert;
+    
+    juce::Colour labelTextColour = isInverted ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
+    patchLabel.setColour(juce::Label::textColourId, labelTextColour);
+}
+
+
 
 PatchCable::PatchCable()
 {
@@ -281,8 +313,8 @@ void PatchBay::mouseDown(const juce::MouseEvent &m)
     for(int point = 0; point < 20; point++)
     {
         auto mousePosition = m.getEventRelativeTo(&patchPoint[point]).getPosition();
-
-        if (!patchPointLayout[point].isInput && patchPoint[point].isMouseOver(mousePosition))
+        
+        if (!patchPointLayout[point].isInput && patchPoint[point].isMouseOverPoint(mousePosition))
         {
             prevCableIndex.reset();
             auto outputPosition = patchPoint[point].getBounds().getCentre().toFloat();
@@ -294,12 +326,12 @@ void PatchBay::mouseDown(const juce::MouseEvent &m)
             patchCable[point].setMousePosition(m);
             activeCableIndex = point;
             
-        } else if (patchPointLayout[point].isInput && patchPoint[point].isAvailable() && patchPoint[point].isMouseOver(mousePosition))
+        } else if (patchPointLayout[point].isInput && patchPoint[point].isAvailable() && patchPoint[point].isMouseOverPoint(mousePosition))
         {
             DBG("Available Input: " << point);
             break;
             
-        } else if (patchPointLayout[point].isInput && !patchPoint[point].isAvailable() && patchPoint[point].isMouseOver(mousePosition))
+        } else if (patchPointLayout[point].isInput && !patchPoint[point].isAvailable() && patchPoint[point].isMouseOverPoint(mousePosition))
         {
             DBG("Unavailable Input: " << point);
             
@@ -317,6 +349,19 @@ void PatchBay::mouseDown(const juce::MouseEvent &m)
             activeCableIndex = outputIndex;
             prevCableIndex = point;
         }
+        
+        // invert outputs
+        if (!patchPointLayout[point].isInput && m.mods.isCommandDown() && patchPoint[point].isMouseOverPanel(mousePosition))
+        {
+            bool newInv, currentInv = patchPoint[point].getIsOutputInverted();
+            if (currentInv) { newInv = false; }
+            else { newInv = true; }
+            
+            patchPoint[point].setIsOutputInverted(newInv);
+        //    int outputIndex = getLocalIndex(point, false);
+            
+            setInvertParameterValues(point);
+        }
     }
 }
 
@@ -327,7 +372,7 @@ void PatchBay::mouseUp(const juce::MouseEvent &m)
         auto& patch = patchPoint[point];
         auto mousePosition = m.getEventRelativeTo(&patch).getPosition();
 
-        if (!patch.isMouseOver(mousePosition))
+        if (!patch.isMouseOverPoint(mousePosition))
             continue;
 
         bool isInput = patchPointLayout[point].isInput;
@@ -399,7 +444,7 @@ void PatchBay::mouseDrag(const juce::MouseEvent &mousePosition)
         //******Set hover while drag******//
         auto localPos = mousePosition.getEventRelativeTo(&patchPoint[point]).getPosition();
 
-        if (activeCableIndex.has_value() && patchPointLayout[point].isInput && patchPoint[point].isMouseOver(localPos) && patchPoint[point].isAvailable())
+        if (activeCableIndex.has_value() && patchPointLayout[point].isInput && patchPoint[point].isMouseOverPoint(localPos) && patchPoint[point].isAvailable())
         {
             patchPoint[point].setMouseOver(true);
             break;
@@ -520,6 +565,12 @@ void PatchBay::handleAsyncUpdate()
                         int output = patchPointLayout[point].localOutputIndex;
                         setCableFromParameter(output - 1, input);
                         DBG("cable set from " << parameterID << " output: " << output - 1 << " input: " << input);
+                    }
+                    
+                    if (patchPointLayout[point].invertParamID == parameterID)
+                    {
+                        DBG("ID from Param: " << patchPointLayout[point].invertParamID << " point index: " << point);
+                        patchPoint[point].setIsOutputInverted(input);
                     }
                 }
             }

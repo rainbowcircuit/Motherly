@@ -20,7 +20,6 @@ PresetInterface::PresetInterface(MotherlyAudioProcessor& p, juce::AudioProcessor
     rateValueLabel.setJustificationType(juce::Justification::right);
     rateValueLabel.setFont(12.0f);
     
-    
     addAndMakeVisible(saveButton);
     saveButton.addListener(this);
     saveButton.setLookAndFeel(&saveLAF);
@@ -126,37 +125,38 @@ void PresetInterface::timerCallback()
 StepInterface::StepInterface(MotherlyAudioProcessor& p, int index) : audioProcessor(p)
 {
     stepIndex = index;
-    freqLookAndFeel.setStepIndex(stepIndex);
-    toneLookAndFeel.setStepIndex(stepIndex);
-    modLookAndFeel.setStepIndex(stepIndex);
-    repeatLookAndFeel.setStepIndex(stepIndex);
+    pitchLAF.setStepIndex(stepIndex);
+    toneLAF.setStepIndex(stepIndex);
+    modLAF.setStepIndex(stepIndex);
+    repeatLAF.setStepIndex(stepIndex);
 
     // initialize sliders and labels
-    setStepParams(freqLabel, freqSlider, juce::Slider::TextBoxBelow, "Pitch", " Hz", freqLookAndFeel);
+    setSliderAndLabel(*this, pitchLabel, pitchSlider, juce::Slider::TextBoxBelow, "Pitch", " Hz", pitchLAF);
     juce::String freqID = "freq" + juce::String(stepIndex);
-    freqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, freqID, freqSlider);
+    pitchAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, freqID, pitchSlider);
 
-    setStepParams(toneLabel, toneSlider, juce::Slider::TextBoxBelow, "Tone", " %", toneLookAndFeel);
+    setSliderAndLabel(*this, toneLabel, toneSlider, juce::Slider::TextBoxBelow, "Tone", " %", toneLAF);
     juce::String toneID = "tone" + juce::String(stepIndex);
     toneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, toneID, toneSlider);
 
-    setStepParams(modLabel, modSlider, juce::Slider::NoTextBox, "P.Env", "", modLookAndFeel);
+    setSliderAndLabel(*this, modLabel, modSlider, juce::Slider::NoTextBox, "P.Env", "", modLAF);
     juce::String modID = "mod" + juce::String(stepIndex);
     modAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, modID, modSlider);
 
-    setStepParams(repeatLabel, repeatSlider, juce::Slider::TextBoxBelow, "Repeat", "", repeatLookAndFeel);
+    setSliderAndLabel(*this, repeatLabel, repeatSlider, juce::Slider::TextBoxBelow, "Repeat", "", repeatLAF);
     juce::String probID = "repeat" + juce::String(stepIndex);
     repeatAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, probID, repeatSlider);
 
     startTimerHz(30);
 }
 
-
 StepInterface::~StepInterface()
 {
-    freqSlider.setLookAndFeel(nullptr);
+    pitchSlider.setLookAndFeel(nullptr);
     toneSlider.setLookAndFeel(nullptr);
     modSlider.setLookAndFeel(nullptr);
+    repeatSlider.setLookAndFeel(nullptr);
+
 }
 
 void StepInterface::paint(juce::Graphics& g)
@@ -186,8 +186,8 @@ void StepInterface::resized()
     float width = bounds.getWidth();
     float height = bounds.getHeight();
 
-    freqLabel.setBounds(x, y + height * 0.035f, width, width/4);
-    freqSlider.setBounds(x, y + height * 0.035f, width, width);
+    pitchLabel.setBounds(x, y + height * 0.035f, width, width/4);
+    pitchSlider.setBounds(x, y + height * 0.035f, width, width);
 
     toneLabel.setBounds(x, y + height * 0.325, width, width/4);
     toneSlider.setBounds(x, y + height * 0.325, width, width * 1.15f);
@@ -214,54 +214,36 @@ void StepInterface::timerCallback()
     stepHovered = isMouseOver(true);
 }
 
-void StepInterface::setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel)
-{
-    // initialize label
-    addAndMakeVisible(label);
-    label.setText(labelText, juce::dontSendNotification);
-    label.setColour(juce::Label::textColourId, Colours::Main::textColor);
-    label.setJustificationType(juce::Justification::centred);
-    label.setFont(12.0f);
-
-    // slider
-    addAndMakeVisible(slider);
-    slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    slider.setTextBoxStyle(textBoxPosition, false, 68, 20);
-    slider.setTextValueSuffix(suffix);
-    slider.setLookAndFeel(&lookAndFeel);
-}
-
-
 DrumMainInterface::DrumMainInterface(MotherlyAudioProcessor& p) : audioProcessor(p)
 {
-    setSliderAndLabel(tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", " %", tensionLAF);
+    setSliderAndLabel(*this, tensionLabel, tensionSlider, juce::Slider::TextBoxBelow, "Tension", " %", tensionLAF);
     tensionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "tension", tensionSlider);
 
-    setSliderAndLabel(inharmLabel, inharmSlider, juce::Slider::TextBoxBelow, "Inharmoncity", " %", inharmLAF);
+    setSliderAndLabel(*this, inharmLabel, inharmSlider, juce::Slider::TextBoxBelow, "Inharmoncity", " %", inharmLAF);
     inharmAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "inharmonicity", inharmSlider);
 
-    setSliderAndLabel(positionLabel, positionSlider, juce::Slider::TextBoxBelow, "Position", " %", positionLAF);
+    setSliderAndLabel(*this, positionLabel, positionSlider, juce::Slider::TextBoxBelow, "Position", " %", positionLAF);
     positionAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "position", positionSlider);
     
-    setSliderAndLabel(op1Label, op1Slider, juce::Slider::NoTextBox, "Op 1", "", smallDialLAF);
+    setSliderAndLabel(*this, op1Label, op1Slider, juce::Slider::NoTextBox, "Op 1", "", smallDialLAF);
     op1Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op1Level", op1Slider);
     
-    setSliderAndLabel(op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", "", smallDialLAF);
+    setSliderAndLabel(*this, op2Label, op2Slider, juce::Slider::NoTextBox, "Op 2", "", smallDialLAF);
     op2Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op2Level", op2Slider);
 
-    setSliderAndLabel(op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", "", smallDialLAF);
+    setSliderAndLabel(*this, op3Label, op3Slider, juce::Slider::NoTextBox, "Op 3", "", smallDialLAF);
     op3Attachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "op3Level", op3Slider);
 
-    setSliderAndLabel(noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", "", smallDialLAF);
+    setSliderAndLabel(*this, noiseLabel, noiseSlider, juce::Slider::NoTextBox, "Noise", "", smallDialLAF);
     noiseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseLevel", noiseSlider);
 
-    setSliderAndLabel(noiseFreqLabel, noiseFreqSlider, juce::Slider::TextBoxBelow, "Freq", " % ", noiseFreqLAF);
+    setSliderAndLabel(*this, noiseFreqLabel, noiseFreqSlider, juce::Slider::TextBoxBelow, "Freq", " % ", noiseFreqLAF);
     noiseFreqAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "noiseFreq", noiseFreqSlider);
     
-    setSliderAndLabel(outputLabel, outputSlider, juce::Slider::TextBoxBelow, "Output", " dB", outputLAF);
+    setSliderAndLabel(*this, outputLabel, outputSlider, juce::Slider::TextBoxBelow, "Output", " dB", outputLAF);
     outputAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "outputGain", outputSlider);
     
-    setSliderAndLabel(algorithmLabel, algorithmSlider, juce::Slider::NoTextBox, "Algorithm", "", algorithmLAF);
+    setSliderAndLabel(*this, algorithmLabel, algorithmSlider, juce::Slider::NoTextBox, "Algorithm", "", algorithmLAF);
     algorithmAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "algorithm", algorithmSlider);
     
     addAndMakeVisible(stateButton);
@@ -339,6 +321,7 @@ void DrumMainInterface::resized()
     stateButton.setBounds(x + width * 0.935f, y + height * 0.4125f, height * 0.175f, height * 0.175f);
 }
 
+/*
 void DrumMainInterface::setSliderAndLabel(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel)
 {
     // initialize label
@@ -356,5 +339,5 @@ void DrumMainInterface::setSliderAndLabel(juce::Label& label, juce::Slider& slid
     slider.setLookAndFeel(&lookAndFeel);
     
 }
-
+*/
 

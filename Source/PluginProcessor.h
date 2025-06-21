@@ -53,9 +53,10 @@ public:
     juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 private:
+    float lastModWheel;
+
     std::atomic<int> stepIndexAtomic;
     std::atomic<float> amplitudeAtomic;
-
     juce::Synthesiser synth;
 
     //==============================================================================

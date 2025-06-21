@@ -9,7 +9,28 @@
 #include "MiscGraphics.h"
 #include "PatchBayGraphics.h"
 
-class PresetInterface : public juce::Component, juce::Timer, juce::ComboBox::Listener, juce::Button::Listener
+class InterfaceHelper
+{
+protected:
+    void setSliderAndLabel(juce::Component& parent, juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel)
+    {
+        // initialize label
+        parent.addAndMakeVisible(label);
+        label.setText(labelText, juce::dontSendNotification);
+        label.setColour(juce::Label::textColourId, Colours::Main::textColor);
+        label.setJustificationType(juce::Justification::centred);
+        label.setFont(12.0f);
+
+        // slider
+        parent.addAndMakeVisible(slider);
+        slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+        slider.setTextBoxStyle(textBoxPosition, false, 68, 20);
+        slider.setTextValueSuffix(suffix);
+        slider.setLookAndFeel(&lookAndFeel);
+    }
+};
+
+class PresetInterface : public juce::Component, juce::Timer, juce::ComboBox::Listener, juce::Button::Listener, InterfaceHelper
 {
 public:
     PresetInterface(MotherlyAudioProcessor& p, juce::AudioProcessorValueTreeState& apvts);
@@ -25,7 +46,7 @@ public:
 private:
     void timerCallback() override;
     
-    UserInterfaceGraphics rateLAF { 9 };
+    UserInterfaceGraphics rateLAF { 11 };
     ButtonGraphics saveLAF { 0 }, nextLAF { 1 }, prevLAF { 2 };
     ComboBoxGraphics comboBoxLAF;
     
@@ -42,7 +63,7 @@ private:
     MotherlyAudioProcessor& audioProcessor;
 };
 
-class StepInterface : public juce::Component, juce::Timer
+class StepInterface : public juce::Component, juce::Timer, InterfaceHelper
 {
 public:
     StepInterface(MotherlyAudioProcessor& p, int index);
@@ -57,12 +78,25 @@ public:
     
 
 private:
-    void setStepParams(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel);
-
-    juce::Label freqLabel, toneLabel, modLabel, repeatLabel;
-    UserInterfaceGraphics freqLookAndFeel { 3 }, toneLookAndFeel { 0 }, modLookAndFeel { 2 }, repeatLookAndFeel { 4 };
-    juce::Slider freqSlider, toneSlider, modSlider, repeatSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> freqAttachment, toneAttachment, modAttachment, repeatAttachment;
+    juce::Label pitchLabel,
+    toneLabel,
+    modLabel,
+    repeatLabel;
+    
+    UserInterfaceGraphics pitchLAF { 0 },
+    toneLAF { 1 },
+    modLAF { 2 },
+    repeatLAF { 3 };
+    
+    juce::Slider pitchSlider,
+    toneSlider,
+    modSlider,
+    repeatSlider;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> pitchAttachment,
+    toneAttachment,
+    modAttachment,
+    repeatAttachment;
 
     int stepIndex;
     float amplitude = 0.0f;
@@ -72,7 +106,7 @@ private:
     MotherlyAudioProcessor& audioProcessor;
 };
 
-class DrumMainInterface : public juce::Component
+class DrumMainInterface : public juce::Component, InterfaceHelper
 {
 public:
     DrumMainInterface(MotherlyAudioProcessor& p);
@@ -81,17 +115,38 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
     
-    void setSliderAndLabel(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel);
-    
-    
 private:
-    UserInterfaceGraphics tensionLAF { 6 }, inharmLAF { 7 }, positionLAF { 8 }, algorithmLAF { 5 }, outputLAF { 10 }, smallDialLAF { 11 }, noiseFreqLAF { 1 };
+    UserInterfaceGraphics tensionLAF { 4 },
+    inharmLAF { 5 },
+    positionLAF { 6 },
+    smallDialLAF { 7 },
+    noiseFreqLAF { 8 },
+    algorithmLAF { 9 },
+    outputLAF { 10 };
     
     ButtonGraphics stateLAF { 0 };
     
-    juce::Slider tensionSlider, inharmSlider, positionSlider, algorithmSlider, testSlider, op1Slider, op2Slider, op3Slider, noiseSlider, testSlider2, noiseFreqSlider, outputSlider;
+    juce::Slider tensionSlider,
+    inharmSlider,
+    positionSlider,
+    algorithmSlider,
+    op1Slider,
+    op2Slider,
+    op3Slider,
+    noiseSlider,
+    noiseFreqSlider,
+    outputSlider;
     
-    juce::Label tensionLabel, inharmLabel, positionLabel, algorithmLabel, op1Label, op2Label, op3Label, noiseLabel, noiseFreqLabel, outputLabel;
+    juce::Label tensionLabel,
+    inharmLabel,
+    positionLabel,
+    algorithmLabel,
+    op1Label,
+    op2Label,
+    op3Label,
+    noiseLabel,
+    noiseFreqLabel,
+    outputLabel;
     
     juce::ToggleButton stateButton;
     std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> stateAttachment;

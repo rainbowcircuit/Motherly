@@ -36,9 +36,9 @@ namespace Utility {
         return min + (max - min) * curvedX;
     }
 
-    static inline float getModWheelValue(juce::MidiBuffer& midiBuffer)
+    static inline float getModWheelValue(juce::MidiBuffer& midiBuffer, float lastValue)
     {
-        float value = 0.0f;
+        float value = lastValue;
         for (const juce::MidiMessageMetadata metadata : midiBuffer)
         {
             auto message = metadata.getMessage();

@@ -14,9 +14,9 @@ public:
     
     void drawRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position);
     void drawSmallRoundDial(juce::Graphics& g, float x, float y, float width, float height, float position);
-    void drawFrequency(juce::Graphics& g, float x, float y, float width, float height, float position);
+    void drawPitch(juce::Graphics& g, float x, float y, float width, float height, float position);
     void drawTone(juce::Graphics& g, float x, float y, float width, float height, float position);
-    void drawPitchMod(juce::Graphics& g, float x, float y, float width, float height, float position);
+    void drawPitchEnv(juce::Graphics& g, float x, float y, float width, float height, float position);
     void drawRepeat(juce::Graphics& g, float x, float y, float width, float height, float position);
     void drawTensionIcon(juce::Graphics& g, float x, float y, float size, float length);
     void drawInharmIcon(juce::Graphics& g, float x, float y, float size, float offset);

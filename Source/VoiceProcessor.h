@@ -47,27 +47,26 @@ public:
     float generateRand();
     
     //==============================================================================
-    void setAlgorithm(int algorithmValue);
-    float algorithmChange();
-    float processAlgorithm0(VoiceParams p);
-    float processAlgorithm1(VoiceParams p);
-    float processAlgorithm2(VoiceParams p);
-    float processAlgorithm3(VoiceParams p);
-    float processAlgorithm4(VoiceParams p);
-    float processAlgorithm5(VoiceParams p);
-    float processAlgorithm6(VoiceParams p);
-    float processAlgorithm7(VoiceParams p);
-    float processAlgorithm8(VoiceParams p);
-    float processAlgorithm9(VoiceParams p);
+    float operator0, operator1, operator2;
+    std::array<float, 4> op2Gain;
+    std::array<float, 4> op1Gain;
+    std::array<float, 4> op0Gain;
+    std::array<float, 4> outGain;
+    
+    std::array<juce::SmoothedValue<float>, 4> op2GainInterpolation;
+    std::array<juce::SmoothedValue<float>, 4> op1GainInterpolation;
+    std::array<juce::SmoothedValue<float>, 4> op0GainInterpolation;
+    std::array<juce::SmoothedValue<float>, 4> outGainInterpolation;
 
-    int algorithmRawValue = 0;
-    int prevAlgorithmRawValue;
+    void setAlgorithm(int algorithmValue);
+    void setAlgorithmGain(int algorithmIndex);
+    int algorithmRawValue;
 
     //==============================================================================
     
     void paramsIn0to1();
     void setDefaults();
-    void overrideDefaults(int outputIndex, int inputIndex);
+    void overrideDefaults(int outputIndex, int inputIndex, bool outputInvertIndex);
     void newParamsIn0to1();
 
 private:
@@ -133,9 +132,7 @@ private:
     op1LevelSmooth,
     op2LevelSmooth,
     noiseLevelSmooth,
-    noiseFreqSmooth,
-    randSmooth;
-    
+    noiseFreqSmooth;
 };
 
 

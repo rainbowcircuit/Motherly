@@ -14,15 +14,12 @@ MotherlyAudioProcessor::MotherlyAudioProcessor()
                      #endif
                        )
 #endif
+{}
 
-{
-}
-
-MotherlyAudioProcessor::~MotherlyAudioProcessor()
-{
-}
+MotherlyAudioProcessor::~MotherlyAudioProcessor() {}
 
 //==============================================================================
+
 const juce::String MotherlyAudioProcessor::getName() const
 {
     return JucePlugin_Name;
@@ -138,7 +135,8 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         buffer.clear (i, 0, buffer.getNumSamples());
     
     //************** Transport **************//
-    float modWheel = Utility::getModWheelValue(midiMessages);
+    float modWheel = Utility::getModWheelValue(midiMessages, lastModWheel);
+    lastModWheel = modWheel;
     
     auto playhead = getPlayHead();
     const auto opt = playhead->getPosition();
@@ -188,7 +186,11 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         {
             juce::String patchBayParamID = "pb" + pbParamID[output] + "Out";
             float input = apvts.getRawParameterValue(patchBayParamID)->load();
-            voice->overrideDefaults(output, input);
+            
+            juce::String invertParamID = "pb" + pbParamID[output] + "Invert";
+            float invert = apvts.getRawParameterValue(invertParamID)->load();
+            
+            voice->overrideDefaults(output, input, invert);
             voice->newParamsIn0to1();
         }
         voice->setGlobalParameters(tension, inharmonicity, position);
@@ -352,6 +354,11 @@ MotherlyAudioProcessor::createParameterLayout()
         layout.add(std::make_unique<juce::AudioParameterChoice>(juce::ParameterID { patchBayParamID, 1},
                                                                 patchBayParamName,
                                                                 juce::StringArray { "No Input", "Pitch In", "Tone In", "Tension in", "Inharm In", "Position In", "Algorithm In", "Noise Level In", "Noise Freq In", "Operator 1 In", "Operator 2 In", "Operator 3 In" }, 0));
+        
+        juce::String invertParamID = "pb" + pbParamID[output] + "Invert";
+        juce::String invertParamName = pbParamID[output] + " Invert";
+
+        layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID { invertParamID, 1 }, invertParamName, false));
     }
     
     return layout;

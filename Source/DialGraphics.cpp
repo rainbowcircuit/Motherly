@@ -25,34 +25,25 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
     
     //==============================================================================
     // Hover Color
+    slider.setMouseCursor(juce::MouseCursor::DraggingHandCursor);
     bool hover = slider.isMouseOver();
-    
     iconGradientColor = hover ? juce::Colour(Colours::Gradient::gradientHover[stepIndex]) : juce::Colour(Colours::Gradient::gradient[stepIndex]);
-
     iconWhiteColor = hover ? juce::Colour(Colours::Main::iconWhiteHover) : juce::Colour(Colours::Main::iconWhite);
     
-    // use enums
+    //==============================================================================
     if (graphicIndex == 0){
+        drawPitch(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+
+    } else if (graphicIndex == 1) {
         drawTone(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
-    } else if (graphicIndex == 1) {
-        drawNoiseFreq(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-
     } else if (graphicIndex == 2){
-        drawPitchMod(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        drawPitchEnv(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
     } else if (graphicIndex == 3){
-        drawFrequency(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-        
-    } else if (graphicIndex == 4){
         drawRepeat(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
-    } else if (graphicIndex == 5){
-        drawAlgorithm(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-        
-    } else if (graphicIndex == 6){
-        // tension
-        
+    } else if (graphicIndex == 4){
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
         float iconSize = graphicWidth * 0.2f;
@@ -62,9 +53,7 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         drawTensionIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize,
                         iconSize, 0.0f);
 
-    } else if (graphicIndex == 7){
-        // inharmoncity
-        
+    } else if (graphicIndex == 5){
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
         float iconSize = graphicWidth * 0.2f;
@@ -73,22 +62,29 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
         
         drawInharmIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize,
                         iconSize, 0.0f);
-        
-    } else if (graphicIndex == 8){
+
+    } else if (graphicIndex == 6){
         drawPosition(g, graphicX, graphicY, graphicWidth, graphicWidth, sliderPosProportional);
         
+    } else if (graphicIndex == 7){
+        drawSmallRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        
+    } else if (graphicIndex == 8){
+        drawNoiseFreq(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        
     } else if (graphicIndex == 9){
-        drawRate(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
-
+        drawAlgorithm(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+        
     } else if (graphicIndex == 10){
-        // amp
         drawRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
         
         float iconSize = graphicWidth * 0.2f;
         drawAmpIcon(g, graphicX, graphicY + graphicWidth - iconSize, iconSize, 0.5f);
         drawAmpIcon(g, graphicX + graphicWidth - iconSize, graphicY + graphicWidth - iconSize, iconSize, 1.0f);
-    } else if (graphicIndex == 11){
-        drawSmallRoundDial(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+
+    } else if (graphicIndex == 11) {
+        drawRate(g, graphicX, graphicY, graphicWidth, graphicHeight, sliderPosProportional);
+
     }
 }
 
@@ -133,7 +129,7 @@ void UserInterfaceGraphics::drawTone(juce::Graphics& g, float x, float y, float 
     g.strokePath(outerTopLines, juce::PathStrokeType(lineWidth));
 }
 
-void UserInterfaceGraphics::drawFrequency(juce::Graphics& g, float x, float y, float width, float height, float position)
+void UserInterfaceGraphics::drawPitch(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
     float panelWidth = width * 0.5f;
     float panelHeight = height * 0.125f;
@@ -193,7 +189,7 @@ void UserInterfaceGraphics::drawFrequency(juce::Graphics& g, float x, float y, f
     
 }
 
-void UserInterfaceGraphics::drawPitchMod(juce::Graphics& g, float x, float y, float width, float height, float position)
+void UserInterfaceGraphics::drawPitchEnv(juce::Graphics& g, float x, float y, float width, float height, float position)
 {
     // coordinates
     float margin = width * 0.25f;
