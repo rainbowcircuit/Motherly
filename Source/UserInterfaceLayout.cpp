@@ -3,6 +3,8 @@
 
 PresetInterface::PresetInterface(MotherlyAudioProcessor& p, juce::AudioProcessorValueTreeState& apvts) : presetManager(apvts), audioProcessor(p)
 {
+    juce::FontOptions font { 12.0f, juce::Font::plain };
+
     addAndMakeVisible(rateSlider);
     rateSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     rateSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
@@ -11,14 +13,14 @@ PresetInterface::PresetInterface(MotherlyAudioProcessor& p, juce::AudioProcessor
 
     addAndMakeVisible(rateLabel);
     rateLabel.setText("Rate", juce::dontSendNotification);
-    rateLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
+    rateLabel.setColour(juce::Label::textColourId, Colors::Main::textColor);
     rateLabel.setJustificationType(juce::Justification::left);
-    rateLabel.setFont(12.0f);
+    rateLabel.setFont(font);
     
     addAndMakeVisible(rateValueLabel);
-    rateValueLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
+    rateValueLabel.setColour(juce::Label::textColourId, Colors::Main::textColor);
     rateValueLabel.setJustificationType(juce::Justification::right);
-    rateValueLabel.setFont(12.0f);
+    rateValueLabel.setFont(font);
     
     addAndMakeVisible(saveButton);
     saveButton.addListener(this);
@@ -164,14 +166,14 @@ void StepInterface::paint(juce::Graphics& g)
     auto bounds = getLocalBounds().toFloat();
     bounds.reduce(5, 5);
         
-    juce::Colour mainColour = Colours::Main::backgroundFill;
-    juce::Colour hoverColour = Colours::Main::backgroundHoverFill;
+    juce::Colour mainColour = Colors::Main::backgroundFill;
+    juce::Colour hoverColour = Colors::Main::backgroundHoverFill;
     juce::Colour bgFillColour = stepHovered ? hoverColour : mainColour;
 
     juce::Path bgFill;
     bgFill.addRoundedRectangle(bounds, 5);
 
-    juce::Colour blinkerFillColour { Colours::Main::backgroundActiveFill };
+    juce::Colour blinkerFillColour { Colors::Main::backgroundActiveFill };
     juce::Colour fillColour =  isStepIndex ? blinkerFillColour : bgFillColour;
 
     g.setColour(fillColour);
@@ -276,8 +278,19 @@ void DrumMainInterface::paint(juce::Graphics& g)
     juce::Path bgFill;
     bgFill.addRoundedRectangle(bg, 5);
     
-    g.setColour(Colours::Main::backgroundFill);
+    g.setColour(Colors::Main::backgroundFill);
     g.fillPath(bgFill);
+    
+    outputSliderDisplay();
+}
+
+void DrumMainInterface::outputSliderDisplay(){
+    outputSlider.textFromValueFunction = [](double value)
+    {
+        juce::String display = juce::String(value);
+        if (value <= -72.0f) { display = "-inf"; }
+        return juce::String(display);
+    };
 }
 
 void DrumMainInterface::resized()
@@ -320,24 +333,4 @@ void DrumMainInterface::resized()
     
     stateButton.setBounds(x + width * 0.935f, y + height * 0.4125f, height * 0.175f, height * 0.175f);
 }
-
-/*
-void DrumMainInterface::setSliderAndLabel(juce::Label& label, juce::Slider& slider, juce::Slider::TextEntryBoxPosition textBoxPosition, juce::String labelText, juce::String suffix, UserInterfaceGraphics& lookAndFeel)
-{
-    // initialize label
-    addAndMakeVisible(label);
-    label.setText(labelText, juce::dontSendNotification);
-    label.setColour(juce::Label::textColourId, Colours::Main::textColor);
-    label.setJustificationType(juce::Justification::centred);
-    label.setFont(12.0f);
-
-    // slider
-    addAndMakeVisible(slider);
-    slider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    slider.setTextBoxStyle(textBoxPosition, false, 50, 20);
-    slider.setTextValueSuffix(suffix);
-    slider.setLookAndFeel(&lookAndFeel);
-    
-}
-*/
 

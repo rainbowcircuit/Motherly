@@ -3,14 +3,14 @@
 PatchPoint::PatchPoint()
 {
     addAndMakeVisible(patchLabel);
-    patchLabel.setFont(10.0f);
+    patchLabel.setFont(juce::FontOptions(10.0f, juce::Font::plain));
     patchLabel.setJustificationType(juce::Justification::centred);
     patchLabel.setInterceptsMouseClicks(false, false);
 }
 
 void PatchPoint::paint(juce::Graphics &g)
 {
-    juce::Colour bgFillColour = !isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
+    juce::Colour bgFillColour = !isInput ? Colors::Main::iconWhite : Colors::Main::iconDarkGrey;
     auto bounds = getLocalBounds().toFloat();
     auto boundsReduced = getLocalBounds().toFloat();
     boundsReduced.reduce(1.2f, 1.2f);
@@ -24,14 +24,14 @@ void PatchPoint::paint(juce::Graphics &g)
     if (!isInverted) {
         g.fillPath(bgPath);
     } else {
-        g.setColour(Colours::Main::iconDarkGrey);
+        g.setColour(Colors::Main::iconDarkGrey);
         g.fillPath(bgReducedPath);
-        g.setColour(Colours::Main::iconWhite);
+        g.setColour(Colors::Main::iconWhite);
         g.strokePath(bgReducedPath, juce::PathStrokeType(1.2f));
     }
     
     // patch points
-    juce::Colour patchColour = !isInput && !isInverted ? Colours::Main::iconBlack : Colours::Main::iconWhite;
+    juce::Colour patchColour = !isInput && !isInverted ? Colors::Main::iconBlack : Colors::Main::iconWhite;
     graphicsPath.addCentredArc(x, y, 2.75, 2.75, 0.0f, 0.0f, 6.28f, true);
     g.setColour(patchColour);
     g.fillPath(graphicsPath);
@@ -102,7 +102,7 @@ void PatchPoint::setIsAvailable(bool availablity)
 void PatchPoint::setIsInput(bool input)
 {
     isInput = input;
-    juce::Colour labelTextColour = isInput ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
+    juce::Colour labelTextColour = isInput ? Colors::Main::iconWhite : Colors::Main::iconDarkGrey;
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
 
@@ -110,7 +110,7 @@ void PatchPoint::setIsOutputInverted(bool invert)
 {
     isInverted = invert;
     
-    juce::Colour labelTextColour = isInverted ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
+    juce::Colour labelTextColour = isInverted ? Colors::Main::iconWhite : Colors::Main::iconDarkGrey;
     patchLabel.setColour(juce::Label::textColourId, labelTextColour);
 }
 
@@ -125,7 +125,7 @@ PatchCable::PatchCable()
 void PatchCable::paint(juce::Graphics& g)
 {
     juce::Path cablePath, cableEndPath;
-    juce::Colour fillColour = Colours::Gradient::gradientDarker[cableColor];
+    juce::Colour fillColour = Colors::Gradient::gradientDarker[cableColor];
     g.setColour(fillColour);
 
     if (cableInUse){
@@ -254,8 +254,8 @@ PatchBay::PatchBay(MotherlyAudioProcessor& p) : audioProcessor (p)
     }
     addAndMakeVisible(patchBayLabel);
     patchBayLabel.setText("Input/Output", juce::dontSendNotification);
-    patchBayLabel.setColour(juce::Label::textColourId, Colours::Main::textColor);
-    patchBayLabel.setFont(12.0f);
+    patchBayLabel.setColour(juce::Label::textColourId, Colors::Main::textColor);
+    patchBayLabel.setFont(juce::FontOptions(12.0f, juce::Font::plain));
     patchBayLabel.setJustificationType(juce::Justification::centred);
 
     parameterIndexAtomic = 0;
@@ -278,7 +278,7 @@ void PatchBay::paint(juce::Graphics& g)
     
     juce::Path bgFill;
     bgFill.addRoundedRectangle(bg.getX(), bg.getY(), bg.getWidth(), bg.getHeight(), 5);
-    g.setColour(Colours::Main::backgroundFill);
+    g.setColour(Colors::Main::backgroundFill);
     g.fillPath(bgFill);
 }
 

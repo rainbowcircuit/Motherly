@@ -4,9 +4,9 @@
 #include "PresetManager.h"
 #include "Utility.h"
 
-#include "LookAndFeel.h"
-#include "DialGraphics.h"
-#include "MiscGraphics.h"
+#include "ColorLookAndFeel.h"
+#include "DialLookAndFeel.h"
+#include "MiscLookAndFeel.h"
 #include "PatchBayGraphics.h"
 
 class InterfaceHelper
@@ -17,9 +17,10 @@ protected:
         // initialize label
         parent.addAndMakeVisible(label);
         label.setText(labelText, juce::dontSendNotification);
-        label.setColour(juce::Label::textColourId, Colours::Main::textColor);
+        label.setColour(juce::Label::textColourId, Colors::Main::textColor);
         label.setJustificationType(juce::Justification::centred);
-        label.setFont(12.0f);
+        juce::FontOptions font { 12.0f, juce::Font::plain };
+        label.setFont(font);
 
         // slider
         parent.addAndMakeVisible(slider);
@@ -114,6 +115,7 @@ public:
     
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void outputSliderDisplay();
     
 private:
     UserInterfaceGraphics tensionLAF { 4 },

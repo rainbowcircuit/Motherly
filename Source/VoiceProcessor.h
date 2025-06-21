@@ -1,4 +1,3 @@
-
 #pragma once
 #include <JuceHeader.h>
 #include "DSP.h"
@@ -81,7 +80,7 @@ private:
     StepSequencer seq;
     juce::Random rand;
 
-    LowPassGate ampEnvelope, algorithmDuck;
+    LowPassGate ampEnvelope;
     CombFilter combFilter;
     
     // Parameters
@@ -134,7 +133,6 @@ private:
     noiseLevelSmooth,
     noiseFreqSmooth;
 };
-
 
 class SynthSound : public juce::SynthesiserSound
 {

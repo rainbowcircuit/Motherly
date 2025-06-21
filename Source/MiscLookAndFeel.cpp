@@ -1,4 +1,4 @@
-#include "MiscGraphics.h"
+#include "MiscLookAndFeel.h"
 
 ButtonGraphics::ButtonGraphics(int graphicIndex)
 {
@@ -12,10 +12,10 @@ void ButtonGraphics::drawButtonBackground (juce::Graphics& g, juce::Button& butt
     
     juce::Path bgPath;
     bgPath.addRoundedRectangle(bounds, 5.0f);
-    juce::Colour buttonColour = shouldDrawButtonAsDown ? Colours::Main::backgroundHoverFill : Colours::Main::backgroundFill;
+    juce::Colour buttonColour = shouldDrawButtonAsDown ? Colors::Main::backgroundHoverFill : Colors::Main::backgroundFill;
     g.setColour(buttonColour);
     g.fillPath(bgPath);
-    g.setColour(Colours::Main::backgroundFill);
+    g.setColour(Colors::Main::backgroundFill);
     g.strokePath(bgPath, juce::PathStrokeType(2.0f));
     
     float x = bounds.getX();

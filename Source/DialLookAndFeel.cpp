@@ -1,12 +1,12 @@
-#include "DialGraphics.h"
-#include "LookAndFeel.h"
+#include "DialLookAndFeel.h"
+#include "ColorLookAndFeel.h"
 #include "Utility.h"
 
 UserInterfaceGraphics::UserInterfaceGraphics(int graphicIndex)
 {
     this->graphicIndex = graphicIndex;
     setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    setColour(juce::Slider::textBoxTextColourId, Colours::Main::textColor);
+    setColour(juce::Slider::textBoxTextColourId, Colors::Main::textColor);
 }
 
 void UserInterfaceGraphics::setStepIndex(int stepIndex)
@@ -27,8 +27,8 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
     // Hover Color
     slider.setMouseCursor(juce::MouseCursor::DraggingHandCursor);
     bool hover = slider.isMouseOver();
-    iconGradientColor = hover ? juce::Colour(Colours::Gradient::gradientHover[stepIndex]) : juce::Colour(Colours::Gradient::gradient[stepIndex]);
-    iconWhiteColor = hover ? juce::Colour(Colours::Main::iconWhiteHover) : juce::Colour(Colours::Main::iconWhite);
+    iconGradientColor = hover ? juce::Colour(Colors::Gradient::gradientHover[stepIndex]) : juce::Colour(Colors::Gradient::gradient[stepIndex]);
+    iconWhiteColor = hover ? juce::Colour(Colors::Main::iconWhiteHover) : juce::Colour(Colors::Main::iconWhite);
     
     //==============================================================================
     if (graphicIndex == 0){
@@ -452,7 +452,7 @@ void UserInterfaceGraphics::drawRoundDial(juce::Graphics& g, float x, float y, f
     dialOutlinePath.addCentredArc(x + width/2, x + width/2,
                                   dialOutlineRadius, dialOutlineRadius,
                                   0.0f, dialStart, dialEnd, true);
-    g.setColour(Colours::Main::iconWhite); //
+    g.setColour(Colors::Main::iconWhite); //
 
     juce::PathStrokeType strokeType(lineWidth, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
     g.strokePath(dialOutlinePath, juce::PathStrokeType(strokeType));
@@ -669,9 +669,9 @@ juce::Label* UserInterfaceGraphics::createSliderTextBox(juce::Slider& slider)
 {
     auto label = LookAndFeel_V4::createSliderTextBox(slider);
     
-    label->setFont(juce::Font(12.0f, juce::Font::plain));
+    label->setFont(juce::FontOptions(12.0f, juce::Font::plain));
     label->setJustificationType(juce::Justification::centred);
-    label->setColour(juce::Label::textColourId, Colours::Main::textColor);
+    label->setColour(juce::Label::textColourId, Colors::Main::textColor);
 
     label->onEditorShow = [label]()
     {

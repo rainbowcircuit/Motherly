@@ -1,4 +1,3 @@
-
 #include "VoiceProcessor.h"
 
 void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numChannels)
@@ -99,9 +98,9 @@ SynthVoice::VoiceParams SynthVoice::processParametersPerBlock(float numSamples)
     combFilter.setDelayTime(positionFrom0to1);
     
     // algorithm
-    float algoScaled = Utility::scale(algoIn0to1, -1.0f, 1.0f, 0.0f, 9.0f);
-  //  int algoFrom0to1 = (int)std::floor(algoScaled) % 10;
-    setAlgorithmGain(algoScaled);
+    float algoScaled = algoIn0to1 * 9.0f;
+    int algoFrom0to1 = (int)std::floor(algoScaled) % 10;
+    setAlgorithmGain(algoFrom0to1);
     
     return params;
 }
@@ -243,7 +242,6 @@ float SynthVoice::generateRand()
     return random * 2.0f - 1.0f;
 }
 
-
 void SynthVoice::setAlgorithm(int algorithmValue)
 {
     algorithmRawValue = algorithmValue;
@@ -340,7 +338,7 @@ void SynthVoice::paramsIn0to1()
     float tensionIn0to1 = tensionRawValue/100.0f; // unipolar
     float inharmIn0to1 = Utility::scale(inharmonicityRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
     float positionIn0to1 = Utility::scale(positionRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
-    float algoIn0to1 = Utility::scale(algorithmRawValue, 0.0f, 9.0f, -1.0f, 1.0f);
+    float algoIn0to1 = algorithmRawValue/9.0f; // bipolar
     float noiseLevelIn0to1 = noiseLevelRawValue/100.0f; // unipolar
     float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
     float op1In0to1 = op0LevelRawValue/100.0f; // unipolar
@@ -351,8 +349,6 @@ void SynthVoice::paramsIn0to1()
     
     defaultsIn0to1  = { pitchIn0to1, toneIn0to1, tensionIn0to1, inharmIn0to1, positionIn0to1, algoIn0to1, noiseLevelIn0to1, noiseFreqIn0to1, op1In0to1, op2In0to1, op3In0to1 };
 }
-
-
 
 void SynthVoice::setDefaults()
 {

@@ -17,13 +17,16 @@
         <FILE id="HUlKir" name="DSP.h" compile="0" resource="0" file="Source/DSP.h"/>
       </GROUP>
       <GROUP id="{D729282A-D6D8-00B0-6349-93397341DEE4}" name="Graphics">
-        <FILE id="NIDg8Q" name="DialGraphics.cpp" compile="1" resource="0"
-              file="Source/DialGraphics.cpp"/>
-        <FILE id="OWaAgJ" name="DialGraphics.h" compile="0" resource="0" file="Source/DialGraphics.h"/>
-        <FILE id="bsuilV" name="LookAndFeel.h" compile="0" resource="0" file="Source/LookAndFeel.h"/>
-        <FILE id="FHEwX5" name="MiscGraphics.cpp" compile="1" resource="0"
-              file="Source/MiscGraphics.cpp"/>
-        <FILE id="e1uiBr" name="MiscGraphics.h" compile="0" resource="0" file="Source/MiscGraphics.h"/>
+        <FILE id="NIDg8Q" name="DialLookAndFeel.cpp" compile="1" resource="0"
+              file="Source/DialLookAndFeel.cpp"/>
+        <FILE id="OWaAgJ" name="DialLookAndFeel.h" compile="0" resource="0"
+              file="Source/DialLookAndFeel.h"/>
+        <FILE id="bsuilV" name="ColorLookAndFeel.h" compile="0" resource="0"
+              file="Source/ColorLookAndFeel.h"/>
+        <FILE id="FHEwX5" name="MiscLookAndFeel.cpp" compile="1" resource="0"
+              file="Source/MiscLookAndFeel.cpp"/>
+        <FILE id="e1uiBr" name="MiscLookAndFeel.h" compile="0" resource="0"
+              file="Source/MiscLookAndFeel.h"/>
         <FILE id="eJwNwr" name="PatchBayGraphics.cpp" compile="1" resource="0"
               file="Source/PatchBayGraphics.cpp"/>
         <FILE id="u0qI4B" name="PatchBayGraphics.h" compile="0" resource="0"

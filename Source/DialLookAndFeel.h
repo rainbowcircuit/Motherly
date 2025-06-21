@@ -1,6 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-#include "LookAndFeel.h"
+#include "ColorLookAndFeel.h"
 class UserInterfaceGraphics : public juce::LookAndFeel_V4
 {
 public:
@@ -37,10 +37,10 @@ private:
     int graphicIndex = 0, stepIndex = 0;
     float lineWidth = 1.0f;
     
-    // colours
+    // colors
     juce::Colour iconWhiteColor;
     juce::Colour iconGradientColor;
-    juce::Colour iconBlackColor = juce::Colour(Colours::Main::backgroundFill);
-    juce::Colour iconLightGreyColour = juce::Colour(Colours::Main::iconLightGrey);
-    juce::Colour iconDarkGreyColour = juce::Colour(Colours::Main::iconDarkGrey);
+    juce::Colour iconBlackColor = juce::Colour(Colors::Main::backgroundFill);
+    juce::Colour iconLightGreyColour = juce::Colour(Colors::Main::iconLightGrey);
+    juce::Colour iconDarkGreyColour = juce::Colour(Colors::Main::iconDarkGrey);
 };

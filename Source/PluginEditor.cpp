@@ -29,7 +29,7 @@ MotherlyAudioProcessorEditor::~MotherlyAudioProcessorEditor() {}
 //==============================================================================
 void MotherlyAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    g.fillAll (Colours::Main::backgroundFillAlt);
+    g.fillAll (Colors::Main::backgroundFillAlt);
     
     juce::Path stepDot;
 

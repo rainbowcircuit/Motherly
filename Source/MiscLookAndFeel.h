@@ -1,6 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
-#include "LookAndFeel.h"
+#include "ColorLookAndFeel.h"
 
 class ButtonGraphics : public juce::LookAndFeel_V4
 {
@@ -38,7 +38,7 @@ public:
         bodyPath.lineTo(botLeft);
         bodyPath.closeSubPath();
         bodyPath = bodyPath.createPathWithRoundedCorners(1.0f);
-        g.setColour(Colours::Main::textColor);
+        g.setColour(Colors::Main::textColor);
         g.fillPath(bodyPath);
     }
 
@@ -73,7 +73,7 @@ public:
         }
 
         arrowPath = arrowPath.createPathWithRoundedCorners(1.0f);
-        g.setColour(Colours::Main::textColor);
+        g.setColour(Colors::Main::textColor);
         g.fillPath(arrowPath);
     }
     
@@ -87,7 +87,7 @@ public:
         graphicPath.startNewSubPath(x + size/2, y + size * 0.1f);
         graphicPath.lineTo(x + size/2, y + size * 0.4f);
 
-        juce::Colour lineColor = state ? Colours::Main::iconWhite : Colours::Main::iconDarkGrey;
+        juce::Colour lineColor = state ? Colors::Main::iconWhite : Colors::Main::iconDarkGrey;
         
         g.setColour(lineColor);
         juce::PathStrokeType strokeType(1.5f, juce::PathStrokeType::curved, juce::PathStrokeType::rounded);
@@ -116,9 +116,9 @@ public:
         juce::Path comboBoxPath, trianglePath, buttonPath;
         
         comboBoxPath.addRoundedRectangle(bounds, 5.0f);
-        g.setColour(Colours::Main::backgroundFill);
+        g.setColour(Colors::Main::backgroundFill);
         g.fillPath(comboBoxPath);
-        g.setColour(Colours::Main::backgroundFillAlt);
+        g.setColour(Colors::Main::backgroundFillAlt);
         g.strokePath(comboBoxPath, juce::PathStrokeType(2.0f));
         
         auto buttonBounds = juce::Rectangle<int>(buttonX, buttonY, buttonW, buttonH);
@@ -126,7 +126,7 @@ public:
         
         
         g.setFont(12.0f);
-        g.setColour(Colours::Main::textColor);
+        g.setColour(Colors::Main::textColor);
         g.drawText(comboBox.getText(), bounds, juce::Justification::centred, false);
     }
     
@@ -136,11 +136,11 @@ public:
         menuPath.addRectangle(area);
         
         juce::Colour menuColor;
-        menuColor = isHighlighted ? Colours::Main::backgroundFillAlt : Colours::Main::backgroundFill;
+        menuColor = isHighlighted ? Colors::Main::backgroundFillAlt : Colors::Main::backgroundFill;
         g.setColour(menuColor);
         g.fillPath(menuPath);
         
-        g.setColour(Colours::Main::textColor);
+        g.setColour(Colors::Main::textColor);
         g.setFont(12.0f);
         g.drawText(text, area, juce::Justification::centred, false);
     }
@@ -149,7 +149,7 @@ public:
     {
         juce::Path menuPath;
         menuPath.addRectangle(0, 0, width, height);
-        g.setColour(Colours::Main::backgroundFillAlt);
+        g.setColour(Colors::Main::backgroundFillAlt);
         g.fillPath(menuPath);
     }
     

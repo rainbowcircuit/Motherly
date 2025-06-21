@@ -1,7 +1,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
-#include "LookAndFeel.h"
+#include "ColorLookAndFeel.h"
 
 class PatchPoint : public juce::Component
 {

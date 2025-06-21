@@ -1,7 +1,7 @@
 #include <JuceHeader.h>
 #pragma once
 
-namespace Colours
+namespace Colors
 {
     namespace Main
     {
