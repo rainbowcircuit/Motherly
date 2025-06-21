@@ -21,7 +21,7 @@ void Operator::setOperatorInputs(float frequency, double inputPhase, float tone)
 {
     operatorPhase = frequency/sampleRate;
     this->inputPhase = inputPhase;
-    fmAmount = tone * 6.0f;
+    fmAmount = tone * 8.0f;
     softClipGain = tone * 1.5f + 1.0f;
 }
 

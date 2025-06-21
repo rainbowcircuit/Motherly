@@ -60,6 +60,7 @@ public:
     void setAlgorithm(int algorithmValue);
     void setAlgorithmGain(int algorithmIndex);
     int algorithmRawValue;
+    bool feedbackPatched = false;
 
     //==============================================================================
     

@@ -129,9 +129,9 @@ float SynthVoice::processSynthVoice(VoiceParams p)
     float tone = p.tone;
 
     op[2].setOperatorInputs2(pitch,
-                             operator0 * op2GainInterpolation[0].getNextValue(),
-                             operator1 * op2GainInterpolation[1].getNextValue(),
-                             operator2 * op2GainInterpolation[2].getNextValue(),
+                             vcaSignalRawValue * op2GainInterpolation[0].getNextValue(), // feedback
+                             0.0f,
+                             0.0f,
                              noise * op2GainInterpolation[3].getNextValue(),
                              tone);
     operator2 = op[2].processOperator() * p.envelope * p.op2Level;
@@ -157,7 +157,7 @@ float SynthVoice::processSynthVoice(VoiceParams p)
                     (operator2 * outGainInterpolation[2].getNextValue()) +
                     (noise * outGainInterpolation[3].getNextValue());
     
-    vcaSignalRawValue = output * 0.25f;
+    vcaSignalRawValue = output;
     return output;
 }
 
@@ -249,63 +249,64 @@ void SynthVoice::setAlgorithm(int algorithmValue)
 
 void SynthVoice::setAlgorithmGain(int algorithmIndex)
 {
+    float fb = feedbackPatched ? 1.0f : 0.0f;
     switch(algorithmIndex){
         case 0:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 1.0, 0.0};
             op0Gain = { 0.0, 1.0, 0.0, 0.0};
             outGain = { 1.0, 0.0, 0.0, 1.0};
             break;
         case 1:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 1.0, 0.0};
             op0Gain = { 0.0, 0.0, 0.0, 0.0};
             outGain = { 1.0, 1.0, 0.0, 1.0};
             break;
         case 2:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 0.0, 0.0};
             op0Gain = { 0.0, 1.0, 1.0, 0.0};
             outGain = { 1.0, 0.0, 0.0, 1.0};
             break;
         case 3:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 1.0, 0.0};
             op0Gain = { 0.0, 1.0, 0.0, 1.0};
             outGain = { 1.0, 0.0, 0.0, 0.0};
             break;
         case 4:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 1.0, 0.0};
             op0Gain = { 0.0, 0.0, 0.0, 1.0};
             outGain = { 1.0, 1.0, 0.0, 0.0};
             break;
         case 5:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 0.0, 0.0};
             op0Gain = { 0.0, 1.0, 1.0, 1.0};
             outGain = { 1.0, 0.0, 0.0, 0.0};
             break;
         case 6:
-            op2Gain = { 0.0, 0.0, 0.0, 0.0};
+            op2Gain = { fb, 0.0, 0.0, 0.0};
             op1Gain = { 0.0, 0.0, 1.0, 1.0};
             op0Gain = { 0.0, 1.0, 0.0, 0.0};
             outGain = { 1.0, 0.0, 0.0, 0.0};
             break;
         case 7:
-            op2Gain = { 0.0, 0.0, 0.0, 3.0};
+            op2Gain = { fb, 0.0, 0.0, 3.0};
             op1Gain = { 0.0, 0.0, 0.0, 0.0};
             op0Gain = { 0.0, 0.0, 1.0, 0.0};
             outGain = { 0.75, 0.75, 0.0, 0.0};
             break;
         case 8:
-            op2Gain = { 0.0, 0.0, 0.0, 3.0};
+            op2Gain = { fb, 0.0, 0.0, 3.0};
             op1Gain = { 0.0, 0.0, 0.0, 0.0};
             op0Gain = { 0.0, 1.0, 1.0, 0.0};
             outGain = { 1.0, 0.0, 0.0, 0.0};
             break;
         case 9:
-            op2Gain = { 0.0, 0.0, 0.0, 3.0};
+            op2Gain = { fb, 0.0, 0.0, 3.0};
             op1Gain = { 0.0, 0.0, 1.0, 0.0};
             op0Gain = { 0.0, 1.0, 0.0, 0.0};
             outGain = { 1.0, 0.0, 0.0, 0.0};
@@ -339,6 +340,7 @@ void SynthVoice::paramsIn0to1()
     float inharmIn0to1 = Utility::scale(inharmonicityRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
     float positionIn0to1 = Utility::scale(positionRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
     float algoIn0to1 = algorithmRawValue/9.0f; // bipolar
+    feedbackPatched = false;
     float noiseLevelIn0to1 = noiseLevelRawValue/100.0f; // unipolar
     float noiseFreqIn0to1 = Utility::scale(noiseFreqRawValue, 0.0f, 100.0f, -1.0f, 1.0f);
     float op1In0to1 = op0LevelRawValue/100.0f; // unipolar
@@ -365,8 +367,14 @@ void SynthVoice::overrideDefaults(int outputIndex, int inputIndex, bool outputIn
         float inversion = outputInvertIndex ? -1.0f : 1.0f;
         inputsIn0to1[inputIndex - 1] = defaultsIn0to1[inputIndex - 1] + outputsIn0to1[outputIndex] * inversion;
     }
+    
     if (outputIndex == 2 && outputInvertIndex){
         inputsIn0to1[inputIndex - 1] = defaultsIn0to1[inputIndex - 1] + (1.0f - outputsIn0to1[outputIndex]);
+    }
+    
+    if (outputIndex == 6 && inputIndex == 1){
+        inputsIn0to1[inputIndex - 1] = defaultsIn0to1[inputIndex - 1];
+        feedbackPatched = true;
     }
 }
 

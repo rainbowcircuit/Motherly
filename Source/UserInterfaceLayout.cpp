@@ -287,9 +287,10 @@ void DrumMainInterface::paint(juce::Graphics& g)
 void DrumMainInterface::outputSliderDisplay(){
     outputSlider.textFromValueFunction = [](double value)
     {
-        juce::String display = juce::String(value);
-        if (value <= -72.0f) { display = "-inf"; }
-        return juce::String(display);
+        if (value <= -72.0)
+            return juce::String("-inf");
+
+        return juce::String(value, 1);
     };
 }
 
