@@ -25,7 +25,6 @@ void UserInterfaceGraphics::drawRotarySlider(juce::Graphics& g, int x, int y, in
     
     //==============================================================================
     // Hover Color
-    slider.setMouseCursor(juce::MouseCursor::DraggingHandCursor);
     bool hover = slider.isMouseOver();
     iconGradientColor = hover ? juce::Colour(Colors::Gradient::gradientHover[stepIndex]) : juce::Colour(Colors::Gradient::gradient[stepIndex]);
     iconWhiteColor = hover ? juce::Colour(Colors::Main::iconWhiteHover) : juce::Colour(Colors::Main::iconWhite);

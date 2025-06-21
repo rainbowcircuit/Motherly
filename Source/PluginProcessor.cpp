@@ -331,7 +331,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "outputGain", 1},
                                                             "Output Gain",
-                                                            juce::NormalisableRange<float> { -72.0f, 6.0f, 0.1f },
+                                                            juce::NormalisableRange<float> { -72.0f, 6.0f, 0.1f, 1.0f },
                                                             -6.0f));
     
     layout.add(std::make_unique<juce::AudioParameterBool>(juce::ParameterID { "active", 1 }, "Active", true));
