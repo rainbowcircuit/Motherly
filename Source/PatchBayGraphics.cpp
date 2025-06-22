@@ -429,6 +429,7 @@ void PatchBay::mouseUp(const juce::MouseEvent &m)
         DBG("Released mouse not over patch point; clearing active cable.");
         disconnectCable(*activeCableIndex, true); // optional fallback disconnect
     }
+    triggerAsyncUpdate();
 }
 
 void PatchBay::mouseDrag(const juce::MouseEvent &mousePosition)
