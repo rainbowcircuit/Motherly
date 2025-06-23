@@ -207,7 +207,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     }
     
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-    demoMode.processDemoMode(buffer);
+    //demoMode.processDemoMode(buffer);
     midiMessages.clear();
 }
 
@@ -225,7 +225,7 @@ juce::AudioProcessorEditor* MotherlyAudioProcessor::createEditor()
 //==============================================================================
 void MotherlyAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-   //   copyXmlToBinary(*apvts.copyState().createXml(), destData);
+      copyXmlToBinary(*apvts.copyState().createXml(), destData);
 }
 
 void MotherlyAudioProcessor::setStateInformation (const void* data, int sizeInBytes)

@@ -92,8 +92,8 @@ SynthVoice::VoiceParams SynthVoice::processParametersPerBlock(float numSamples)
 {
     VoiceParams params { };
 
-    params.inharm = Utility::scale(inharmSmooth.skip(numSamples), -1.0f, 1.0f, 0.5f, 3.0f);
-    params.position = Utility::scale(positionSmooth.skip(numSamples), -1.0f, 1.0f, 0.0f, 5.0f);
+    params.inharm = Utility::scale(inharmSmooth.skip(numSamples/2), -1.0f, 1.0f, 0.5f, 3.0f);
+    params.position = Utility::scale(positionSmooth.skip(numSamples/2), -1.0f, 1.0f, 0.0f, 5.0f);
     
     // algorithm
     float algoScaled = algoIn0to1 * 9.0f;
