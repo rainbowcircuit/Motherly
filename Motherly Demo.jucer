@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="A0HWTL" name="Motherly Demo" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              companyName="Rainbow Circuit" companyWebsite="www.rainbowcircuit.co"
+              companyEmail="hey@rainbowcircuit.co" pluginFormats="buildAU">
+  <MAINGROUP id="zmfijh" name="Motherly Demo">
+    <GROUP id="{CF90F07D-8415-00FB-BC46-051533EE2EB3}" name="Source">
+      <FILE id="i4o1Dr" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="bVyL8J" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="nBiDuH" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="bPxu9Q" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+    </GROUP>
+    <FILE id="u0ZrO6" name="ColorLookAndFeel.h" compile="0" resource="0"
+          file="Source/ColorLookAndFeel.h"/>
+    <FILE id="BFVToe" name="DialLookAndFeel.cpp" compile="1" resource="0"
+          file="Source/DialLookAndFeel.cpp"/>
+    <FILE id="E53dmy" name="DialLookAndFeel.h" compile="0" resource="0"
+          file="Source/DialLookAndFeel.h"/>
+    <FILE id="LZFbXP" name="DSP.cpp" compile="1" resource="0" file="Source/DSP.cpp"/>
+    <FILE id="u1aFB5" name="DSP.h" compile="0" resource="0" file="Source/DSP.h"/>
+    <FILE id="u75U9D" name="FMOperator.cpp" compile="1" resource="0" file="Source/FMOperator.cpp"/>
+    <FILE id="OWwIJk" name="FMOperator.h" compile="0" resource="0" file="Source/FMOperator.h"/>
+    <FILE id="HjAUUW" name="MiscLookAndFeel.cpp" compile="1" resource="0"
+          file="Source/MiscLookAndFeel.cpp"/>
+    <FILE id="uuTZPC" name="MiscLookAndFeel.h" compile="0" resource="0"
+          file="Source/MiscLookAndFeel.h"/>
+    <FILE id="s2LW58" name="PatchBayGraphics.cpp" compile="1" resource="0"
+          file="Source/PatchBayGraphics.cpp"/>
+    <FILE id="WJIHnm" name="PatchBayGraphics.h" compile="0" resource="0"
+          file="Source/PatchBayGraphics.h"/>
+    <FILE id="SVPPeU" name="PresetManager.cpp" compile="1" resource="0"
+          file="Source/PresetManager.cpp"/>
+    <FILE id="hAlJb9" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
+    <FILE id="vqW9hZ" name="StepSequencer.cpp" compile="1" resource="0"
+          file="Source/StepSequencer.cpp"/>
+    <FILE id="cfj9pi" name="StepSequencer.h" compile="0" resource="0" file="Source/StepSequencer.h"/>
+    <FILE id="aQ17qN" name="UserInterfaceLayout.cpp" compile="1" resource="0"
+          file="Source/UserInterfaceLayout.cpp"/>
+    <FILE id="bgXM3X" name="UserInterfaceLayout.h" compile="0" resource="0"
+          file="Source/UserInterfaceLayout.h"/>
+    <FILE id="CxQbPO" name="Utility.h" compile="0" resource="0" file="Source/Utility.h"/>
+    <FILE id="ufiqnm" name="VoiceProcessor.cpp" compile="1" resource="0"
+          file="Source/VoiceProcessor.cpp"/>
+    <FILE id="sYdzPR" name="VoiceProcessor.h" compile="0" resource="0"
+          file="Source/VoiceProcessor.h"/>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"/>
+  <EXPORTFORMATS>
+    <VS2022 targetFolder="Builds/VisualStudio2022">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Motherly Demo"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Motherly Demo"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2022>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="Motherly Demo" customXcodeFlags="PRODUCT_BUNDLE_IDENTIFIER=com.RainbowCircuit.MotherlyDemo&#10;"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="Motherly Demo" customXcodeFlags="PRODUCT_BUNDLE_IDENTIFIER=com.RainbowCircuit.MotherlyDemo&#10;"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+  </EXPORTFORMATS>
+</JUCERPROJECT>

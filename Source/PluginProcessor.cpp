@@ -1,3 +1,4 @@
+
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -91,7 +92,7 @@ void MotherlyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
             voice->prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
         }
     }
-//    demoMode.prepareToPlay(sampleRate);
+    demoMode.prepareToPlay(sampleRate);
 }
 
 void MotherlyAudioProcessor::releaseResources()
@@ -159,10 +160,10 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     float noiseFreq = apvts.getRawParameterValue("noiseFreq")->load();
     float output = apvts.getRawParameterValue("outputGain")->load();
     bool active = apvts.getRawParameterValue("active")->load();
-
+    
     // patch bay parameters
     std::array<juce::String, 9> pbParamID = { "Pitch", "Tone", "EG", "Repeat", "Step", "Rand", "VCA", "Noise", "MWheel" };
-
+    
     if (auto voice = dynamic_cast<SynthVoice*>(synth.getVoice(0)))
     {
         for (int step = 0; step < 8; step++){
@@ -170,7 +171,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
             juce::String toneParamID = "tone" + juce::String(step);
             juce::String modParamID = "mod" + juce::String(step);
             juce::String probParamID = "repeat" + juce::String(step);
-
+            
             float pitch = apvts.getRawParameterValue(freqParamID)->load();
             float tone = apvts.getRawParameterValue(toneParamID)->load();
             float mod = apvts.getRawParameterValue(modParamID)->load();
@@ -202,11 +203,11 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
         // get step index;
         int stepIndex = voice->getStepIndex();
         stepIndexAtomic.store(stepIndex);
-
+        
     }
     
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-//    demoMode.processDemoMode(buffer);
+    demoMode.processDemoMode(buffer);
     midiMessages.clear();
 }
 
@@ -224,7 +225,7 @@ juce::AudioProcessorEditor* MotherlyAudioProcessor::createEditor()
 //==============================================================================
 void MotherlyAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    copyXmlToBinary(*apvts.copyState().createXml(), destData);
+   //   copyXmlToBinary(*apvts.copyState().createXml(), destData);
 }
 
 void MotherlyAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -257,7 +258,7 @@ MotherlyAudioProcessor::createParameterLayout()
 
         layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { freqParamID, 1},
                                                                freqParamName,
-                                                                juce::NormalisableRange<float> { 30.0f, 1200.0f, 0.1f, 0.5f },
+                                                                juce::NormalisableRange<float> { 20.0f, 1000.0f, 0.1f, 0.5f },
                                                                 220.0f));
 
         juce::String toneParamID = "tone" + juce::String(step);
@@ -320,7 +321,7 @@ MotherlyAudioProcessor::createParameterLayout()
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseLevel", 1},
                                                             "Noise Level",
                                                             juce::NormalisableRange<float> { 0.0f, 100.0f, 0.1f },
-                                                            25.0f, "%"));
+                                                            0.0f, "%"));
     
     layout.add(std::make_unique<juce::AudioParameterFloat>(juce::ParameterID { "noiseFreq", 1},
                                                             "Noise Frequency",
