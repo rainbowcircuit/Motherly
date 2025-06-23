@@ -1,20 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
 
-class CombFilter
-{
-public:
-    void prepareToPlay(double sampleRate, uint32_t maximumBlockSize, uint32_t numChannels);
-    void setDelayTime(float delayTime);
-    float processComb(float input);
-    
-private:
-    juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> combDelay;
-    float delayTime = 48000.0f;
-    juce::SmoothedValue<float> delayTimeSmooth;
-    double sampleRate = 0.0;
-};
-
 class Metro
 {
 public:

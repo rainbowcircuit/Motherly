@@ -1,36 +1,5 @@
 #include "DSP.h"
 
-void CombFilter::prepareToPlay(double sampleRate, uint32_t maximumBlockSize, uint32_t numChannels)
-{
-    this->sampleRate = sampleRate;
-
-    juce::dsp::ProcessSpec spec;
-    spec.sampleRate = sampleRate;
-    spec.maximumBlockSize = maximumBlockSize;
-    spec.numChannels = numChannels;
-
-    combDelay.prepare(spec);
-    combDelay.setMaximumDelayInSamples((int)std::ceil(sampleRate));
-    combDelay.setDelay(30.0f);
-    
-    delayTimeSmooth.reset(sampleRate, 0.01);
-}
-
-void CombFilter::setDelayTime(float delayTime)
-{
-    float delayTimeInSamples = delayTime/1000.0f * sampleRate;
-    delayTimeSmooth.setTargetValue(delayTimeInSamples);
-    combDelay.setDelay(delayTimeSmooth.getNextValue());
-}
-
-float CombFilter::processComb(float input)
-{
-    combDelay.pushSample(0, input);
-
-    float delayedSample = combDelay.popSample(0);
-    return input + delayedSample;
-}
-
 void Metro::setSampleRate(double sampleRate)
 {
     this->sampleRate = sampleRate;

@@ -17,18 +17,19 @@ void Operator::resetAngle()
     operatorAngle = 0.0;
 }
 
-void Operator::setOperatorInputs(float frequency, double inputPhase, float tone)
+void Operator::setOperatorInputs(float frequency, double inPhase1, double inPhase2, double inPhase3, double inPhase4, float tone, float bias)
 {
     operatorPhase = frequency/sampleRate;
-    this->inputPhase = inputPhase;
-    fmAmount = tone * 8.0f;
+    inputPhase = inPhase1 + inPhase2 + inPhase3 + inPhase4;
+    fmAmount = tone * 6.0f;
     softClipGain = tone * 1.5f + 1.0f;
+    softClipBias = 1.0f - bias;
 }
 
 float Operator::processOperator()
 {
     float modulator = inputPhase * fmAmount;
-    modulator = std::tanh(modulator * softClipGain);
+    modulator = std::tanh(modulator * softClipGain + softClipBias);
     float phase = operatorAngle * juce::MathConstants<float>::twoPi + modulator;
     float outputWaveform = std::sin(phase);
     

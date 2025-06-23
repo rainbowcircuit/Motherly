@@ -16,8 +16,7 @@ void SynthVoice::prepareToPlay(double sampleRate, int samplesPerBlock, int numCh
     
     ns.prepareToPlay(sampleRate);
     ampEnvelope.setSampleRate(sampleRate);
-    combFilter.prepareToPlay(sampleRate, samplesPerBlock, numChannels);
-    
+
     // smoothening
     pitchSmooth.reset(sampleRate, 0.02f);
     toneSmooth.reset(sampleRate, 0.02f);
@@ -93,9 +92,8 @@ SynthVoice::VoiceParams SynthVoice::processParametersPerBlock(float numSamples)
 {
     VoiceParams params { };
 
-    params.inharm = Utility::scale(inharmSmooth.skip(numSamples/2), -1.0f, 1.0f, 0.5f, 3.0f);
-    float positionFrom0to1 = Utility::scale(positionSmooth.skip(numSamples/2), -1.0f, 1.0f, 5.0f, 35.0f);
-    combFilter.setDelayTime(positionFrom0to1);
+    params.inharm = Utility::scale(inharmSmooth.skip(numSamples), -1.0f, 1.0f, 0.5f, 3.0f);
+    params.position = Utility::scale(positionSmooth.skip(numSamples), -1.0f, 1.0f, 0.0f, 5.0f);
     
     // algorithm
     float algoScaled = algoIn0to1 * 9.0f;
@@ -110,8 +108,10 @@ void SynthVoice::processParametersPerSample(SynthVoice::VoiceParams &params)
     params.pitch = Utility::scale(pitchSmooth.getNextValue(), -1.0f, 1.0f, 30.0f, 1200.0f);
     params.tone =  Utility::scale(toneSmooth.getNextValue(), -1.0f, 1.0f, 0.0f, 1.0f);
 
+
     float noiseFreqFrom0to1 = Utility::scale(noiseFreqSmooth.getNextValue(), -1.0f, 1.0f, 100.0f, 7900.0f);
     ns.setFilter(noiseFreqFrom0to1, 3.0f);
+    
     
     params.op0Level = op0LevelSmooth.getNextValue();
     params.op1Level = op1LevelSmooth.getNextValue();
@@ -127,31 +127,33 @@ float SynthVoice::processSynthVoice(VoiceParams p)
 
     float pitch = p.pitch * p.modEnvelope;
     float tone = p.tone;
+    float position = p.position;
 
-    op[2].setOperatorInputs2(pitch,
+    op[2].setOperatorInputs(pitch,
                              vcaSignalRawValue * op2GainInterpolation[0].getNextValue(), // feedback
                              0.0f,
                              0.0f,
                              noise * op2GainInterpolation[3].getNextValue(),
-                             tone);
+                             tone, position);
     operator2 = op[2].processOperator() * p.envelope * p.op2Level;
     
-    op[1].setOperatorInputs2(pitch * p.inharm,
+    op[1].setOperatorInputs(pitch * p.inharm,
                              operator0 * op1GainInterpolation[0].getNextValue(),
                              operator1 * op1GainInterpolation[1].getNextValue(),
                              operator2 * op1GainInterpolation[2].getNextValue(),
                              noise * op1GainInterpolation[3].getNextValue(),
-                             tone);
+                             tone, position);
     operator1 = op[1].processOperator() * p.envelope * p.op1Level;
-    
-    op[0].setOperatorInputs2(pitch,
+
+    op[0].setOperatorInputs(pitch,
                              operator0 * op0GainInterpolation[0].getNextValue(),
                              operator1 * op0GainInterpolation[1].getNextValue(),
                              operator2 * op0GainInterpolation[2].getNextValue(),
                              noise * op0GainInterpolation[3].getNextValue(),
-                             tone);
-    operator0 = op[0].processOperator() * p.envelope * p.op0Level;
-
+                             tone, 0.0f);
+    
+    float operator0 = op[0].processOperator() * p.envelope * p.op0Level;
+    
     float output = (operator0 * outGainInterpolation[0].getNextValue()) +
                     (operator1 * outGainInterpolation[1].getNextValue()) +
                     (operator2 * outGainInterpolation[2].getNextValue()) +

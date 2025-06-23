@@ -18,7 +18,7 @@ public:
     
     struct VoiceParams
     {
-        float envelope, modEnvelope, pitch, tone, inharm;
+        float envelope, modEnvelope, pitch, tone, inharm, position;
         int algorithm;
         float op0Level, op1Level, op2Level, noiseLevel;
     };
@@ -78,11 +78,11 @@ private:
     // DSP Objects
     std::array<Operator, 3> op;
     NoiseGenerator ns;
+    juce::dsp::DelayLine<float, juce::dsp::DelayLineInterpolationTypes::Linear> combDelay;
     StepSequencer seq;
     juce::Random rand;
 
     LowPassGate ampEnvelope;
-    CombFilter combFilter;
     
     // Parameters
     std::array<float, 9> outputsIn0to1;
@@ -115,6 +115,7 @@ private:
     tensionIn0to1,
     inharmIn0to1,
     positionIn0to1,
+    lastPositionFrom0to1,
     algoIn0to1,
     operLevelIn0to1,
     noiseLevelIn0to1,
