@@ -91,7 +91,7 @@ void MotherlyAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
             voice->prepareToPlay(sampleRate, samplesPerBlock, getTotalNumOutputChannels());
         }
     }
-    demoMode.prepareToPlay(sampleRate);
+//    demoMode.prepareToPlay(sampleRate);
 }
 
 void MotherlyAudioProcessor::releaseResources()
@@ -206,7 +206,7 @@ void MotherlyAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juc
     }
     
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-    demoMode.processDemoMode(buffer);
+//    demoMode.processDemoMode(buffer);
     midiMessages.clear();
 }
 
