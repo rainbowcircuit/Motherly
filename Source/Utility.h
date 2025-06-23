@@ -1,4 +1,5 @@
 #pragma once
+#include <JuceHeader.h>
 
 namespace Utility {
     static inline float scale (float input, float inputMin, float inputMax, float outputMin, float outputMax) {
@@ -52,4 +53,35 @@ namespace Utility {
     }
 }
 
+class DemoMode
+{
+public:
+    // use this at the processblock for demo mode.
+    void prepareToPlay(double sampleRate)
+    {
+        increment = 1.0f/(sampleRate * 60);
+        phase = 0.0f;
+    }
 
+    void processDemoMode(juce::AudioBuffer<float> &buffer)
+    {
+        for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
+        {
+            auto* channelData = buffer.getWritePointer(channel);
+            for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
+            {
+                phase += increment;
+                if (phase >= 1.0f) { phase = 0.0f; }
+
+                if (phase >= 0.8f) {
+                    channelData[sample] = rand.nextFloat() * 0.03125;
+                } else {
+                    channelData[sample] = channelData[sample];
+                }
+            }
+        }
+    }
+    
+    float increment, phase;
+    juce::Random rand;
+};

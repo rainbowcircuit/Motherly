@@ -58,7 +58,7 @@ private:
     std::atomic<int> stepIndexAtomic;
     std::atomic<float> amplitudeAtomic;
     juce::Synthesiser synth;
-
+    DemoMode demoMode;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MotherlyAudioProcessor)
 };
